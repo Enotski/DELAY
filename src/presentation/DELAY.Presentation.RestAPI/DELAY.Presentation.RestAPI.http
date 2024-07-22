@@ -1,0 +1,6 @@
+@DELAY.Presentation.RestAPI_HostAddress = http://localhost:5139
+
+GET {{DELAY.Presentation.RestAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

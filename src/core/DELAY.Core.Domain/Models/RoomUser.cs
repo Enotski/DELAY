@@ -3,7 +3,7 @@ using DELAY.Core.Domain.Interfaces;
 
 namespace DELAY.Core.Domain.Models
 {
-    public class RoomUser: IKey
+    public class RoomUser : IKey
     {
         public Guid Id { get; set; }
         public Room Room { get; set; }

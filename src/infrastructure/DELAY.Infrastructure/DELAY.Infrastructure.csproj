@@ -9,11 +9,23 @@
   <ItemGroup>
     <Folder Include="Mapper\" />
     <Folder Include="Persistence\Context\" />
-    <Folder Include="Persistence\Repositories\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\src\core\DELAY.Core.Domain\DELAY.Core.Domain.csproj" />
+	<ItemGroup>
+		<PackageReference Include="Mapster" Version="7.4.0" />
+		<PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.25" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.22" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <ProjectReference Include="..\..\core\DELAY.Core.Application\DELAY.Core.Application.csproj" />
+    <ProjectReference Include="..\..\core\DELAY.Core.Domain\DELAY.Core.Domain.csproj" />
   </ItemGroup>
+
 
 </Project>

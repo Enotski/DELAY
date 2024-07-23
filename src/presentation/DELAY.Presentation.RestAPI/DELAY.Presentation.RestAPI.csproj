@@ -10,4 +10,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\DELAY.Core.Application\DELAY.Core.Application.csproj" />
+    <ProjectReference Include="..\..\core\DELAY.Core.Domain\DELAY.Core.Domain.csproj" />
+    <ProjectReference Include="..\..\infrastructure\DELAY.Infrastructure\DELAY.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

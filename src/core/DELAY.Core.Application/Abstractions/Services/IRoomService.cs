@@ -17,5 +17,12 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <param name="room">Room updated model</param>
         /// <returns></returns>
         Task UpdateAsync(Room room);
+
+        /// <summary>
+        /// Get boards assigned to user
+        /// </summary>
+        /// <param name="userId">User id</param>
+        /// <returns></returns>
+        Task<IReadOnlyList<Room>> GetTicketsAssignedToUser(Guid userId);
     }
 }

@@ -3,7 +3,7 @@ using DELAY.Infrastructure.Persistence.Repositories.Base;
 
 namespace DELAY.Infrastructure.Persistence.Repositories
 {
-    internal class TicketListRepository : BaseRepository, ITicketListStorage
+    internal class TicketListRepository : BaseRepository, ITicketsListStorage
     {
     }
 }

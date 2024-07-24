@@ -1,4 +1,4 @@
-﻿using DELAY.Core.Application.Contracts;
+﻿using DELAY.Core.Application.Contracts.Models.Request;
 using DELAY.Core.Domain.Interfaces;
 using DELAY.Core.Domain.Models.Base;
 
@@ -58,14 +58,14 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         /// <param name="options">Search options</param>
         /// <returns></returns>
-        Task<IReadOnlyList<T>> GetRecordsAsync(SearchOptionsDto options);
+        Task<IReadOnlyList<T>> GetRecordsAsync(SearchOptionsDto options, PaginationOptionsDto pagination);
 
         /// <summary>
         /// Get key-name by search options
         /// </summary>
         /// <param name="options">Search options</param>
         /// <returns></returns>
-        Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(SearchOptionsDto options);
+        Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(SearchOptionsDto options, PaginationOptionsDto pagination);
 
         /// <summary>
         /// Get records by pagination options

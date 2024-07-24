@@ -1,5 +1,8 @@
-﻿namespace DELAY.Core.Application.Contracts
+﻿namespace DELAY.Core.Application.Contracts.Models.Request
 {
+    /// <summary>
+    /// Pagination options for records select
+    /// </summary>
     public sealed class PaginationOptionsDto
     {
         public int? Skip { get; set; }

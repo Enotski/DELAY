@@ -1,8 +1,9 @@
-﻿namespace DELAY.Core.Domain.Models
+﻿using DELAY.Core.Domain.Models.Base;
+
+namespace DELAY.Core.Domain.Models
 {
-    public class TicketUser
+    public class TicketUser : KeyModel
     {
-        public Guid Id { get; set; }
         public Ticket Ticket { get; set; }
         public User User { get; set; }
     }

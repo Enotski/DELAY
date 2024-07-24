@@ -1,9 +1,8 @@
-﻿using DELAY.Core.Domain.Interfaces;
+﻿using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Domain.Models
 {
-    public class TicketsList : IName
+    public class TicketsList : KeyNamedModel
     {
-        public string Name { get; set; }
     }
 }

@@ -1,10 +1,8 @@
-﻿namespace DELAY.Core.Application.Contracts
+﻿namespace DELAY.Core.Application.Contracts.Models.Request
 {
     public class SearchOptionsDto
     {
         public string Term { get; set; }
-
-        public PaginationOptionsDto PaginatedOption { get; set; }
 
         public SearchOptionsDto() { }
     }

@@ -5,10 +5,10 @@ using DELAY.Core.Domain.Models;
 
 namespace DELAY.Core.Application.Abstractions.Storages
 {
-    public interface ITicketStorage : INamedStorage<Ticket>
+    public interface ITicketsListStorage : INamedStorage<TicketsList>
     {
         Task<int> CountAsync(IEnumerable<SearchOptionsDto> options, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyList<TicketDto>> GetRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, IEnumerable<SortOptionsDto> sortOptions, PaginationOptionsDto paginationOption, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<TicketsListDto>> GetRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, IEnumerable<SortOptionsDto> sortOptions, PaginationOptionsDto paginationOption, CancellationToken cancellationToken = default);
     }
 }

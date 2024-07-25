@@ -2,7 +2,7 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Base
 {
-    public class KeyNameDto : BaseDto, IName
+    public class KeyNameDto : KeyDto, IName
     {
         public KeyNameDto() : base()
         { }

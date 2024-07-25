@@ -4,7 +4,7 @@ using DELAY.Core.Domain.Models;
 
 namespace DELAY.Core.Application.Abstractions.Storages
 {
-    public interface ITicketUserStorage : IBaseStorage<TicketUser>
+    public interface ITicketUserStorage : IBaseStorage<TicketUserDto>
     {
         Task<int> CountRecordsByUserAsync(Guid userId, CancellationToken cancellationToken = default);
 

@@ -8,7 +8,7 @@ namespace DELAY.Infrastructure
     public static class DependencyInjection
     {
 
-        public static IServiceCollection AddApplication(this IServiceCollection services, ConfigurationManager config)
+        public static IServiceCollection AddInfrasturcture(this IServiceCollection services, ConfigurationManager config)
         {
             services.AddPersistence(config);
 
@@ -18,10 +18,10 @@ namespace DELAY.Infrastructure
         public static IServiceCollection AddPersistence(this IServiceCollection services, ConfigurationManager config)
         {
             var dbServerType = config["DbServerType"];
-            var connectionString = config.GetConnectionString("DbConnection");
-
+            string connectionString;
             if (!string.IsNullOrEmpty(dbServerType) && dbServerType.ToUpper() == "POSTGRES")
             {
+                connectionString = config.GetConnectionString("PgConnection");
                 services.AddDbContext<DelayContext>(c => c.UseNpgsql(connectionString, serverOptions => serverOptions.CommandTimeout(120)));
             }
 

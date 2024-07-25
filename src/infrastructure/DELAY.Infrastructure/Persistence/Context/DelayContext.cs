@@ -1,4 +1,5 @@
-﻿using DELAY.Infrastructure.Persistence.Entities.Base;
+﻿using DELAY.Infrastructure.Persistence.Context.Configuration;
+using DELAY.Infrastructure.Persistence.Entities.Base;
 using Microsoft.EntityFrameworkCore;
 
 namespace DELAY.Infrastructure.Persistence.Context
@@ -36,7 +37,7 @@ namespace DELAY.Infrastructure.Persistence.Context
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.ApplyConfigurationsFromAssembly(typeof(PaoeContext).Assembly);
+            builder.ApplyConfigurationsFromAssembly(typeof(DelayContext).Assembly);
 
             builder.Seed();
 

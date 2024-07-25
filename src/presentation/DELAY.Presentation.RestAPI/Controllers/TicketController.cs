@@ -1,6 +1,10 @@
-﻿namespace DELAY.Core.Application.Abstractions.Services
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace DELAY.Core.Application.Abstractions.Services
 {
-    public class TicketController
+    [ApiController]
+    [Route("tickets")]
+    public class TicketController : ControllerBase
     {
     }
 }

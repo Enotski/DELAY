@@ -1,8 +1,9 @@
-﻿namespace DELAY.Core.Application.Contracts.Models
+﻿using DELAY.Core.Application.Contracts.Models.Base;
+
+namespace DELAY.Core.Application.Contracts.Models
 {
-    public class TicketUserDto
+    public class TicketUserDto : KeyDto
     {
-        public Guid Id { get; set; }
         public TicketDto Ticket { get; set; }
         public UserDto User { get; set; }
     }

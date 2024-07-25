@@ -1,6 +1,10 @@
-﻿namespace DELAY.Core.Application.Abstractions.Services
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace DELAY.Core.Application.Abstractions.Services
 {
-    public class BoardController
+    [ApiController]
+    [Route("boards")]
+    public class BoardController : ControllerBase
     {
     }
 }

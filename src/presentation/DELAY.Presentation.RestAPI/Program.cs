@@ -31,8 +31,8 @@ namespace DELAY.Presentation.RestAPI
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

@@ -1,11 +1,12 @@
-﻿using DELAY.Core.Domain.Models.Base;
+﻿using DELAY.Core.Domain.Interfaces;
+using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Domain.Models
 {
     /// <summary>
     /// Task in tracker
     /// </summary>
-    public class Ticket : KeyNamedModel
+    public class Ticket : KeyNamedModel, IDescriptioin
     {
         public Ticket(string name, string description, User changedBy, IEnumerable<User> assignedUsers) : base(name)
         {

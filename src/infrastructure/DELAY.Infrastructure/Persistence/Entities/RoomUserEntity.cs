@@ -3,9 +3,8 @@ using DELAY.Core.Domain.Interfaces;
 
 namespace DELAY.Infrastructure.Persistence.Entities.Base
 {
-    public class RoomUserEntity : IKey
+    public class RoomUserEntity : KeyModelEntity, IKey
     {
-        public Guid Id { get; set; }
         public Guid RoomId { get; set; }
         public RoomEntity Room { get; set; }
         public Guid UserId { get; set; }

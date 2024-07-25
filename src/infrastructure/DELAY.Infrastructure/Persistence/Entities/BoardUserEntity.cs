@@ -2,9 +2,8 @@
 
 namespace DELAY.Infrastructure.Persistence.Entities.Base
 {
-    public class BoardUserEntity
+    public class BoardUserEntity : KeyModelEntity
     {
-        public Guid Id { get; set; }
         public Guid BoardId { get; set; }
         public BoardEntity Board { get; set; }
         public Guid UserId { get; set; }

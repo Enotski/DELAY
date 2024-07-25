@@ -1,8 +1,7 @@
 ﻿namespace DELAY.Infrastructure.Persistence.Entities.Base
 {
-    public class TicketUserEntity
+    public class TicketUserEntity: KeyModelEntity
     {
-        public Guid Id { get; set; }
         public Guid TicketId { get; set; }
         public TicketEntity Ticket { get; set; }
         public Guid UserId { get; set; }

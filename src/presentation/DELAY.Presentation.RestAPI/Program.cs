@@ -1,3 +1,5 @@
+using DELAY.Core.Application;
+using DELAY.Infrastructure;
 
 namespace DELAY.Presentation.RestAPI
 {
@@ -6,6 +8,10 @@ namespace DELAY.Presentation.RestAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services
+                .AddApplication()
+                .AddInfrasturcture(builder.Configuration);
 
             // Add services to the container.
 

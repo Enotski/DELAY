@@ -35,11 +35,11 @@ namespace DELAY.Core.Domain.Models
 
         public void Update(string name, string description, IEnumerable<User> assignedUsers, User changedBy)
         {
-            Name = name;
             Description = description;
             ChangedDate = DateTime.UtcNow;
             ChangedBy = changedBy;
             AssignedUsers = assignedUsers;
+            this.Update(name);
         }
     }
 }

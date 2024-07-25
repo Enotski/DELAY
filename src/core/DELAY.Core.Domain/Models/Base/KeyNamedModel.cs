@@ -2,14 +2,14 @@
 
 namespace DELAY.Core.Domain.Models.Base
 {
-    public class KeyNamedModel : KeyModel, IName
+    public abstract class KeyNamedModel : KeyModel, IName
     {
-        public KeyNamedModel(Guid id, string name) : base(id)
+        protected KeyNamedModel(Guid id, string name) : base(id)
         {
             Name = name;
         }
 
-        public KeyNamedModel(string name) : base()
+        protected KeyNamedModel(string name) : base()
         {
             Name = name;
         }
@@ -25,5 +25,10 @@ namespace DELAY.Core.Domain.Models.Base
             }
         }
         private string name;
+
+        public void Update(string name)
+        {
+            Name = name;
+        }
     }
 }

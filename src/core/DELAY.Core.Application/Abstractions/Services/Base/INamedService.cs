@@ -1,6 +1,6 @@
-﻿using DELAY.Core.Application.Contracts.Models.Request;
+﻿using DELAY.Core.Application.Contracts.Models.Base;
+using DELAY.Core.Application.Contracts.Models.Request;
 using DELAY.Core.Domain.Interfaces;
-using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {
@@ -15,7 +15,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <param name="id">Key</param>
         /// <param name="triggeredBy">What invoke operation</param>
         /// <returns></returns>
-        Task<int> DeleteAsync(Guid id, string triggeredBy);
+        Task DeleteAsync(Guid id, string triggeredBy);
 
         /// <summary>
         /// Delete by keys
@@ -23,7 +23,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <param name="ids">Keys</param>
         /// <param name="triggeredBy">What invoke operation</param>
         /// <returns></returns>        
-        Task<int> DeleteAsync(IEnumerable<Guid> ids, string triggeredBy);
+        Task DeleteAsync(IEnumerable<Guid> ids, string triggeredBy);
 
         /// <summary>
         /// Get records by key
@@ -33,64 +33,31 @@ namespace DELAY.Core.Application.Abstractions.Services
         Task<T> GetRecordAsync(Guid id);
 
         /// <summary>
-        /// Get key-name record by key
+        /// Get records by keys
         /// </summary>
-        /// <param name="id">Key</param>
-        /// <returns></returns>
-        Task<KeyNamedModel> GetKeyNameRecordAsync(Guid id);
-
-        /// <summary>
-        /// Get records by search options
-        /// </summary>
-        /// <param name="options">Search options</param>
+        /// <param name="ids">Keys</param>
         /// <returns></returns>
         Task<IReadOnlyList<T>> GetRecordsAsync(IEnumerable<Guid> ids);
 
         /// <summary>
-        /// Get key-name by search options
+        /// Get key-name by keys
         /// </summary>
         /// <param name="id">Key</param>
         /// <returns></returns>
-        Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids);
+        Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids);
 
         /// <summary>
         /// Get records by search options
         /// </summary>
         /// <param name="options">Search options</param>
         /// <returns></returns>
-        Task<IReadOnlyList<T>> GetRecordsAsync(SearchOptionsDto options, PaginationOptionsDto pagination);
+        Task<IReadOnlyList<T>> GetRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, IEnumerable<SortOptionsDto> sortOptions, PaginationOptionsDto pagination);
 
         /// <summary>
         /// Get key-name by search options
         /// </summary>
         /// <param name="options">Search options</param>
         /// <returns></returns>
-        Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(SearchOptionsDto options, PaginationOptionsDto pagination);
-
-        /// <summary>
-        /// Get records by pagination options
-        /// </summary>
-        /// <param name="options">Pagination options</param>
-        /// <returns></returns>
-        Task<IReadOnlyList<T>> GetRecordsAsync(PaginationOptionsDto options);
-
-        /// <summary>
-        /// Get key-name by pagination options
-        /// </summary>
-        /// <param name="options">Pagination options</param>
-        /// <returns></returns>
-        Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(PaginationOptionsDto options);
-
-        /// <summary>
-        /// Get records
-        /// </summary>
-        /// <returns></returns>
-        Task<IReadOnlyList<T>> GetRecordsAsync();
-
-        /// <summary>
-        /// Get key-name
-        /// </summary>
-        /// <returns></returns>
-        Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync();
+        Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, SortOptionsDto sortOption, PaginationOptionsDto pagination);
     }
 }

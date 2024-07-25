@@ -10,5 +10,7 @@ namespace DELAY.Core.Application.Abstractions.Storages
         Task<int> CountAsync(IEnumerable<SearchOptionsDto> options, CancellationToken cancellationToken = default);
 
         Task<IReadOnlyList<TicketDto>> GetRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, IEnumerable<SortOptionsDto> sortOptions, PaginationOptionsDto paginationOption, CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<TicketDto>> GetAssignedToUserAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }

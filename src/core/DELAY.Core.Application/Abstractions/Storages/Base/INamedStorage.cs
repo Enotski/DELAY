@@ -53,7 +53,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="paginationOption"><inheritdoc cref="PaginationOptionsDto"/></param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(string term, PaginationOptionsDto paginationOption, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, SortOptionsDto sortOption, PaginationOptionsDto pagination, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get key-name records by keys

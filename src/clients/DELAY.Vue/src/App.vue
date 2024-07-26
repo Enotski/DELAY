@@ -1,23 +1,27 @@
 <template>
-  <div class="menu">
+  <nav
+    class="navbar d-flex fixed-top bg-light justify-content-between box-shadow mb-3 shadow p-3 py-2"
+  >
     <n-menu
       :options="menuOptions"
-      default-value="/"
+      :value="currentRouteName"
       mode="horizontal"
       responsive
     />
+  </nav>
+  <div class="row content-container justify-center align-center m-0">
+    <RouterView />
   </div>
-  <n-divider title-placement="right">DELAY</n-divider>
-  <div class="content"></div>
-  <RouterView />
 </template>
 
 <script setup lang="ts">
 import type { Component } from "vue";
-import { h } from "vue";
+import { computed, h } from "vue";
 import { RouterLink, RouterView } from "vue-router";
-import { NDivider, NMenu, NIcon } from "naive-ui";
+import { NMenu, NIcon } from "naive-ui";
 import type { MenuOption } from "naive-ui";
+import { useRouter } from "vue-router";
+
 import {
   SmartHome as homeIco,
   UserCircle as accountIco,
@@ -30,6 +34,9 @@ function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) });
 }
 
+const router = useRouter();
+const currentRouteName = computed(() => router.currentRoute.value.name);
+
 const menuOptions: MenuOption[] = [
   {
     label: () =>
@@ -40,7 +47,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => "Home" }
       ),
-    key: "/",
+    key: "home",
     icon: renderIcon(homeIco),
   },
   {
@@ -52,7 +59,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => "Account" }
       ),
-    key: "/account",
+    key: "account",
     icon: renderIcon(accountIco),
   },
   {
@@ -60,11 +67,11 @@ const menuOptions: MenuOption[] = [
       h(
         RouterLink,
         {
-          to: "/boards",
+          to: "/tickets",
         },
-        { default: () => "Boards" }
+        { default: () => "Tickets" }
       ),
-    key: "/boards",
+    key: "tickets",
     icon: renderIcon(boardIco),
   },
   {
@@ -74,9 +81,9 @@ const menuOptions: MenuOption[] = [
         {
           to: "/rooms",
         },
-        { default: () => "Chats" }
+        { default: () => "ChatRooms" }
       ),
-    key: "/rooms",
+    key: "rooms",
     icon: renderIcon(messageIco),
   },
   {
@@ -88,79 +95,8 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => "Users" }
       ),
-    key: "/users",
+    key: "users",
     icon: renderIcon(usersIco),
   },
 ];
 </script>
-
-<style scoped>
-.menu {
-  width: 100%;
-}
-.content {
-  width: 100%;
-}
-
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>

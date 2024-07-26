@@ -1,26 +1,107 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
+  <div class="menu">
+    <n-menu
+      :options="menuOptions"
+      default-value="/"
+      mode="horizontal"
+      responsive
+    />
+  </div>
+  <n-divider title-placement="right">DELAY</n-divider>
+  <div class="content"></div>
   <RouterView />
 </template>
 
+<script setup lang="ts">
+import type { Component } from "vue";
+import { h } from "vue";
+import { RouterLink, RouterView } from "vue-router";
+import { NDivider, NMenu, NIcon } from "naive-ui";
+import type { MenuOption } from "naive-ui";
+import {
+  SmartHome as homeIco,
+  UserCircle as accountIco,
+  Users as usersIco,
+  Messages as messageIco,
+  ClipboardList as boardIco,
+} from "@vicons/tabler";
+
+function renderIcon(icon: Component) {
+  return () => h(NIcon, null, { default: () => h(icon) });
+}
+
+const menuOptions: MenuOption[] = [
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: "/",
+        },
+        { default: () => "Home" }
+      ),
+    key: "/",
+    icon: renderIcon(homeIco),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: "/account",
+        },
+        { default: () => "Account" }
+      ),
+    key: "/account",
+    icon: renderIcon(accountIco),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: "/boards",
+        },
+        { default: () => "Boards" }
+      ),
+    key: "/boards",
+    icon: renderIcon(boardIco),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: "/rooms",
+        },
+        { default: () => "Chats" }
+      ),
+    key: "/rooms",
+    icon: renderIcon(messageIco),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: "/users",
+        },
+        { default: () => "Users" }
+      ),
+    key: "/users",
+    icon: renderIcon(usersIco),
+  },
+];
+</script>
+
 <style scoped>
+.menu {
+  width: 100%;
+}
+.content {
+  width: 100%;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;

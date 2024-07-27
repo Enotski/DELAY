@@ -1,19 +1,21 @@
 <template>
   <div class="row">
     <div class="mb-4" style="display: contents">
-      <n-card class="box-shadow mb-3 shadow" style="width: max-content">
-        <n-button type="success" ghost @click="addUser"> Add </n-button>
+      <div class="card-border mb-3" style="width: max-content">
+        <n-button type="success" quaternary circle @click="addUser">
+          <template #icon>
+            <n-icon><plus-ico /></n-icon>
+          </template>
+        </n-button>
         <n-divider vertical style="height: 2em" />
-        <n-button type="error" ghost @click="deleteUser"> Delete </n-button>
-      </n-card>
+        <n-button type="error" quaternary circle @click="deleteUser">
+          <template #icon>
+            <n-icon><minus-ico /></n-icon>
+          </template>
+        </n-button>
+      </div>
     </div>
-    <n-card
-      class="box-shadow mb-3 shadow"
-      :segmented="{
-        content: true,
-        footer: 'soft',
-      }"
-    >
+    <div class="card-border mb-3">
       <n-data-table
         :bordered="true"
         :single-line="false"
@@ -24,18 +26,20 @@
         :remote="true"
         @update:checked-row-keys="handleCheck"
       />
-    </n-card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import { sendRequest } from "@/utils/request-utils";
-import { NDataTable, NButton, NCard, NDivider } from "naive-ui";
+import { NDataTable, NButton, NIcon, NDivider } from "naive-ui";
 import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
+
+import { Plus as plusIco, Minus as minusIco } from "@vicons/tabler";
 
 const usersData = ref([]);
 

@@ -8,30 +8,33 @@
     size="large"
     class="row"
   >
-    <n-card
-      class="box-shadow mb-3 shadow"
-      :segmented="{
-        content: true,
-        footer: 'soft',
-      }"
-    >
-      <n-form-item class="w-50" label="Name" path="user.name">
+    <div style="display: contents">
+      <div class="card-border mb-3" style="width: max-content">
+        <n-button quaternary circle type="primary" ghost @click="onSave">
+          <template #icon>
+            <n-icon><plus-ico /></n-icon>
+          </template>
+        </n-button>
+        <n-divider vertical style="height: 2em" />
+        <n-button quaternary circle type="error" ghost @click="onCancel">
+          <template #icon>
+            <n-icon><minus-ico /></n-icon>
+          </template>
+        </n-button>
+      </div>
+    </div>
+    <div class="card-border mb-3">
+      <n-form-item label="Name" path="user.name">
         <n-input v-model:value="formValue.user.name" placeholder="Input Name" />
       </n-form-item>
-    </n-card>
-    <div style="display: contents">
-      <n-card class="box-shadow mb-3 shadow" style="width: max-content">
-        <n-button type="success" ghost @click="onSave"> Save </n-button>
-        <n-divider vertical style="height: 2em" />
-        <n-button type="error" ghost @click="onCancel"> Cancel </n-button>
-      </n-card>
     </div>
   </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { NForm, NCard, NFormItem, NInput, NButton, NDivider } from "naive-ui";
+import { NForm, NFormItem, NInput, NButton, NDivider, NIcon } from "naive-ui";
+import { Check as plusIco, X as minusIco } from "@vicons/tabler";
 
 const formValue = ref({
   user: {

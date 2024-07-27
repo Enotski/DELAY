@@ -2,19 +2,19 @@
   <div class="d-flex" size="large">
     <div class="row me-5">
       <div class="mb-4" style="display: contents">
-        <n-card class="box-shadow mb-3 shadow" style="width: max-content">
-          <n-button type="success" ghost @click="addBoard"> Add </n-button>
+        <div class="mb-3 card-border" style="width: max-content">
+          <n-button type="success" quaternary circle @click="addBoard">
+            <template #icon>
+              <n-icon><plus-ico /></n-icon> </template
+          ></n-button>
           <n-divider vertical style="height: 2em" />
-          <n-button type="error" ghost @click="deleteBoard"> Delete </n-button>
-        </n-card>
+          <n-button type="error" quaternary circle @click="deleteBoard">
+            <template #icon>
+              <n-icon><minus-ico /></n-icon> </template
+          ></n-button>
+        </div>
       </div>
-      <n-card
-        class="box-shadow shadow p-0"
-        :segmented="{
-          content: true,
-          footer: 'soft',
-        }"
-      >
+      <div class="card-border mb-3">
         <n-data-table
           style="min-width: 350px"
           :bordered="true"
@@ -26,25 +26,34 @@
           :remote="true"
           @update:checked-row-keys="handleCheck"
         />
-      </n-card>
+      </div>
     </div>
     <div class="row">
       <div class="mb-4" style="display: contents">
-        <n-card class="box-shadow mb-3 shadow" style="width: max-content">
-          <n-button type="success" ghost @click="addBoard"> Add </n-button>
+        <div class="card-border mb-3" style="width: max-content">
+          <n-button type="success" quaternary circle @click="addBoard">
+            <template #icon>
+              <n-icon><plus-ico /></n-icon> </template
+          ></n-button>
           <n-divider vertical style="height: 2em" />
-          <n-button type="error" ghost @click="deleteBoard"> Delete </n-button>
-        </n-card>
+          <n-button type="error" quaternary circle @click="deleteBoard">
+            <template #icon>
+              <n-icon><minus-ico /></n-icon> </template
+          ></n-button>
+        </div>
       </div>
       <div class="d-flex p-0">
-        <n-card class="box-shadow shadow me-4">
+        <div class="card-border mb-3 me-4">
           <n-button
             type="success"
             class="btn-add-ticket"
+            circle
             ghost
             @click="addTicket"
           >
-            Add
+            <template #icon>
+              <n-icon><plus-ico /></n-icon>
+            </template>
           </n-button>
           <n-data-table
             style="min-width: 400px"
@@ -57,15 +66,18 @@
             :remote="true"
             @update:checked-row-keys="handleCheck"
           />
-        </n-card>
-        <n-card class="box-shadow shadow me-4">
+        </div>
+        <div class="card-border mb-3 me-4">
           <n-button
             type="success"
             class="btn-add-ticket"
+            circle
             ghost
             @click="addTicket"
           >
-            Add
+            <template #icon>
+              <n-icon><plus-ico /></n-icon>
+            </template>
           </n-button>
           <n-data-table
             style="min-width: 400px"
@@ -78,15 +90,18 @@
             :remote="true"
             @update:checked-row-keys="handleCheck"
           />
-        </n-card>
-        <n-card class="box-shadow shadow me-4">
+        </div>
+        <div class="card-border mb-3 me-4">
           <n-button
             type="success"
             class="btn-add-ticket"
+            circle
             ghost
             @click="addTicket"
           >
-            Add
+            <template #icon>
+              <n-icon><plus-ico /></n-icon>
+            </template>
           </n-button>
           <n-data-table
             style="min-width: 400px"
@@ -99,15 +114,18 @@
             :remote="true"
             @update:checked-row-keys="handleCheck"
           />
-        </n-card>
-        <n-card class="box-shadow shadow me-4">
+        </div>
+        <div class="card-border mb-3 me-4">
           <n-button
             type="success"
             class="btn-add-ticket"
+            circle
             ghost
             @click="addTicket"
           >
-            Add
+            <template #icon>
+              <n-icon><plus-ico /></n-icon>
+            </template>
           </n-button>
           <n-data-table
             style="min-width: 400px"
@@ -120,70 +138,7 @@
             :remote="true"
             @update:checked-row-keys="handleCheck"
           />
-        </n-card>
-        <n-card class="box-shadow shadow me-4">
-          <n-button
-            type="success"
-            class="btn-add-ticket"
-            ghost
-            @click="addTicket"
-          >
-            Add
-          </n-button>
-          <n-data-table
-            style="min-width: 400px"
-            :bordered="true"
-            :single-line="false"
-            :columns="boardsColumns"
-            :data="boardsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
-        </n-card>
-        <n-card class="box-shadow shadow me-4">
-          <n-button
-            type="success"
-            class="btn-add-ticket"
-            ghost
-            @click="addTicket"
-          >
-            Add
-          </n-button>
-          <n-data-table
-            style="min-width: 400px"
-            :bordered="true"
-            :single-line="false"
-            :columns="boardsColumns"
-            :data="boardsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
-        </n-card>
-        <n-card class="box-shadow shadow me-4">
-          <n-button
-            type="success"
-            class="btn-add-ticket"
-            ghost
-            @click="addTicket"
-          >
-            Add
-          </n-button>
-          <n-data-table
-            style="min-width: 400px"
-            :bordered="true"
-            :single-line="false"
-            :columns="boardsColumns"
-            :data="boardsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
-        </n-card>
+        </div>
       </div>
     </div>
   </div>
@@ -192,11 +147,12 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import { sendRequest } from "@/utils/request-utils";
-import { NDataTable, NButton, NFlex, NCard, NDivider, NLayout } from "naive-ui";
+import { NDataTable, NButton, NIcon, NDivider } from "naive-ui";
 import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
+import { Plus as plusIco, Minus as minusIco } from "@vicons/tabler";
 
 const boardsData = ref([]);
 const ticketsListsData = ref([]);
@@ -277,7 +233,7 @@ const boardsColumns: TableColumn[] = [
           strong: true,
           tertiary: true,
           size: "small",
-          onClick: () => borderInfo(row),
+          onClick: () => boardInfo(row),
         },
         { default: () => "Info" }
       );

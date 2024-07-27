@@ -6,20 +6,32 @@
     :model="formValue"
     :rules="rules"
     size="large"
+    class="row"
   >
-    <n-form-item label="Name" path="user.name">
-      <n-input v-model:value="formValue.user.name" placeholder="Input Name" />
-    </n-form-item>
-    <n-form-item>
-      <n-button type="success" ghost @click="onSave"> Save </n-button>
-      <n-button type="error" ghost @click="onCancel"> Cancel </n-button>
-    </n-form-item>
+    <n-card
+      class="box-shadow mb-3 shadow"
+      :segmented="{
+        content: true,
+        footer: 'soft',
+      }"
+    >
+      <n-form-item class="w-50" label="Name" path="user.name">
+        <n-input v-model:value="formValue.user.name" placeholder="Input Name" />
+      </n-form-item>
+    </n-card>
+    <div style="display: contents">
+      <n-card class="box-shadow mb-3 shadow" style="width: max-content">
+        <n-button type="success" ghost @click="onSave"> Save </n-button>
+        <n-divider vertical style="height: 2em" />
+        <n-button type="error" ghost @click="onCancel"> Cancel </n-button>
+      </n-card>
+    </div>
   </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { NForm, NFormItem, NInput, NButton } from "naive-ui";
+import { NForm, NCard, NFormItem, NInput, NButton, NDivider } from "naive-ui";
 
 const formValue = ref({
   user: {

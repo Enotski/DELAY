@@ -1,59 +1,198 @@
 <template>
-  <n-flex justify="space-around" size="large">
-    <div>
-      <n-button type="success" ghost @click="addBoard"> Add </n-button>
-      <n-button type="error" ghost @click="deleteBoard"> Delete </n-button>
-      <div>Boards</div>
-      <n-data-table
-        :bordered="true"
-        :single-line="false"
-        :columns="boardsColumns"
-        :data="boardsData"
-        :row-key="rowKey"
-        :pagination="pagination"
-        :remote="true"
-        @update:checked-row-keys="handleCheck"
-      />
+  <div class="d-flex" size="large">
+    <div class="row me-5">
+      <div class="mb-4" style="display: contents">
+        <n-card class="box-shadow mb-3 shadow" style="width: max-content">
+          <n-button type="success" ghost @click="addBoard"> Add </n-button>
+          <n-divider vertical style="height: 2em" />
+          <n-button type="error" ghost @click="deleteBoard"> Delete </n-button>
+        </n-card>
+      </div>
+      <n-card
+        class="box-shadow shadow p-0"
+        :segmented="{
+          content: true,
+          footer: 'soft',
+        }"
+      >
+        <n-data-table
+          style="min-width: 350px"
+          :bordered="true"
+          :single-line="false"
+          :columns="boardsColumns"
+          :data="boardsData"
+          :row-key="rowKey"
+          :pagination="pagination"
+          :remote="true"
+          @update:checked-row-keys="handleCheck"
+        />
+      </n-card>
     </div>
-    <div>
-      <n-button type="success" ghost @click="addTicketsList"> Add </n-button>
-      <n-button type="error" ghost @click="deleteTicketsList">
-        Delete
-      </n-button>
-      <div>TicketsLists</div>
-      <n-data-table
-        :bordered="true"
-        :single-line="false"
-        :columns="ticketsListsColumns"
-        :data="ticketsListsData"
-        :row-key="rowKey"
-        :pagination="pagination"
-        :remote="true"
-        @update:checked-row-keys="handleCheck"
-      />
+    <div class="row">
+      <div class="mb-4" style="display: contents">
+        <n-card class="box-shadow mb-3 shadow" style="width: max-content">
+          <n-button type="success" ghost @click="addBoard"> Add </n-button>
+          <n-divider vertical style="height: 2em" />
+          <n-button type="error" ghost @click="deleteBoard"> Delete </n-button>
+        </n-card>
+      </div>
+      <div class="d-flex p-0">
+        <n-card class="box-shadow shadow me-4">
+          <n-button
+            type="success"
+            class="btn-add-ticket"
+            ghost
+            @click="addTicket"
+          >
+            Add
+          </n-button>
+          <n-data-table
+            style="min-width: 400px"
+            :bordered="true"
+            :single-line="false"
+            :columns="boardsColumns"
+            :data="boardsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-card>
+        <n-card class="box-shadow shadow me-4">
+          <n-button
+            type="success"
+            class="btn-add-ticket"
+            ghost
+            @click="addTicket"
+          >
+            Add
+          </n-button>
+          <n-data-table
+            style="min-width: 400px"
+            :bordered="true"
+            :single-line="false"
+            :columns="boardsColumns"
+            :data="boardsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-card>
+        <n-card class="box-shadow shadow me-4">
+          <n-button
+            type="success"
+            class="btn-add-ticket"
+            ghost
+            @click="addTicket"
+          >
+            Add
+          </n-button>
+          <n-data-table
+            style="min-width: 400px"
+            :bordered="true"
+            :single-line="false"
+            :columns="boardsColumns"
+            :data="boardsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-card>
+        <n-card class="box-shadow shadow me-4">
+          <n-button
+            type="success"
+            class="btn-add-ticket"
+            ghost
+            @click="addTicket"
+          >
+            Add
+          </n-button>
+          <n-data-table
+            style="min-width: 400px"
+            :bordered="true"
+            :single-line="false"
+            :columns="boardsColumns"
+            :data="boardsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-card>
+        <n-card class="box-shadow shadow me-4">
+          <n-button
+            type="success"
+            class="btn-add-ticket"
+            ghost
+            @click="addTicket"
+          >
+            Add
+          </n-button>
+          <n-data-table
+            style="min-width: 400px"
+            :bordered="true"
+            :single-line="false"
+            :columns="boardsColumns"
+            :data="boardsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-card>
+        <n-card class="box-shadow shadow me-4">
+          <n-button
+            type="success"
+            class="btn-add-ticket"
+            ghost
+            @click="addTicket"
+          >
+            Add
+          </n-button>
+          <n-data-table
+            style="min-width: 400px"
+            :bordered="true"
+            :single-line="false"
+            :columns="boardsColumns"
+            :data="boardsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-card>
+        <n-card class="box-shadow shadow me-4">
+          <n-button
+            type="success"
+            class="btn-add-ticket"
+            ghost
+            @click="addTicket"
+          >
+            Add
+          </n-button>
+          <n-data-table
+            style="min-width: 400px"
+            :bordered="true"
+            :single-line="false"
+            :columns="boardsColumns"
+            :data="boardsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-card>
+      </div>
     </div>
-    <div>
-      <n-button type="success" ghost @click="addTicket"> Add </n-button>
-      <n-button type="error" ghost @click="deleteTicket"> Delete </n-button>
-      <div>Tickets</div>
-      <n-data-table
-        :bordered="true"
-        :single-line="false"
-        :columns="ticketsColumns"
-        :data="ticketsData"
-        :row-key="rowKey"
-        :pagination="pagination"
-        :remote="true"
-        @update:checked-row-keys="handleCheck"
-      />
-    </div>
-  </n-flex>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import { sendRequest } from "@/utils/request-utils";
-import { NDataTable, NButton, NFlex } from "naive-ui";
+import { NDataTable, NButton, NFlex, NCard, NDivider, NLayout } from "naive-ui";
 import type {
   RowData,
   TableColumn,

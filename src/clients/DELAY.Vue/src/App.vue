@@ -9,7 +9,7 @@
       responsive
     />
   </nav>
-  <div class="row content-container justify-center align-center m-0">
+  <div class="content-container">
     <RouterView />
   </div>
 </template>

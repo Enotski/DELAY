@@ -1,23 +1,37 @@
 <template>
-  <n-button type="success" ghost @click="addUser"> Add </n-button>
-  <n-button type="error" ghost @click="deleteUser"> Delete </n-button>
-  <div>Users</div>
-  <n-data-table
-    :bordered="true"
-    :single-line="false"
-    :columns="usersColumns"
-    :data="usersData"
-    :row-key="rowKey"
-    :pagination="pagination"
-    :remote="true"
-    @update:checked-row-keys="handleCheck"
-  />
+  <div class="row">
+    <div class="mb-4" style="display: contents">
+      <n-card class="box-shadow mb-3 shadow" style="width: max-content">
+        <n-button type="success" ghost @click="addUser"> Add </n-button>
+        <n-divider vertical style="height: 2em" />
+        <n-button type="error" ghost @click="deleteUser"> Delete </n-button>
+      </n-card>
+    </div>
+    <n-card
+      class="box-shadow mb-3 shadow"
+      :segmented="{
+        content: true,
+        footer: 'soft',
+      }"
+    >
+      <n-data-table
+        :bordered="true"
+        :single-line="false"
+        :columns="usersColumns"
+        :data="usersData"
+        :row-key="rowKey"
+        :pagination="pagination"
+        :remote="true"
+        @update:checked-row-keys="handleCheck"
+      />
+    </n-card>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import { sendRequest } from "@/utils/request-utils";
-import { NDataTable, NButton, NFlex } from "naive-ui";
+import { NDataTable, NButton, NCard, NDivider } from "naive-ui";
 import type {
   RowData,
   TableColumn,

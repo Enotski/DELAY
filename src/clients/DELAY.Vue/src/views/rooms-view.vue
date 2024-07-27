@@ -3,13 +3,13 @@
     <div class="row">
       <div class="mb-4" style="display: contents">
         <div class="mb-3 card-border" style="width: max-content">
-          <n-button quaternary circle type="primary" ghost @click="addRoom">
+          <n-button quaternary circle type="primary" @click="addRoom">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
           <n-divider vertical style="height: 2em" />
-          <n-button quaternary circle type="error" ghost @click="deleteRoom">
+          <n-button quaternary circle type="error" @click="deleteRoom">
             <template #icon>
               <n-icon><minus-ico /></n-icon>
             </template>

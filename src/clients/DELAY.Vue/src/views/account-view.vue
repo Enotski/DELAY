@@ -10,13 +10,13 @@
   >
     <div style="display: contents">
       <div class="card-border mb-3" style="width: max-content">
-        <n-button quaternary circle type="primary" ghost @click="onSave">
+        <n-button quaternary circle type="primary" @click="onSave">
           <template #icon>
             <n-icon><plus-ico /></n-icon>
           </template>
         </n-button>
         <n-divider vertical style="height: 2em" />
-        <n-button quaternary circle type="error" ghost @click="onCancel">
+        <n-button quaternary circle type="error" @click="onCancel">
           <template #icon>
             <n-icon><minus-ico /></n-icon>
           </template>

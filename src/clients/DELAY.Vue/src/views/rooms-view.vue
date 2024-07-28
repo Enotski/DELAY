@@ -1,23 +1,26 @@
 <template>
   <div class="d-flex justify-content-between" size="large">
-    <div class="row">
+    <div class="col me-4 flex-container">
       <div class="mb-4" style="display: contents">
         <div class="mb-3 card-border" style="width: max-content">
-          <n-button quaternary circle type="primary" @click="addRoom">
+          <n-button type="primary" @click="addRoom">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
           <n-divider vertical style="height: 2em" />
-          <n-button quaternary circle type="error" @click="deleteRoom">
+          <n-button type="error" @click="deleteRoom">
             <template #icon>
               <n-icon><minus-ico /></n-icon>
             </template>
           </n-button>
         </div>
       </div>
-      <div class="card-border">
+      <div class="card-border flex-stretch">
         <n-data-table
+          :style="{
+            height: '100%',
+          }"
           style="min-width: 350px"
           :bordered="true"
           :single-line="false"
@@ -30,35 +33,30 @@
         />
       </div>
     </div>
-    <div class="row">
-      <div class="d-flex flex-column card-border me-4 mb-3">
+    <div class="col me-4 flex-container">
+      <div class="d-flex flex-column card-border mb-3 flex-stretch">
         <div class="text-center"><h5>Chat</h5></div>
-        <n-infinite-scroll
-          style="height: 240px"
-          :distance="10"
-          @load="handleLoad"
-        >
-          <div
-            v-for="(item, index) in items"
-            :key="item.key"
-            class="message"
-            :class="{ reverse: index % 5 === 0 }"
-          >
-            <img class="avatar" :src="item.avatar" alt="" />
-            <span> {{ item.message }} {{ index % 5 === 0 ? "?" : "" }}</span>
-          </div>
-          <div v-if="loading" class="text">Loading...</div>
-          <div v-if="noMore" class="text">No More 🤪</div>
-        </n-infinite-scroll>
+        <div style="height: 70vh">
+          <n-infinite-scroll :distance="10" @load="handleLoad">
+            <div
+              v-for="(item, index) in items"
+              :key="item.key"
+              class="message"
+              :class="{ reverse: index % 5 === 0 }"
+            >
+              <img class="avatar" :src="item.avatar" alt="" />
+              <span> {{ item.message }} {{ index % 5 === 0 ? "?" : "" }}</span>
+            </div>
+            <div v-if="loading" class="text">Loading...</div>
+            <div v-if="noMore" class="text">No More 🤪</div>
+          </n-infinite-scroll>
+        </div>
       </div>
       <div class="mb-4" style="display: contents">
-        <div
-          class="card-border mb-3"
-          style="width: inherit; height: max-content"
-        >
+        <div class="card-border" style="width: inherit; height: max-content">
           <n-input-group>
             <n-input />
-            <n-button type="primary" circle ghost @click="sendMesage">
+            <n-button type="primary" @click="sendMesage">
               <template #icon>
                 <n-icon><send-ico /></n-icon>
               </template>
@@ -67,10 +65,33 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="card-border">
+    <div class="col card-border flex-container">
+      <div class="mb-4" style="width: inherit; height: max-content">
+        <n-input-group>
+          <n-select
+            v-model:value="selectedUsersValues"
+            multiple
+            filterable
+            placeholder="Search users"
+            :options="usersOptions"
+            :loading="loading"
+            clearable
+            remote
+            :clear-filter-after-select="false"
+            @search="handleUsersSearch"
+          />
+          <n-button type="primary" @click="addUserToRoom">
+            <template #icon>
+              <n-icon><plus-ico /></n-icon>
+            </template>
+          </n-button>
+        </n-input-group>
+      </div>
+      <div class="flex-stretch">
         <n-data-table
-          style="min-width: 350px"
+          :style="{
+            height: '100%',
+          }"
           :bordered="true"
           :single-line="false"
           :columns="roomsColumns"
@@ -96,6 +117,7 @@ import {
   NIcon,
   NInfiniteScroll,
   NDivider,
+  NSelect,
 } from "naive-ui";
 import type {
   RowData,
@@ -139,7 +161,8 @@ const defaultRequestOptions = {
     take: 0,
   },
 };
-
+let usersOptions: any[];
+let selectedUsersValues: any[];
 onMounted(async () => {});
 
 // const handleAddClick = async () => {
@@ -199,6 +222,8 @@ function roomInfo(row: any) {}
 
 function deleteRoom(row: any) {}
 function sendMesage(row: any) {}
+function addUserToRoom(row: any) {}
+function handleUsersSearch(arg: string) {}
 
 const loading = ref(false);
 

@@ -1,22 +1,25 @@
 <template>
-  <div class="row">
+  <div class="row flex-container">
     <div class="mb-4" style="display: contents">
       <div class="card-border mb-3" style="width: max-content">
-        <n-button type="success" quaternary circle @click="addUser">
+        <n-button type="success" @click="addUser">
           <template #icon>
             <n-icon><plus-ico /></n-icon>
           </template>
         </n-button>
         <n-divider vertical style="height: 2em" />
-        <n-button type="error" quaternary circle @click="deleteUser">
+        <n-button type="error" @click="deleteUser">
           <template #icon>
             <n-icon><minus-ico /></n-icon>
           </template>
         </n-button>
       </div>
     </div>
-    <div class="card-border mb-3">
+    <div class="card-border flex-stretch">
       <n-data-table
+        :style="{
+          height: '100%',
+        }"
         :bordered="true"
         :single-line="false"
         :columns="usersColumns"

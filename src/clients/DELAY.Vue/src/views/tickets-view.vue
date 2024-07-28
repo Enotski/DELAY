@@ -1,21 +1,27 @@
 <template>
   <div class="d-flex" size="large">
-    <div class="row me-5">
+    <div class="row me-5 flex-container">
       <div class="mb-4" style="display: contents">
-        <div class="mb-3 card-border" style="width: max-content">
-          <n-button type="success" quaternary circle @click="addBoard">
+        <div
+          class="mb-3 card-border"
+          style="width: max-content; height: fit-content"
+        >
+          <n-button type="success" @click="addBoard">
             <template #icon>
               <n-icon><plus-ico /></n-icon> </template
           ></n-button>
           <n-divider vertical style="height: 2em" />
-          <n-button type="error" quaternary circle @click="deleteBoard">
+          <n-button type="error" @click="deleteBoard">
             <template #icon>
               <n-icon><minus-ico /></n-icon> </template
           ></n-button>
         </div>
       </div>
-      <div class="card-border mb-3">
+      <div class="card-border mb-3 flex-stretch">
         <n-data-table
+          :style="{
+            height: '100%',
+          }"
           style="min-width: 350px"
           :bordered="true"
           :single-line="false"
@@ -28,116 +34,112 @@
         />
       </div>
     </div>
-    <div class="row">
+    <div class="row flex-container">
       <div class="mb-4" style="display: contents">
         <div class="card-border mb-3" style="width: max-content">
-          <n-button type="success" quaternary circle @click="addBoard">
+          <n-button type="success" @click="addBoard">
             <template #icon>
               <n-icon><plus-ico /></n-icon> </template
           ></n-button>
           <n-divider vertical style="height: 2em" />
-          <n-button type="error" quaternary circle @click="deleteBoard">
+          <n-button type="error" @click="deleteBoard">
             <template #icon>
               <n-icon><minus-ico /></n-icon> </template
           ></n-button>
         </div>
       </div>
-      <div class="d-flex p-0">
-        <div class="card-border mb-3 me-4">
-          <n-button
-            type="success"
-            class="btn-add-ticket"
-            circle
-            ghost
-            @click="addTicket"
-          >
+      <div class="d-flex p-0 flex-stretch">
+        <div class="card-border mb-3 me-4 flex-card-content">
+          <div class="flex-stretch">
+            <n-data-table
+              :style="{
+                height: '100%',
+              }"
+              style="min-width: 400px"
+              :bordered="true"
+              :single-line="false"
+              :columns="boardsColumns"
+              :data="boardsData"
+              :row-key="rowKey"
+              :pagination="pagination"
+              :remote="true"
+              @update:checked-row-keys="handleCheck"
+            />
+          </div>
+          <n-button type="success" class="mt-3" ghost @click="addTicket">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
-          <n-data-table
-            style="min-width: 400px"
-            :bordered="true"
-            :single-line="false"
-            :columns="boardsColumns"
-            :data="boardsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
         </div>
-        <div class="card-border mb-3 me-4">
-          <n-button
-            type="success"
-            class="btn-add-ticket"
-            circle
-            ghost
-            @click="addTicket"
-          >
+        <div class="card-border mb-3 me-4 flex-card-content">
+          <div class="flex-stretch">
+            <n-data-table
+              :style="{
+                height: '100%',
+              }"
+              style="min-width: 400px"
+              :bordered="true"
+              :single-line="false"
+              :columns="boardsColumns"
+              :data="boardsData"
+              :row-key="rowKey"
+              :pagination="pagination"
+              :remote="true"
+              @update:checked-row-keys="handleCheck"
+            />
+          </div>
+          <n-button type="success" class="mt-3" ghost @click="addTicket">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
-          <n-data-table
-            style="min-width: 400px"
-            :bordered="true"
-            :single-line="false"
-            :columns="boardsColumns"
-            :data="boardsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
         </div>
-        <div class="card-border mb-3 me-4">
-          <n-button
-            type="success"
-            class="btn-add-ticket"
-            circle
-            ghost
-            @click="addTicket"
-          >
+        <div class="card-border mb-3 me-4 flex-card-content">
+          <div class="flex-stretch">
+            <n-data-table
+              :style="{
+                height: '100%',
+              }"
+              style="min-width: 400px"
+              :bordered="true"
+              :single-line="false"
+              :columns="boardsColumns"
+              :data="boardsData"
+              :row-key="rowKey"
+              :pagination="pagination"
+              :remote="true"
+              @update:checked-row-keys="handleCheck"
+            />
+          </div>
+          <n-button type="success" class="mt-3" ghost @click="addTicket">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
-          <n-data-table
-            style="min-width: 400px"
-            :bordered="true"
-            :single-line="false"
-            :columns="boardsColumns"
-            :data="boardsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
         </div>
-        <div class="card-border mb-3 me-4">
-          <n-button
-            type="success"
-            class="btn-add-ticket"
-            circle
-            ghost
-            @click="addTicket"
-          >
+        <div class="card-border mb-3 me-4 flex-card-content">
+          <div class="flex-stretch">
+            <n-data-table
+              :style="{
+                height: '100%',
+              }"
+              style="min-width: 400px"
+              :bordered="true"
+              :single-line="false"
+              :columns="boardsColumns"
+              :data="boardsData"
+              :row-key="rowKey"
+              :pagination="pagination"
+              :remote="true"
+              @update:checked-row-keys="handleCheck"
+            />
+          </div>
+          <n-button type="success" class="mt-3" ghost @click="addTicket">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
-          <n-data-table
-            style="min-width: 400px"
-            :bordered="true"
-            :single-line="false"
-            :columns="boardsColumns"
-            :data="boardsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
         </div>
       </div>
     </div>

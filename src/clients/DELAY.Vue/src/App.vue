@@ -1,16 +1,18 @@
 <template>
-  <nav
-    class="navbar d-flex fixed-top bg-light justify-content-between box-shadow mb-3 shadow p-3 py-2"
-  >
-    <n-menu
-      :options="menuOptions"
-      :value="currentRouteName"
-      mode="horizontal"
-      responsive
-    />
-  </nav>
-  <div class="content-container">
-    <RouterView />
+  <div class="flex-container">
+    <nav
+      class="navbar d-flex fixed-top bg-light justify-content-between box-shadow shadow p-3 py-2"
+    >
+      <n-menu
+        :options="menuOptions"
+        :value="currentRouteName"
+        mode="horizontal"
+        responsive
+      />
+    </nav>
+    <div class="content-container flex-stretch">
+      <RouterView />
+    </div>
   </div>
 </template>
 

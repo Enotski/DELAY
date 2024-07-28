@@ -7,19 +7,31 @@ a,
   padding: 3px;
 }
 .content-container {
-  margin-bottom: 2rem !important;
   margin-top: 5rem !important;
   margin-left: 3rem !important;
   margin-right: 2rem !important;
-}
-.btn-add-ticket{
-  position: relative;
-  top: -54px;
-  left: 380px;
 }
 .card-border{
   border: 1px solid rgb(102 102 102 / 10%);
   border-radius: 6px;
   padding: 14px;
   box-shadow: rgb(131 131 131 / 24%) 5px 5px 25px 4px;
+}
+.flex-container {
+  display: flex;
+  flex-direction: column;
+    height: 86vh;
+}
+.flex-card-content{
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-stretch {
+  flex-grow: 1;
+}
+html,
+body {
+  height: 100%;
+  /* Полное покрытие видового поля экрана */
 }

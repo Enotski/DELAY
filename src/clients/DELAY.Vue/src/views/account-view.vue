@@ -24,39 +24,43 @@
       </div>
     </div>
     <div class="card-border mb-3">
-      <n-form-item label="Name" path="user.name">
-        <n-input v-model:value="formValue.user.name" placeholder="Input Name" />
+      <n-form-item label="Name" path="name">
+        <n-input v-model:value="formValue.name" placeholder="Input Name" />
       </n-form-item>
     </div>
   </n-form>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { NForm, NFormItem, NInput, NButton, NDivider, NIcon } from "naive-ui";
 import { Check as plusIco, X as minusIco } from "@vicons/tabler";
 
 const formValue = ref({
-  user: {
-    name: "",
-    age: "",
-  },
-  phone: "",
+  name: "",
 });
 const rules = {
-  user: {
-    name: {
-      required: true,
-      message: "Please input your name",
-      trigger: "blur",
-    },
+  name: {
+    required: true,
+    message: "Please input your name",
+    trigger: "blur",
   },
 };
+
+onMounted(async () => {
+  await getInfo();
+});
+
+async function getInfo() {
+  formValue.value.name = "default name";
+  console.log("get info");
+}
 
 function onSave(e: MouseEvent) {
   console.log("Save");
 }
 function onCancel(e: MouseEvent) {
+  formValue.value.name = "default name";
   console.log("Cancel");
 }
 </script>

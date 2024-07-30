@@ -1,140 +1,144 @@
 <template>
+  <n-modal
+    v-model:show="showModal"
+    preset="dialog"
+    title="Dialog"
+    content="Are you sure?"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onPositiveClick"
+    @negative-click="onNegativeClick"
+  />
   <div class="d-flex" size="large">
-    <div class="row me-5 flex-container">
-      <div class="mb-4" style="display: contents">
-        <div
-          class="mb-3 card-border"
-          style="width: max-content; height: fit-content"
-        >
-          <n-button type="success" @click="addBoard">
-            <template #icon>
-              <n-icon><plus-ico /></n-icon> </template
-          ></n-button>
-          <n-divider vertical style="height: 2em" />
-          <n-button type="error" @click="deleteBoard">
-            <template #icon>
-              <n-icon><minus-ico /></n-icon> </template
-          ></n-button>
-        </div>
-      </div>
-      <div class="card-border mb-3 flex-stretch">
-        <n-data-table
-          :style="{
-            height: '100%',
-          }"
-          style="min-width: 350px"
-          :bordered="true"
-          :single-line="false"
-          :columns="boardsColumns"
-          :data="boardsData"
-          :row-key="rowKey"
-          :pagination="pagination"
-          :remote="true"
-          @update:checked-row-keys="handleCheck"
-        />
-      </div>
+    <div
+      class="card-border mb-3 me-5 flex-card-content"
+      style="width: inherit; height: max-content"
+    >
+      <n-data-table
+        :style="{
+          height: '100%',
+        }"
+        style="min-width: 400px"
+        :max-height="660"
+        :bordered="true"
+        :single-line="false"
+        :columns="boardsColumns"
+        :data="boardsData"
+        :row-key="rowKey"
+        :pagination="pagination"
+        :remote="true"
+        @update:checked-row-keys="handleCheck"
+      />
+      <n-button type="success" class="mt-3" ghost @click="addBoard">
+        <template #icon>
+          <n-icon><plus-ico /></n-icon>
+        </template>
+      </n-button>
     </div>
-    <div class="row flex-container">
+    <div class="row flex-container" style="width: inherit; height: max-content">
       <div class="mb-4" style="display: contents">
         <div class="card-border mb-3" style="width: max-content">
-          <n-button type="success" @click="addBoard">
+          <n-button type="success" @click="addTicketsList">
             <template #icon>
               <n-icon><plus-ico /></n-icon> </template
-          ></n-button>
-          <n-divider vertical style="height: 2em" />
-          <n-button type="error" @click="deleteBoard">
-            <template #icon>
-              <n-icon><minus-ico /></n-icon> </template
           ></n-button>
         </div>
       </div>
       <div class="d-flex p-0 flex-stretch">
-        <div class="card-border mb-3 me-4 flex-card-content">
-          <div class="flex-stretch">
-            <n-data-table
-              :style="{
-                height: '100%',
-              }"
-              style="min-width: 400px"
-              :bordered="true"
-              :single-line="false"
-              :columns="boardsColumns"
-              :data="boardsData"
-              :row-key="rowKey"
-              :pagination="pagination"
-              :remote="true"
-              @update:checked-row-keys="handleCheck"
-            />
-          </div>
+        <div
+          class="card-border mb-3 me-4 flex-card-content"
+          style="width: inherit; height: max-content"
+        >
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            style="min-width: 400px"
+            :max-height="550"
+            :bordered="true"
+            :single-line="false"
+            :columns="ticketsColumns"
+            :data="ticketsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
           <n-button type="success" class="mt-3" ghost @click="addTicket">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
         </div>
-        <div class="card-border mb-3 me-4 flex-card-content">
-          <div class="flex-stretch">
-            <n-data-table
-              :style="{
-                height: '100%',
-              }"
-              style="min-width: 400px"
-              :bordered="true"
-              :single-line="false"
-              :columns="boardsColumns"
-              :data="boardsData"
-              :row-key="rowKey"
-              :pagination="pagination"
-              :remote="true"
-              @update:checked-row-keys="handleCheck"
-            />
-          </div>
+        <div
+          class="card-border mb-3 me-4 flex-card-content"
+          style="width: inherit; height: max-content"
+        >
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            style="min-width: 400px"
+            :max-height="550"
+            :bordered="true"
+            :single-line="false"
+            :columns="ticketsColumns"
+            :data="ticketsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
           <n-button type="success" class="mt-3" ghost @click="addTicket">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
         </div>
-        <div class="card-border mb-3 me-4 flex-card-content">
-          <div class="flex-stretch">
-            <n-data-table
-              :style="{
-                height: '100%',
-              }"
-              style="min-width: 400px"
-              :bordered="true"
-              :single-line="false"
-              :columns="boardsColumns"
-              :data="boardsData"
-              :row-key="rowKey"
-              :pagination="pagination"
-              :remote="true"
-              @update:checked-row-keys="handleCheck"
-            />
-          </div>
+        <div
+          class="card-border mb-3 me-4 flex-card-content"
+          style="width: inherit; height: max-content"
+        >
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            style="min-width: 400px"
+            :max-height="550"
+            :bordered="true"
+            :single-line="false"
+            :columns="ticketsColumns"
+            :data="ticketsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
           <n-button type="success" class="mt-3" ghost @click="addTicket">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
             </template>
           </n-button>
         </div>
-        <div class="card-border mb-3 me-4 flex-card-content">
-          <div class="flex-stretch">
-            <n-data-table
-              :style="{
-                height: '100%',
-              }"
-              style="min-width: 400px"
-              :bordered="true"
-              :single-line="false"
-              :columns="boardsColumns"
-              :data="boardsData"
-              :row-key="rowKey"
-              :pagination="pagination"
-              :remote="true"
-              @update:checked-row-keys="handleCheck"
-            />
-          </div>
+        <div
+          class="card-border mb-3 me-4 flex-card-content"
+          style="width: inherit; height: max-content"
+        >
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            style="min-width: 400px"
+            :max-height="550"
+            :bordered="true"
+            :single-line="false"
+            :columns="ticketsColumns"
+            :data="ticketsData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
           <n-button type="success" class="mt-3" ghost @click="addTicket">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
@@ -149,16 +153,113 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import { sendRequest } from "@/utils/request-utils";
-import { NDataTable, NButton, NIcon, NDivider } from "naive-ui";
+import { NDataTable, NButton, NIcon, NDivider, NInput, NModal } from "naive-ui";
 import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
 import { Plus as plusIco, Minus as minusIco } from "@vicons/tabler";
 
-const boardsData = ref([]);
-const ticketsListsData = ref([]);
-const ticketsData = ref([]);
+const boardsData = ref([
+  {
+    id: 0,
+    name: "John Brown",
+  },
+  {
+    id: 1,
+    name: "Jim Green",
+  },
+  {
+    id: 2,
+    name: "Joe Black",
+  },
+  {
+    id: 11,
+    name: "John Brown",
+  },
+  {
+    id: 22,
+    name: "Jim Green",
+  },
+  {
+    id: 33,
+    name: "Joe Black",
+  },
+  {
+    id: 12,
+    name: "John Brown",
+  },
+  {
+    id: 31,
+    name: "Jim Green",
+  },
+  {
+    id: 21,
+    name: "Joe Black",
+  },
+  {
+    id: 10,
+    name: "John Brown",
+  },
+  {
+    id: 41,
+    name: "Jim Green",
+  },
+  {
+    id: 92,
+    name: "Joe Black",
+  },
+]);
+const ticketsData = ref([
+  {
+    id: 0,
+    name: "John Brown",
+  },
+  {
+    id: 1,
+    name: "Jim Green",
+  },
+  {
+    id: 2,
+    name: "Joe Black",
+  },
+  {
+    id: 11,
+    name: "John Brown",
+  },
+  {
+    id: 22,
+    name: "Jim Green",
+  },
+  {
+    id: 33,
+    name: "Joe Black",
+  },
+  {
+    id: 12,
+    name: "John Brown",
+  },
+  {
+    id: 31,
+    name: "Jim Green",
+  },
+  {
+    id: 21,
+    name: "Joe Black",
+  },
+  {
+    id: 10,
+    name: "John Brown",
+  },
+  {
+    id: 41,
+    name: "Jim Green",
+  },
+  {
+    id: 92,
+    name: "Joe Black",
+  },
+]);
 
 const rowKey = (row: any) => row.id;
 const checkedRowKeysRef = ref([]);
@@ -219,21 +320,29 @@ onMounted(async () => {});
 
 const boardsColumns: TableColumn[] = [
   {
-    type: "selection",
-  },
-  {
-    title: "Name",
+    title: "Boards",
+    align: "center",
     key: "name",
+    render(row, index) {
+      return h(NInput, {
+        value: row.name,
+        onUpdateValue(v) {
+          boardsData.value[index].name = v;
+          console.log(boardsData.value[index].name);
+        },
+      });
+    },
   },
   {
     title: "",
     key: "info",
+    width: 68,
     render(row) {
       return h(
         NButton,
         {
           strong: true,
-          tertiary: true,
+          type: "info",
           size: "small",
           onClick: () => boardInfo(row),
         },
@@ -241,73 +350,134 @@ const boardsColumns: TableColumn[] = [
       );
     },
   },
+  {
+    width: 80,
+    key: "delete",
+    render(row) {
+      return h(
+        NButton,
+        {
+          type: "error",
+          strong: true,
+          size: "small",
+          onClick: () => deleteBoard(row),
+        },
+        { default: () => "Delete" }
+      );
+    },
+  },
 ];
+
 const ticketsColumns: TableColumn[] = [
   {
-    type: "selection",
-  },
-  {
-    title: "Name",
+    title: "Tickets",
+    align: "center",
     key: "name",
+    render(row, index) {
+      return h(NInput, {
+        value: row.name,
+        onUpdateValue(v) {
+          ticketsData.value[index].name = v;
+          console.log(ticketsData.value[index].name);
+        },
+      });
+    },
   },
   {
-    title: "",
-    key: "info",
-    render(row) {
+    title(column: any) {
       return h(
         NButton,
         {
+          type: "error",
           strong: true,
-          tertiary: true,
           size: "small",
-          onClick: () => ticketInfo(row),
+          onClick: () => deleteTicketsList(column),
         },
-        { default: () => "Info" }
+        { default: () => "Delete list" }
       );
     },
-  },
-];
-const ticketsListsColumns: TableColumn[] = [
-  {
-    type: "selection",
-  },
-  {
-    title: "Name",
-    key: "name",
-  },
-  {
-    title: "",
-    key: "info",
-    render(row) {
-      return h(
-        NButton,
-        {
-          strong: true,
-          tertiary: true,
-          size: "small",
-          onClick: () => ticketsListInfo(row),
+    align: "center",
+    key: "editButtons",
+    children: [
+      {
+        key: "info",
+        width: 68,
+        render(row) {
+          return h(
+            NButton,
+            {
+              ghost: true,
+              type: "info",
+              strong: true,
+              size: "small",
+              onClick: () => ticketInfo(row),
+            },
+            { default: () => "Info" }
+          );
         },
-        { default: () => "Info" }
-      );
-    },
+      },
+      {
+        width: 80,
+        key: "delete",
+        render(row) {
+          return h(
+            NButton,
+            {
+              ghost: true,
+              type: "error",
+              strong: true,
+              size: "small",
+              onClick: () => deleteTicket(row),
+            },
+            { default: () => "Delete" }
+          );
+        },
+      },
+    ],
   },
 ];
 
-function addBoard(row: any) {}
+const showModal = ref(false);
 
-function addTicketsList(row: any) {}
+function addBoard(row: any) {
+  console.log("addBoard");
+}
 
-function addTicket(row: any) {}
+function addTicketsList(row: any) {
+  console.log("addTicketsList");
+}
 
-function boardInfo(row: any) {}
+function addTicket(row: any) {
+  console.log("addTicket");
+}
 
-function ticketsListInfo(row: any) {}
+function boardInfo(row: any) {
+  showModal.value = true;
+  console.log("boardInfo");
+}
 
-function ticketInfo(row: any) {}
+function ticketInfo(row: any) {
+  showModal.value = true;
+  console.log("ticketInfo");
+}
 
-function deleteBoard(row: any) {}
+function onPositiveClick(row: any) {
+  console.log("onPositiveClick");
+}
+function onNegativeClick(row: any) {
+  showModal.value = false;
+  console.log("onNegativeClick");
+}
 
-function deleteTicketsList(row: any) {}
+function deleteBoard(row: any) {
+  console.log("deleteBoard");
+}
 
-function deleteTicket(row: any) {}
+function deleteTicketsList(row: any) {
+  console.log("deleteTicketsList");
+}
+
+function deleteTicket(row: any) {
+  console.log("deleteTicket");
+}
 </script>

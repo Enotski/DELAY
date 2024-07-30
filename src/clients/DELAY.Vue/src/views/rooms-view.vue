@@ -1,8 +1,21 @@
 <template>
+  <n-modal
+    v-model:show="showModal"
+    preset="dialog"
+    title="Dialog"
+    content="Are you sure?"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onPositiveClick"
+    @negative-click="onNegativeClick"
+  />
   <div class="d-flex justify-content-between" size="large">
     <div class="col me-4 flex-container">
       <div class="mb-4" style="display: contents">
-        <div class="mb-3 card-border" style="width: max-content">
+        <div
+          class="mb-3 card-border"
+          style="width: max-content; height: max-content"
+        >
           <n-button type="primary" @click="addRoom">
             <template #icon>
               <n-icon><plus-ico /></n-icon>
@@ -21,6 +34,7 @@
           :style="{
             height: '100%',
           }"
+          :max-height="630"
           style="min-width: 350px"
           :bordered="true"
           :single-line="false"
@@ -92,10 +106,11 @@
           :style="{
             height: '100%',
           }"
+          max-height="630"
           :bordered="true"
           :single-line="false"
-          :columns="roomsColumns"
-          :data="roomsData"
+          :columns="roomUsersColumns"
+          :data="roomUsersData"
           :row-key="rowKey"
           :pagination="pagination"
           :remote="true"
@@ -117,6 +132,7 @@ import {
   NIcon,
   NInfiniteScroll,
   NDivider,
+  NModal,
   NSelect,
 } from "naive-ui";
 import type {
@@ -130,7 +146,171 @@ import {
   Send as sendIco,
 } from "@vicons/tabler";
 
-const roomsData = ref([]);
+const roomsData = ref([
+  {
+    id: 110,
+    name: "John Brown",
+  },
+  {
+    id: 111,
+    name: "Jim Green",
+  },
+  {
+    id: 112,
+    name: "Joe Black",
+  },
+  {
+    id: 111,
+    name: "John Brown",
+  },
+  {
+    id: 212,
+    name: "Jim Green",
+  },
+  {
+    id: 313,
+    name: "Joe Black",
+  },
+  {
+    id: 112,
+    name: "John Brown",
+  },
+  {
+    id: 131,
+    name: "Jim Green",
+  },
+  {
+    id: 0,
+    name: "John Brown",
+  },
+  {
+    id: 1,
+    name: "Jim Green",
+  },
+  {
+    id: 2,
+    name: "Joe Black",
+  },
+  {
+    id: 11,
+    name: "John Brown",
+  },
+  {
+    id: 22,
+    name: "Jim Green",
+  },
+  {
+    id: 33,
+    name: "Joe Black",
+  },
+  {
+    id: 12,
+    name: "John Brown",
+  },
+  {
+    id: 31,
+    name: "Jim Green",
+  },
+  {
+    id: 21,
+    name: "Joe Black",
+  },
+  {
+    id: 10,
+    name: "John Brown",
+  },
+  {
+    id: 41,
+    name: "Jim Green",
+  },
+  {
+    id: 92,
+    name: "Joe Black",
+  },
+]);
+
+const roomUsersData = ref([
+  {
+    id: 110,
+    name: "John Brown",
+  },
+  {
+    id: 111,
+    name: "Jim Green",
+  },
+  {
+    id: 112,
+    name: "Joe Black",
+  },
+  {
+    id: 111,
+    name: "John Brown",
+  },
+  {
+    id: 212,
+    name: "Jim Green",
+  },
+  {
+    id: 313,
+    name: "Joe Black",
+  },
+  {
+    id: 112,
+    name: "John Brown",
+  },
+  {
+    id: 131,
+    name: "Jim Green",
+  },
+  {
+    id: 0,
+    name: "John Brown",
+  },
+  {
+    id: 1,
+    name: "Jim Green",
+  },
+  {
+    id: 2,
+    name: "Joe Black",
+  },
+  {
+    id: 11,
+    name: "John Brown",
+  },
+  {
+    id: 22,
+    name: "Jim Green",
+  },
+  {
+    id: 33,
+    name: "Joe Black",
+  },
+  {
+    id: 12,
+    name: "John Brown",
+  },
+  {
+    id: 31,
+    name: "Jim Green",
+  },
+  {
+    id: 21,
+    name: "Joe Black",
+  },
+  {
+    id: 10,
+    name: "John Brown",
+  },
+  {
+    id: 41,
+    name: "Jim Green",
+  },
+  {
+    id: 92,
+    name: "Joe Black",
+  },
+]);
 
 const rowKey = (row: any) => row.id;
 const checkedRowKeysRef = ref([]);
@@ -201,12 +381,14 @@ const roomsColumns: TableColumn[] = [
   {
     title: "",
     key: "info",
+    width: 68,
     render(row) {
       return h(
         NButton,
         {
+          ghost: true,
+          type: "info",
           strong: true,
-          tertiary: true,
           size: "small",
           onClick: () => roomInfo(row),
         },
@@ -216,14 +398,88 @@ const roomsColumns: TableColumn[] = [
   },
 ];
 
-function addRoom(row: any) {}
+const roomUsersColumns: TableColumn[] = [
+  {
+    title: "Users",
+    align: "center",
+    key: "name",
+  },
+  {
+    title: "",
+    key: "info",
+    width: 68,
+    render(row) {
+      return h(
+        NButton,
+        {
+          ghost: true,
+          type: "info",
+          strong: true,
+          size: "small",
+          onClick: () => userInfo(row),
+        },
+        { default: () => "Info" }
+      );
+    },
+  },
+  {
+    width: 80,
+    key: "delete",
+    render(row) {
+      return h(
+        NButton,
+        {
+          type: "error",
+          strong: true,
+          size: "small",
+          onClick: () => deleteUser(row),
+        },
+        { default: () => "Delete" }
+      );
+    },
+  },
+];
 
-function roomInfo(row: any) {}
+const showModal = ref(false);
 
-function deleteRoom(row: any) {}
-function sendMesage(row: any) {}
-function addUserToRoom(row: any) {}
-function handleUsersSearch(arg: string) {}
+function addRoom(row: any) {
+  console.log("addRoom");
+}
+
+function roomInfo(row: any) {
+  showModal.value = true;
+  console.log("roomInfo");
+}
+
+function userInfo(row: any) {
+  showModal.value = true;
+  console.log("userInfo");
+}
+
+function deleteUser(row: any) {
+  console.log("deleteUser");
+}
+
+function deleteRoom(row: any) {
+  console.log("deleteRoom");
+}
+function sendMesage(row: any) {
+  console.log("sendMesage");
+}
+function addUserToRoom(row: any) {
+  console.log("addUserToRoom");
+}
+function handleUsersSearch(arg: string) {
+  console.log("handleUsersSearch");
+}
+
+function onPositiveClick(row: any) {
+  console.log("onPositiveClick");
+}
+function onNegativeClick(row: any) {
+  showModal.value = false;
+  console.log("onNegativeClick");
+}
 
 const loading = ref(false);
 

@@ -1,26 +1,30 @@
 <template>
-  <div class="flex-container">
-    <nav
-      class="navbar d-flex fixed-top bg-light justify-content-between box-shadow shadow p-3 py-2"
-    >
-      <n-menu
-        :options="menuOptions"
-        :value="currentRouteName"
-        mode="horizontal"
-        responsive
-      />
-    </nav>
-    <div class="content-container flex-stretch">
-      <RouterView />
-    </div>
-  </div>
+  <n-message-provider>
+    <n-dialog-provider>
+      <div class="flex-container">
+        <nav
+          class="navbar d-flex fixed-top bg-light justify-content-between box-shadow shadow p-3 py-2"
+        >
+          <n-menu
+            :options="menuOptions"
+            :value="currentRouteName"
+            mode="horizontal"
+            responsive
+          />
+        </nav>
+        <div class="content-container flex-stretch">
+          <RouterView />
+        </div>
+      </div>
+    </n-dialog-provider>
+  </n-message-provider>
 </template>
 
 <script setup lang="ts">
 import type { Component } from "vue";
 import { computed, h } from "vue";
 import { RouterLink, RouterView } from "vue-router";
-import { NMenu, NIcon } from "naive-ui";
+import { NMenu, NIcon, NMessageProvider, NDialogProvider } from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import { useRouter } from "vue-router";
 
@@ -37,7 +41,7 @@ function renderIcon(icon: Component) {
 }
 
 const router = useRouter();
-const currentRouteName = computed(() => router.currentRoute.value.name);
+const currentRouteName: any = computed(() => router.currentRoute.value.name);
 
 const menuOptions: MenuOption[] = [
   {

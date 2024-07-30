@@ -1,4 +1,14 @@
 <template>
+  <n-modal
+    v-model:show="showModal"
+    preset="dialog"
+    title="Dialog"
+    content="Are you sure?"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onPositiveClick"
+    @negative-click="onNegativeClick"
+  />
   <div class="row flex-container">
     <div class="mb-4" style="display: contents">
       <div class="card-border mb-3" style="width: max-content">
@@ -17,14 +27,12 @@
     </div>
     <div class="card-border flex-stretch">
       <n-data-table
-        :style="{
-          height: '100%',
-        }"
+        :max-height="600"
         :bordered="true"
         :single-line="false"
         :columns="usersColumns"
-        :data="usersData"
-        :row-key="rowKey"
+        :data="tableData"
+        :row-key="id"
         :pagination="pagination"
         :remote="true"
         @update:checked-row-keys="handleCheck"
@@ -36,7 +44,7 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import { sendRequest } from "@/utils/request-utils";
-import { NDataTable, NButton, NIcon, NDivider } from "naive-ui";
+import { NDataTable, NButton, NInput, NIcon, NDivider, NModal } from "naive-ui";
 import type {
   RowData,
   TableColumn,
@@ -44,9 +52,58 @@ import type {
 
 import { Plus as plusIco, Minus as minusIco } from "@vicons/tabler";
 
-const usersData = ref([]);
+const tableData = ref([
+  {
+    id: 0,
+    name: "John Brown",
+  },
+  {
+    id: 1,
+    name: "Jim Green",
+  },
+  {
+    id: 2,
+    name: "Joe Black",
+  },
+  {
+    id: 11,
+    name: "John Brown",
+  },
+  {
+    id: 22,
+    name: "Jim Green",
+  },
+  {
+    id: 33,
+    name: "Joe Black",
+  },
+  {
+    id: 12,
+    name: "John Brown",
+  },
+  {
+    id: 31,
+    name: "Jim Green",
+  },
+  {
+    id: 21,
+    name: "Joe Black",
+  },
+  {
+    id: 10,
+    name: "John Brown",
+  },
+  {
+    id: 41,
+    name: "Jim Green",
+  },
+  {
+    id: 92,
+    name: "Joe Black",
+  },
+]);
 
-const rowKey = (row: any) => row.id;
+const id = (row: any) => row.id;
 const checkedRowKeysRef = ref([]);
 
 const handleCheck = (rowKeys: any) => {
@@ -56,6 +113,8 @@ const handleCheck = (rowKeys: any) => {
 const pagination = {
   pageSize: 10,
 };
+
+const showModal = ref(false);
 
 const defaultRequestOptions = {
   searchOptions: [
@@ -110,16 +169,27 @@ const usersColumns: TableColumn[] = [
   {
     title: "Name",
     key: "name",
+    render(row, index) {
+      return h(NInput, {
+        value: row.name,
+        onUpdateValue(v) {
+          tableData.value[index].name = v;
+          console.log(tableData.value[index].name);
+        },
+      });
+    },
   },
   {
     title: "",
     key: "info",
+    width: 68,
     render(row) {
       return h(
         NButton,
         {
+          ghost: true,
+          type: "info",
           strong: true,
-          tertiary: true,
           size: "small",
           onClick: () => userInfo(row),
         },
@@ -129,9 +199,28 @@ const usersColumns: TableColumn[] = [
   },
 ];
 
-function addUser(row: any) {}
+function addUser(row: any) {
+  tableData.value.push({
+    id: tableData.value.length,
+    name: "New User_" + tableData.value.length,
+  });
+  console.log("addUser");
+}
 
-function userInfo(row: any) {}
+function userInfo(row: any) {
+  showModal.value = true;
+  console.log("userInfo");
+}
 
-function deleteUser(row: any) {}
+function onPositiveClick(row: any) {
+  console.log("onPositiveClick");
+}
+function onNegativeClick(row: any) {
+  showModal.value = false;
+  console.log("onNegativeClick");
+}
+
+function deleteUser(row: any) {
+  console.log("deleteUser");
+}
 </script>

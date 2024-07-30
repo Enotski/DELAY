@@ -1,6 +1,16 @@
 <template>
   <n-message-provider>
     <n-dialog-provider>
+      <n-modal
+        v-model:show="showModal"
+        preset="dialog"
+        title="Dialog"
+        content="Are you sure?"
+        positive-text="Confirm"
+        negative-text="Cancel"
+        @positive-click="onPositiveClick"
+        @negative-click="onNegativeClick"
+      />
       <div class="flex-container">
         <nav
           class="navbar d-flex fixed-top bg-light justify-content-between box-shadow shadow p-3 py-2"
@@ -22,9 +32,16 @@
 
 <script setup lang="ts">
 import type { Component } from "vue";
-import { computed, h } from "vue";
+import { computed, h, ref } from "vue";
 import { RouterLink, RouterView } from "vue-router";
-import { NMenu, NIcon, NMessageProvider, NDialogProvider } from "naive-ui";
+import {
+  NMenu,
+  NIcon,
+  NMessageProvider,
+  NDialogProvider,
+  NButton,
+  NModal,
+} from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import { useRouter } from "vue-router";
 
@@ -42,7 +59,20 @@ function renderIcon(icon: Component) {
 
 const router = useRouter();
 const currentRouteName: any = computed(() => router.currentRoute.value.name);
+const isAuthorized = ref(true);
+const showModal = ref(false);
 
+function auth() {
+  showModal.value = true;
+  console.log("boardInfo");
+}
+function onPositiveClick(row: any) {
+  console.log("onPositiveClick");
+}
+function onNegativeClick(row: any) {
+  showModal.value = false;
+  console.log("onNegativeClick");
+}
 const menuOptions: MenuOption[] = [
   {
     label: () =>
@@ -61,22 +91,11 @@ const menuOptions: MenuOption[] = [
       h(
         RouterLink,
         {
-          to: "/account",
-        },
-        { default: () => "Account" }
-      ),
-    key: "account",
-    icon: renderIcon(accountIco),
-  },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
           to: "/tickets",
         },
         { default: () => "Tickets" }
       ),
+    show: isAuthorized.value,
     key: "tickets",
     icon: renderIcon(boardIco),
   },
@@ -89,6 +108,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => "ChatRooms" }
       ),
+    show: isAuthorized.value,
     key: "rooms",
     icon: renderIcon(messageIco),
   },
@@ -101,8 +121,39 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => "Users" }
       ),
+    show: isAuthorized.value,
     key: "users",
     icon: renderIcon(usersIco),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: "/account",
+        },
+        { default: () => "Account" }
+      ),
+    show: isAuthorized.value,
+    key: "account",
+    icon: renderIcon(accountIco),
+  },
+  {
+    label: () =>
+      h(
+        NButton,
+        {
+          ghost: true,
+          type: "success",
+          strong: true,
+          size: "medium",
+          icon: renderIcon(accountIco),
+          onClick: () => auth(),
+        },
+        { default: () => "LogIn" }
+      ),
+    show: !isAuthorized.value,
+    key: "auth",
   },
 ];
 </script>

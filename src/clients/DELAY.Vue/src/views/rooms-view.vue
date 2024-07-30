@@ -11,25 +11,10 @@
   />
   <div class="d-flex justify-content-between" size="large">
     <div class="col me-4 flex-container">
-      <div class="mb-4" style="display: contents">
-        <div
-          class="mb-3 card-border"
-          style="width: max-content; height: max-content"
-        >
-          <n-button type="primary" @click="addRoom">
-            <template #icon>
-              <n-icon><plus-ico /></n-icon>
-            </template>
-          </n-button>
-          <n-divider vertical style="height: 2em" />
-          <n-button type="error" @click="deleteRoom">
-            <template #icon>
-              <n-icon><minus-ico /></n-icon>
-            </template>
-          </n-button>
-        </div>
-      </div>
-      <div class="card-border flex-stretch">
+      <div
+        class="card-border mb-3 me-5 flex-card-content"
+        style="width: inherit; height: max-content"
+      >
         <n-data-table
           :style="{
             height: '100%',
@@ -45,6 +30,11 @@
           :remote="true"
           @update:checked-row-keys="handleCheck"
         />
+        <n-button type="success" class="mt-3" ghost @click="addRoom">
+          <template #icon>
+            <n-icon><plus-ico /></n-icon>
+          </template>
+        </n-button>
       </div>
     </div>
     <div class="col me-4 flex-container">
@@ -386,13 +376,28 @@ const roomsColumns: TableColumn[] = [
       return h(
         NButton,
         {
-          ghost: true,
           type: "info",
           strong: true,
           size: "small",
           onClick: () => roomInfo(row),
         },
         { default: () => "Info" }
+      );
+    },
+  },
+  {
+    width: 80,
+    key: "delete",
+    render(row) {
+      return h(
+        NButton,
+        {
+          type: "error",
+          strong: true,
+          size: "small",
+          onClick: () => deleteRoom(row),
+        },
+        { default: () => "Delete" }
       );
     },
   },
@@ -430,8 +435,8 @@ const roomUsersColumns: TableColumn[] = [
         NButton,
         {
           type: "error",
-          strong: true,
           size: "small",
+          ghost: true,
           onClick: () => deleteUser(row),
         },
         { default: () => "Delete" }
@@ -457,10 +462,12 @@ function userInfo(row: any) {
 }
 
 function deleteUser(row: any) {
+  showModal.value = true;
   console.log("deleteUser");
 }
 
 function deleteRoom(row: any) {
+  showModal.value = true;
   console.log("deleteRoom");
 }
 function sendMesage(row: any) {

@@ -470,14 +470,17 @@ function onNegativeClick(row: any) {
 }
 
 function deleteBoard(row: any) {
+  showModal.value = true;
   console.log("deleteBoard");
 }
 
 function deleteTicketsList(row: any) {
+  showModal.value = true;
   console.log("deleteTicketsList");
 }
 
 function deleteTicket(row: any) {
+  showModal.value = true;
   console.log("deleteTicket");
 }
 </script>

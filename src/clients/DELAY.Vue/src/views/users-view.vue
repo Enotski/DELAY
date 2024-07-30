@@ -17,12 +17,6 @@
             <n-icon><plus-ico /></n-icon>
           </template>
         </n-button>
-        <n-divider vertical style="height: 2em" />
-        <n-button type="error" @click="deleteUser">
-          <template #icon>
-            <n-icon><minus-ico /></n-icon>
-          </template>
-        </n-button>
       </div>
     </div>
     <div class="card-border flex-stretch">
@@ -197,6 +191,23 @@ const usersColumns: TableColumn[] = [
       );
     },
   },
+  {
+    width: 80,
+    key: "delete",
+    render(row) {
+      return h(
+        NButton,
+        {
+          ghost: true,
+          type: "error",
+          strong: true,
+          size: "small",
+          onClick: () => deleteUser(row),
+        },
+        { default: () => "Delete" }
+      );
+    },
+  },
 ];
 
 function addUser(row: any) {
@@ -221,6 +232,7 @@ function onNegativeClick(row: any) {
 }
 
 function deleteUser(row: any) {
+  showModal.value = true;
   console.log("deleteUser");
 }
 </script>

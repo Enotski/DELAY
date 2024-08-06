@@ -12,20 +12,6 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// Get record by key
         /// </summary>
         /// <param name="id">Key</param>
-        /// <returns></returns>
-        T Get(Guid id);
-
-        /// <summary>
-        /// Get records by keys
-        /// </summary>
-        /// <param name="ids">Keys</param>
-        /// <returns></returns>
-        IReadOnlyList<T> Get(IEnumerable<Guid> ids);
-
-        /// <summary>
-        /// Get record by key
-        /// </summary>
-        /// <param name="id">Key</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
         Task<T> GetAsync(Guid id, CancellationToken cancellationToken = default);
@@ -44,7 +30,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="entity">Record</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task AddAsync(T entity, CancellationToken cancellationToken = default);
+        Task<Guid> AddAsync(T entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Add records
@@ -52,7 +38,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="entities">Records</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task AddAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        Task<int> AddAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update record
@@ -60,7 +46,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="entity">Record</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task UpdateAsync(T entity, CancellationToken cancellationToken = default);
+        Task<int> UpdateAsync(T entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update records
@@ -68,7 +54,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="entities">Records</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task UpdateAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        Task<int> UpdateAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete record
@@ -76,7 +62,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="entity">Key</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task DeleteAsync(T entity, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(T entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete record by key
@@ -84,7 +70,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="id">Key</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete records by keys
@@ -92,7 +78,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="ids">Keys</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task DeleteAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete records
@@ -100,6 +86,6 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="entities">Records</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task DeleteAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
     }
 }

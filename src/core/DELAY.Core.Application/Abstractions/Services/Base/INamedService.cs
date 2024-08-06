@@ -15,7 +15,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <param name="id">Key</param>
         /// <param name="triggeredBy">What invoke operation</param>
         /// <returns></returns>
-        Task DeleteAsync(Guid id, string triggeredBy);
+        Task<int> DeleteAsync(Guid id, string triggeredBy);
 
         /// <summary>
         /// Delete by keys
@@ -23,7 +23,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <param name="ids">Keys</param>
         /// <param name="triggeredBy">What invoke operation</param>
         /// <returns></returns>        
-        Task DeleteAsync(IEnumerable<Guid> ids, string triggeredBy);
+        Task<int> DeleteAsync(IEnumerable<Guid> ids, string triggeredBy);
 
         /// <summary>
         /// Get records by key

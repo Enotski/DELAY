@@ -3,7 +3,7 @@ using DELAY.Core.Application.Abstractions.Services;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Base;
-using DELAY.Core.Application.Contracts.Models.Request;
+using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Models;
 
 namespace DELAY.Core.Application.Services
@@ -98,7 +98,7 @@ namespace DELAY.Core.Application.Services
             }
         }
 
-        public async Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, SortOptionsDto sortOption, PaginationOptionsDto pagination)
+        public async Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<SearchOptions> searchOptions, SortOptions sortOption, PaginationOptions pagination)
         {
             try
             {
@@ -110,7 +110,7 @@ namespace DELAY.Core.Application.Services
             }
         }
 
-        public async Task<TicketDto> GetRecordAsync(Guid id)
+        public async Task<TicketDto> GetAsync(Guid id)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace DELAY.Core.Application.Services
             }
         }
 
-        public async Task<IReadOnlyList<TicketDto>> GetRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, IEnumerable<SortOptionsDto> sortOptions, PaginationOptionsDto pagination)
+        public async Task<IReadOnlyList<TicketDto>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
         {
             try
             {

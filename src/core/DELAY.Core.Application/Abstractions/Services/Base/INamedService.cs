@@ -1,6 +1,7 @@
-﻿using DELAY.Core.Application.Contracts.Models.Base;
-using DELAY.Core.Application.Contracts.Models.Request;
+﻿using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Interfaces;
+using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {
@@ -30,7 +31,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         /// <param name="id">Key</param>
         /// <returns></returns>
-        Task<T> GetRecordAsync(Guid id);
+        Task<T> GetAsync(Guid id);
 
         /// <summary>
         /// Get records by keys
@@ -44,20 +45,6 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         /// <param name="id">Key</param>
         /// <returns></returns>
-        Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids);
-
-        /// <summary>
-        /// Get records by search options
-        /// </summary>
-        /// <param name="options">Search options</param>
-        /// <returns></returns>
-        Task<IReadOnlyList<T>> GetRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, IEnumerable<SortOptionsDto> sortOptions, PaginationOptionsDto pagination);
-
-        /// <summary>
-        /// Get key-name by search options
-        /// </summary>
-        /// <param name="options">Search options</param>
-        /// <returns></returns>
-        Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, SortOptionsDto sortOption, PaginationOptionsDto pagination);
+        Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids);
     }
 }

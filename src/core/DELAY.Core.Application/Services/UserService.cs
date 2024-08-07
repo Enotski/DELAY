@@ -1,8 +1,9 @@
 ﻿using DELAY.Core.Application.Abstractions.Mapper;
 using DELAY.Core.Application.Abstractions.Services;
+using DELAY.Core.Application.Abstractions.Services.Base;
 using DELAY.Core.Application.Abstractions.Storages;
-using DELAY.Core.Application.Contracts.Models.Base;
-using DELAY.Core.Application.Contracts.Models.Request;
+using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
 using DELAY.Core.Domain.Models.Base;
@@ -15,13 +16,15 @@ namespace DELAY.Core.Application.Services
 
         private readonly IModelMapperService mapper;
 
-        public UserService(IUserStorage userStorage, IModelMapperService mapper, ICryptographyService cryptoService)
+        private readonly ICryptographyService cryptoService;
+
+        public UserService(IUserStorage userStorage, IModelMapperService mapper)
         {
             this.userStorage = userStorage ?? throw new ArgumentNullException(nameof(IUserStorage));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(IModelMapperService));
         }
 
-        private async Task<KeyNamedModel> ValidatePermissionToOperation(RoleType roleType, string triggeredByName)
+        public async Task<KeyNamedModel> ValidatePermissionToOperation(RoleType roleType, string triggeredByName)
         { 
             var result = await userStorage.PermissionToPerformOperationAsync(roleType, triggeredByName);
 
@@ -33,9 +36,16 @@ namespace DELAY.Core.Application.Services
             return result;
         }
 
-        public async Task<Guid> AddAsync(User user, string triggeredBy)
+        public async Task<Guid> AddAsync(User model, string triggeredBy)
         {
-            var triggred = await ValidatePermissionToOperation(RoleType.Administrator, triggeredBy);
+            if (model == null)
+                throw new ArgumentNullException(nameof(User));
+
+            var triggered = await ValidatePermissionToOperation(Domain.Enums.RoleType.Administrator, triggeredBy);
+
+            var passwordHash = cryptoService.GetHash(model.Password);
+
+            var user = new User(model.Name, model.Email, model.PhoneNumber, passwordHash, triggered.Name);
 
             if (!user.IsValid())
                 throw new ArgumentException("Invalid user data");
@@ -48,8 +58,11 @@ namespace DELAY.Core.Application.Services
            return await userStorage.AddAsync(user);
         }
 
-        public async Task<int> UpdateAsync(User user, string triggeredBy)
+        public async Task<int> UpdateAsync(User model, string triggeredBy)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(User));
+
             var triggred = await ValidatePermissionToOperation(RoleType.Administrator, triggeredBy);
 
             if (triggred == null)
@@ -57,14 +70,14 @@ namespace DELAY.Core.Application.Services
                 throw new Exception("No permission for operation");
             }
 
-            var record = await userStorage.GetAsync(user.Id);
+            var record = await userStorage.GetAsync(model.Id);
 
             if (record == null)
             {
                 throw new Exception("Record not found");
             }
 
-            record.Update(user.Name, user.Email, user.PhoneNumber, triggred.Name);
+            record.Update(model.Name, model.Email, model.PhoneNumber, triggred.Name);
 
             if (!record.IsValid())
                 throw new ArgumentException("Invalid user data");
@@ -101,49 +114,34 @@ namespace DELAY.Core.Application.Services
             return await userStorage.DeleteAsync(ids);
         }
 
-        public async Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids)
+        public async Task<User> GetAsync(Guid id)
+        {
+            return await userStorage.GetAsync(id);
+        }
+
+        public async Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
+        {
+            return await userStorage.GetRecordsAsync(searchOptions, sortOptions, pagination);
+        }
+
+        public async Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids)
         {
             return await userStorage.GetKeyNameRecordsAsync(ids);
         }
 
-        public async Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, SortOptionsDto sortOption, PaginationOptionsDto pagination)
-        {
-            return await userStorage.GetKeyNameRecordsAsync(searchOptions, sortOption, pagination);
-        }
-
-        public async Task<User> GetRecordAsync(Guid id)
-        {
-            var result = await userStorage.GetAsync(id);
-
-            return mapper.Map<User>(result);
-        }
-
         public async Task<IReadOnlyList<User>> GetRecordsAsync(IEnumerable<Guid> ids)
         {
-            var result = await userStorage.GetAsync(ids);
-
-            return mapper.Map<IReadOnlyList<User>>(result);
+            return await userStorage.GetAsync(ids);
         }
 
-        public async Task<IReadOnlyList<User>> GetRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, IEnumerable<SortOptionsDto> sortOptions, PaginationOptionsDto pagination)
+        public async Task<IEnumerable<User>> GetUsersByTicketAsync(Guid ticketId)
         {
-            var result = await userStorage.GetRecordsAsync(searchOptions, sortOptions, pagination);
-
-            return mapper.Map<IReadOnlyList<User>>(result);
-        }
-
-        public async Task<IEnumerable<User>> GetAssigedUsersToTicketAsync(Guid ticketId)
-        {
-            var result = await userStorage.GetAssigedUsersToTicketAsync(ticketId);
-
-            return mapper.Map<IReadOnlyList<User>>(result);
+            return await userStorage.GetAssigedUsersToTicketAsync(ticketId);
         }
 
         public async Task<IEnumerable<User>> GetBoardUsersAsync(Guid boardId)
         {
-            var result = await userStorage.GetBoardUsersAsync(boardId);
-
-            return mapper.Map<IReadOnlyList<User>>(result);
+            return await userStorage.GetBoardUsersAsync(boardId);
         }
     }
 }

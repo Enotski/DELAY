@@ -1,4 +1,4 @@
-﻿namespace DELAY.Infrastructure.Cryptography
+﻿namespace DELAY.Core.Application.Abstractions.Services.Base
 {
     public interface ICryptographyService
     {

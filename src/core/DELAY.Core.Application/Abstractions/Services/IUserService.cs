@@ -1,4 +1,6 @@
-﻿using DELAY.Core.Domain.Enums;
+﻿using DELAY.Core.Application.Contracts.Models.SelectOptions;
+using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
 using DELAY.Core.Domain.Models.Base;
 
@@ -20,10 +22,17 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <returns></returns>
         Task<int> UpdateAsync(User user, string triggeredBy);
 
-        Task<IEnumerable<User>> GetAssigedUsersToTicketAsync(Guid ticketId);
+        Task<IEnumerable<User>> GetUsersByTicketAsync(Guid ticketId);
 
         Task<IEnumerable<User>> GetBoardUsersAsync(Guid boardId);
 
         Task<KeyNamedModel> ValidatePermissionToOperation(RoleType roleType, string triggeredByName);
+
+        /// <summary>
+        /// Get records by search options
+        /// </summary>
+        /// <param name="options">Search options</param>
+        /// <returns></returns>
+        Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination);
     }
 }

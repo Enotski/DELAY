@@ -2,7 +2,7 @@
 
 namespace DELAY.Core.Application.Contracts.Models
 {
-    public class UserDto : KeyNameDto
+    public class UserApiModel : KeyNameDto
     {
         public string Email { get; set; }
 

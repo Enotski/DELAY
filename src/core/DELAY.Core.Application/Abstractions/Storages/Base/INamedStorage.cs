@@ -1,6 +1,7 @@
-﻿using DELAY.Core.Application.Contracts.Models.Base;
-using DELAY.Core.Application.Contracts.Models.Request;
+﻿using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Interfaces;
+using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Application.Abstractions.Storages.Base
 {
@@ -28,7 +29,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="id">Key</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<KeyNameDto> GetKeyNameByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<KeyNamedModel> GetKeyNameByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get key-name records
@@ -36,7 +37,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="ids">Keys</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<IReadOnlyList<KeyNameDto>> GetKeyNamesByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<KeyNamedModel>> GetKeyNamesByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get key by record name
@@ -50,10 +51,10 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// Get key-name records by search term
         /// </summary>
         /// <param name="term">Search term</param>
-        /// <param name="paginationOption"><inheritdoc cref="PaginationOptionsDto"/></param>
+        /// <param name="paginationOption"><inheritdoc cref="PaginationOptions"/></param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<SearchOptionsDto> searchOptions, SortOptionsDto sortOption, PaginationOptionsDto pagination, CancellationToken cancellationToken = default);
+        Task<PagedDataModel<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<SearchOptions> searchOptions, SortOptions sortOption, PaginationOptions pagination, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get key-name records by keys
@@ -61,6 +62,6 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="ids">Keys</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
     }
 }

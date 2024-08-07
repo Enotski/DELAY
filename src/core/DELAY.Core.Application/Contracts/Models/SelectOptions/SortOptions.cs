@@ -1,20 +1,20 @@
 ﻿using DELAY.Core.Application.Contracts.Enums;
 
-namespace DELAY.Core.Application.Contracts.Models.Request
+namespace DELAY.Core.Application.Contracts.Models.SelectOptions
 {
-    public class SortOptionsDto
+    public class SortOptions
     {
         public string Column { get; set; }
         public OrderType Order { get; set; }
-        public SortOptionsDto(string column, OrderType order) : this(column)
+        public SortOptions(string column, OrderType order) : this(column)
         {
             Order = order;
         }
-        public SortOptionsDto(string column)
+        public SortOptions(string column)
         {
             Column = column;
         }
-        public SortOptionsDto()
+        public SortOptions()
         {
         }
     }

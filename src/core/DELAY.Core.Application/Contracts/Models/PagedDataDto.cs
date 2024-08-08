@@ -1,12 +1,12 @@
 ﻿namespace DELAY.Core.Application.Contracts.Models
 {
-    public class PagedDataModel<T>
+    public class PagedDataDto<T>
     {
-        public PagedDataModel()
+        public PagedDataDto()
         {
         }
 
-        public PagedDataModel(int totalCount, IReadOnlyList<T> data)
+        public PagedDataDto(int totalCount, IReadOnlyList<T> data)
         {
             TotalCount = totalCount;
             Data = data;

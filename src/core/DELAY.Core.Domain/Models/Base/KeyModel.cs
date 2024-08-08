@@ -21,9 +21,9 @@ namespace DELAY.Core.Domain.Models.Base
                 if (value == Guid.Empty)
                     throw new ArgumentException(nameof(Id));
 
-                Id = value;
+                id = value;
             }
         }
-        private readonly Guid id;
+        private Guid id;
     }
 }

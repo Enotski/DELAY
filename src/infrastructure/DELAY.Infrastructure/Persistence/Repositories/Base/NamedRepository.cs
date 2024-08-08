@@ -1,46 +1,103 @@
 ﻿using DELAY.Core.Application.Abstractions.Storages.Base;
-using DELAY.Core.Application.Contracts.Models.Base;
+using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Interfaces;
+using DELAY.Core.Domain.Models.Base;
+using DELAY.Infrastructure.Builders;
+using DELAY.Infrastructure.Extensions;
+using DELAY.Infrastructure.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DELAY.Infrastructure.Persistence.Repositories.Base
 {
-    internal class NamedRepository<T> : BaseRepository<T>, INamedStorage<T>
-        where T : class, IKey, IName
+    internal abstract class NamedRepository<TEntity> : BaseRepository<TEntity>, INamedStorage<TEntity>
+        where TEntity : class, IKey, IName
     {
-        public Task<Guid> GetKeyByNameAsync(string name, CancellationToken cancellationToken = default)
+        protected NamedRepository(DelayContext context) : base(context)
         {
-            throw new NotImplementedException();
         }
 
-        public Task<KeyNameDto> GetKeyNameByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        protected IQueryable<TEntity> BuildQueryOrderedByName(Expression<Func<TEntity, bool>> filter = null)
         {
-            throw new NotImplementedException();
+            return BuildQuery(filter, ordered: o => o.OrderBy(x => x.Name));
         }
 
-        public Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<SearchOptions> searchOptions, SortOptions sortOption, PaginationOptions pagination, CancellationToken cancellationToken = default)
+        protected Expression<Func<TEntity, KeyNamedModel>> KeyNamedSelectorSpecification()
         {
-            throw new NotImplementedException();
+            return x => new KeyNamedModel(x.Id, x.Name);
         }
 
-        public Task<IReadOnlyList<KeyNameDto>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        public async Task<Guid?> GetKeyByNameAsync(string name, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(name))
+            {
+                return Guid.Empty;
+            }
+
+            name = name.ToUpperTrim();
+
+            return await context.Set<TEntity>()
+                .Where(m => m.Name.ToUpper() == name)
+                .Select(m => m.Id)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public Task<IReadOnlyList<KeyNameDto>> GetKeyNamesByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        public async Task<KeyNamedModel> GetKeyNameByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var filter = ByKeySearchSpecification(id);
+            var selector = KeyNamedSelectorSpecification();
+
+            return await context.Set<TEntity>()
+                .Where(filter)
+                .Select(selector)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public Task<string> GetNameByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (!ids.Any())
+                return new List<KeyNamedModel>();
+
+            var filter = ByKeysSearchSpecification(ids);
+            var selector = KeyNamedSelectorSpecification();
+
+            return await BuildQueryOrderedByName(filter)
+                .Select(selector)
+                .ToListAsync(cancellationToken);
         }
 
-        public Task<IReadOnlyList<string>> GetNamesByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        public async Task<string> GetNameByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var filter = ByKeySearchSpecification(id);
+
+            return await context.Set<TEntity>().Where(filter).Select(m => m.Name).FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<IReadOnlyList<string>> GetNamesByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        {
+            var filter = ByKeysSearchSpecification(ids);
+
+            return await BuildQueryOrderedByName(filter)
+                .Select(m => m.Name)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<PagedDataDto<KeyNamedModel>> GetKeyNameRecordsAsync(string name, PaginationOptions pagination, CancellationToken cancellationToken)
+        {
+            var filter = PredicateBuilder.True<TEntity>();
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                name = name.ToUpperTrim();
+                filter = filter.And(m => !string.IsNullOrEmpty(m.Name) && m.Name.ToUpper().Contains(name));
+            }
+
+            var count = await CountAsync(filter, cancellationToken);
+
+            var records = await BuildQuery(filter, m => m.OrderBy(m => m.Name), pagination)
+                .Select(m => new KeyNamedModel(m.Id, m.Name)).ToListAsync(cancellationToken);
+
+            return new PagedDataDto<KeyNamedModel>(count, records);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using DELAY.Core.Application.Abstractions.Storages.Base;
-using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Domain.Models;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
+using DELAY.Core.Application.Contracts.Models;
 
 namespace DELAY.Core.Application.Abstractions.Storages
 {
@@ -9,8 +9,8 @@ namespace DELAY.Core.Application.Abstractions.Storages
     {
         Task<int> CountAsync(IEnumerable<SearchOptions> options, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyList<TicketDto>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Ticket>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyList<TicketDto>> GetAssignedToUserAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<Ticket>> GetAssignedToUserAsync(Guid userId, CancellationToken cancellationToken = default);
     }
 }

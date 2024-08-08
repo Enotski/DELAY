@@ -3,9 +3,9 @@ using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Application.Contracts.Models
 {
-    public class BoardDto : KeyNameDto
+    public class BoardApiModel : KeyNameApiModel
     {
         public string Description { get; set; }
-        public ICollection<BoardUserDto> BoardUsers { get; set; } = new List<BoardUserDto>();
+        public ICollection<KeyNameApiModel> BoardUsers { get; set; } = new List<KeyNameApiModel>();
     }
 }

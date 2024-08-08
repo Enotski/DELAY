@@ -2,7 +2,9 @@
 {
     public class SearchOptions
     {
-        public string Term { get; set; }
+        public string Column { get; set; }
+
+        public string Value { get; set; }
 
         public SearchOptions() { }
     }

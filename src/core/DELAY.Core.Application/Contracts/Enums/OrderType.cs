@@ -2,7 +2,7 @@
 {
     public enum OrderType
     {
-        Ascending = 0,
+        Asc = 0,
         Descending
     }
 }

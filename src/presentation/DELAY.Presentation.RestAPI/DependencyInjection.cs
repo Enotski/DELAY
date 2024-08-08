@@ -78,8 +78,7 @@ namespace DELAY.Presentation.RestAPI
                     });
                 };
 
-                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "api_doc.xml"));
             });
 
             return services;

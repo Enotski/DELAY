@@ -8,10 +8,10 @@ namespace DELAY.Core.Application.Abstractions.Storages
     {
         Task<int> CountRecordsByUserAsync(Guid userId, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyList<RoomUserDto>> GetRecordsByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<RoomUser>> GetRecordsByUserAsync(Guid userId, CancellationToken cancellationToken = default);
 
         Task<int> CountRecordsByRoomAsync(Guid roomId, CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyList<RoomUserDto>> GetRecordsByRoomAsync(Guid roomId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<RoomUser>> GetRecordsByRoomAsync(Guid roomId, CancellationToken cancellationToken = default);
     }
 }

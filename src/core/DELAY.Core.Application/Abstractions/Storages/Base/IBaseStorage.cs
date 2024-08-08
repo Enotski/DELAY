@@ -30,7 +30,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="entity">Record</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<Guid> AddAsync(T entity, CancellationToken cancellationToken = default);
+        Task<Guid?> AddAsync(T entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Add records

@@ -11,14 +11,16 @@ namespace DELAY.Core.Application.Abstractions.Storages
     {
         Task<int> CountAsync(IEnumerable<SearchOptions> options, CancellationToken cancellationToken = default);
 
-        Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default);
+        Task<PagedDataDto<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<User>> GetAssigedUsersToTicketAsync(Guid ticketId, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<User>> GetBoardUsersAsync(Guid boardId, CancellationToken cancellationToken = default);
 
-        Task<bool> IsUnique(string name, string email, string phoneNumber, Guid? id = null, CancellationToken cancellationToken = default);
+        Task<bool> IsUniqueName(string name, Guid? id = null, CancellationToken cancellationToken = default);
+        Task<bool> IsUniqueEmail(string email, Guid? id = null, CancellationToken cancellationToken = default);
+        Task<bool> IsUniquePhone(string phoneNumber, Guid? id = null, CancellationToken cancellationToken = default);
 
-        Task<KeyNamedModel> PermissionToPerformOperationAsync(RoleType role, string triggeredBy);
+        Task<KeyNamedModel> PermissionToPerformOperationAsync(RoleType role, string triggeredBy, CancellationToken cancellationToken = default);
     }
 }

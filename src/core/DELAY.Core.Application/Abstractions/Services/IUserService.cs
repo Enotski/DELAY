@@ -13,7 +13,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         /// <param name="user">User model</param>
         /// <returns></returns>
-        Task<Guid> AddAsync(User user, string triggeredBy);
+        Task<Guid?> AddAsync(User user, string triggeredBy);
 
         /// <summary>
         /// Update user
@@ -26,13 +26,11 @@ namespace DELAY.Core.Application.Abstractions.Services
 
         Task<IEnumerable<User>> GetBoardUsersAsync(Guid boardId);
 
-        Task<KeyNamedModel> ValidatePermissionToOperation(RoleType roleType, string triggeredByName);
-
         /// <summary>
         /// Get records by search options
         /// </summary>
         /// <param name="options">Search options</param>
         /// <returns></returns>
-        Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination);
+        Task<PagedDataDto<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination);
     }
 }

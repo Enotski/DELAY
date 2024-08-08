@@ -1,4 +1,5 @@
-﻿using DELAY.Core.Domain.Models.Base;
+﻿using DELAY.Core.Domain.Enums;
+using DELAY.Core.Domain.Models.Base;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -17,8 +18,9 @@ namespace DELAY.Core.Domain.Models
         public DateTime CreateDate { get; set; }
 
         public string ChangedBy {  get; set; }
+        public RoleType Role {  get; set; }
 
-        public bool IsValid()
+        public bool IsValidCredentials()
         {
             return !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Password) && IsValidEmail(Email) && IsValidPhoneNumber(PhoneNumber);
         }
@@ -96,14 +98,16 @@ namespace DELAY.Core.Domain.Models
             CreateDate = DateTime.UtcNow;
             ChangedDate = CreateDate;
             ChangedBy = changedBy;
+            Role = RoleType.User;
         }
 
-        public void Update(string name, string email, string phoneNumber, string changedBy)
+        public void Update(string name, string email, string phoneNumber, RoleType role, string changedBy)
         {
             Email = email;
             PhoneNumber = phoneNumber;
             ChangedBy = changedBy;
             ChangedDate = DateTime.UtcNow;
+            Role = role;
 
             base.Update(name);
         }

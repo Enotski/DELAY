@@ -27,8 +27,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         private readonly IModelMapperService mapper;
 
-        public UserController()
+        public UserController(IUserService userService, IModelMapperService mapper, ILogger<UserController> logger)
         {
+            this.logger = logger;
+
+            this.userService = userService ?? throw new ArgumentNullException(nameof(IUserService));
+
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(IModelMapperService));
         }
 
         /// <summary>
@@ -55,7 +60,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </remarks>
         /// <response code="200">OK</response>
         /// <response code="404">Не удалось найти по ключу</response>
-        /// <response code="500">Ошибка сервера</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -65,13 +70,14 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                var user = await userService.GetAsync(id);
+                var user = await userService.GetAsync(id); ;
 
                 if (user == null)
                 {
                     string message = "Не удалось определить объект активности по ключу";
 
                     logger.LogInformation(message + " {id}", id);
+
 
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
@@ -114,7 +120,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </remarks>
         /// <response code="200">OK</response>
         /// <response code="404">Не удалось найти по ключу</response>
-        /// <response code="500">Ошибка сервера</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet]
         [Route("board")]
         [Produces("application/json")]
@@ -136,7 +142,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
 
-                var result = mapper.Map<UserApiModel>(user);
+                var result = mapper.Map<IEnumerable<UserApiModel>>(user);
 
                 logger.LogInformation("Получение объекта активности по ключу {id}: {result}", result, id);
 
@@ -174,7 +180,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </remarks>
         /// <response code="200">OK</response>
         /// <response code="404">Не удалось найти по ключу</response>
-        /// <response code="500">Ошибка сервера</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet]
         [Route("ticket")]
         [Produces("application/json")]
@@ -247,7 +253,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// 
         /// </remarks>
         /// <response code="200">OK</response>
-        /// <response code="500">Ошибка сервера</response>
+        /// <response code="500">Internal server error</response>
         [HttpPost]
         [Route("get-all")]
         [Produces("application/json")]
@@ -297,7 +303,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </remarks>
         /// <response code="200">OK</response>
         /// <response code="404">Не удалось найти по ключу</response>
-        /// <response code="500">Ошибка сервера</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet]
         [Route("get-list")]
         [Produces("application/json")]
@@ -357,7 +363,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </remarks>
         /// <response code="200">OK</response>
         /// <response code="404">Не удалось найти по ключу</response>
-        /// <response code="500">Ошибка сервера</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet]
         [Route("get-key-name-list")]
         [Produces("application/json")]
@@ -421,7 +427,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddUser([FromBody] UserApiModel model)
+        public async Task<IActionResult> AddAsync([FromBody] UserApiModel model)
         {
             try
             {
@@ -461,13 +467,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         ///     "0"
         /// 
         /// </remarks>
-        /// <response code="202">User updated</response>
-        /// <response code="500">Server error</response>
+        /// <response code="202">Accepted</response>
+        /// <response code="500">Internal server error</response>
         [HttpPut]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateUser([FromBody] UserApiModel model)
+        public async Task<IActionResult> UpdateAsync([FromBody] UserApiModel model)
         {
             try
             {
@@ -492,15 +498,15 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <remarks>
         /// Пример запроса:
         ///
-        ///     DELETE /api/events/{id}
+        ///     DELETE /api/users/{id}
         ///
         /// Пример ответа:
         /// 
         ///     0
         /// 
         /// </remarks>
-        /// <response code="202">Операция выполнена</response>
-        /// <response code="500">Ошибка сервера</response>
+        /// <response code="202">Accepted</response>
+        /// <response code="500">Internal server error</response>
         [HttpDelete]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -517,19 +523,19 @@ namespace DELAY.Core.Application.Abstractions.Services
             }
             catch (Exception exp)
             {
-                logger.LogError("Ошибка удаления активностей по параметрам фильтра {filter}: {exp}", filter, exp);
+                logger.LogError("Ошибка удаления активностей по параметрам фильтра {filter}: {exp}", id, exp);
 
                 return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
             }
         }
         /// <summary>
-        /// Удаление активностей по параметрам фильтра
+        /// Delete by ids
         /// </summary>
-        /// <param name="id">Фильтр записей для удаления</param>
+        /// <param name="ids">Records ids</param>
         /// <remarks>
         /// Пример запроса:
         ///
-        ///     POST /api/events/delete-multiple
+        ///     POST /api/users/delete-multiple
         ///     {
         ///       "ids": ["string"],
         ///     }
@@ -539,8 +545,8 @@ namespace DELAY.Core.Application.Abstractions.Services
         ///     0
         /// 
         /// </remarks>
-        /// <response code="202">Операция выполнена</response>
-        /// <response code="500">Ошибка сервера</response>
+        /// <response code="202">Accepted</response>
+        /// <response code="500">Internal server error</response>
         [HttpPost]
         [Route("delete-multiple")]
         [Produces("application/json")]
@@ -552,13 +558,13 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 var deletedCount = await userService.DeleteAsync(ids, HttpContext.User.Identity.Name);
 
-                logger.LogInformation("Удалено {deletedCount} активностей по параметрам фильтра {filter}", deletedCount, id);
+                logger.LogInformation("Удалено {deletedCount} активностей по параметрам фильтра {filter}", deletedCount, ids);
 
                 return Accepted(deletedCount);
             }
             catch (Exception exp)
             {
-                logger.LogError("Ошибка удаления активностей по параметрам фильтра {filter}: {exp}", filter, exp);
+                logger.LogError("Ошибка удаления активностей по параметрам фильтра {filter}: {exp}", ids, exp);
 
                 return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
             }

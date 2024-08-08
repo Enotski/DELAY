@@ -1,8 +1,7 @@
-﻿using DELAY.Core.Application.Abstractions.Mapper;
-using DELAY.Core.Application.Mapper;
-using Mapster;
+﻿using DELAY.Core.Application.Abstractions.Services;
+using DELAY.Core.Application.Abstractions.Services.Base;
+using DELAY.Core.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace DELAY.Core.Application
 {
@@ -10,18 +9,10 @@ namespace DELAY.Core.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            services.AddMapperService();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IBoardService, BoardService>();
+            services.AddScoped<ICryptographyService, CryptographyService>();
 
-            return services;
-        }
-
-        private static IServiceCollection AddMapperService(this IServiceCollection services)
-        {
-            var config = TypeAdapterConfig.GlobalSettings;
-            config.Scan(Assembly.GetExecutingAssembly());
-            services.AddSingleton(config);
-            services.AddMapster();
-            services.AddTransient<IModelMapperService, MapsterMapperService>();
             return services;
         }
     }

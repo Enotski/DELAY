@@ -1,7 +1,6 @@
 ﻿using DELAY.Core.Application.Abstractions.Mapper;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Domain.Models;
-using DELAY.Infrastructure.Extensions;
 using DELAY.Presentation.RestAPI.Contracts.Request;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
@@ -77,7 +76,6 @@ namespace DELAY.Core.Application.Abstractions.Services
                     string message = "Не удалось определить объект активности по ключу";
 
                     logger.LogInformation(message + " {id}", id);
-
 
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
@@ -427,7 +425,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddAsync([FromBody] UserDto model)
+        public async Task<IActionResult> AddAsync([FromBody] UserCreateRequestDto model)
         {
             try
             {
@@ -498,7 +496,10 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <remarks>
         /// Пример запроса:
         ///
-        ///     DELETE /api/users/{id}
+        ///     DELETE /api/users/
+        ///     {
+        ///         id: ""
+        ///     }
         ///
         /// Пример ответа:
         /// 
@@ -511,7 +512,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteAsync(Guid id)
+        public async Task<IActionResult> DeleteAsync([FromBody]Guid id)
         {
             try
             {

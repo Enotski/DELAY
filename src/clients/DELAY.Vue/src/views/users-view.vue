@@ -1,14 +1,77 @@
 <template>
   <n-modal
-    v-model:show="showModal"
+    v-model:show="showAddModal"
     preset="dialog"
-    title="Dialog"
+    title="Add user"
     content="Are you sure?"
     positive-text="Confirm"
     negative-text="Cancel"
-    @positive-click="onPositiveClick"
-    @negative-click="onNegativeClick"
-  />
+    @positive-click="onConfirmAddClick"
+    @negative-click="onCancelAddClick"
+  >
+    <n-form
+      ref="formRef"
+      inline
+      :label-width="80"
+      :model="formValue"
+      :rules="rules"
+      size="large"
+      class="row"
+    >
+      <n-form-item label="Name" path="name">
+        <n-input v-model:value="formValue.name" placeholder="Input Name" />
+      </n-form-item>
+      <n-form-item label="Password" path="password">
+        <n-input
+          v-model:value="formValue.password"
+          placeholder="Input Password"
+        />
+      </n-form-item>
+      <n-form-item label="Email" path="email">
+        <n-input v-model:value="formValue.email" placeholder="Input Email" />
+      </n-form-item>
+      <n-form-item label="Phone" path="phoneNumber">
+        <n-input
+          v-model:value="formValue.phoneNumber"
+          placeholder="Input Phone"
+        />
+      </n-form-item>
+    </n-form>
+  </n-modal>
+
+  <n-modal
+    v-model:show="showEditModal"
+    preset="dialog"
+    title="Edit user"
+    content="Are you sure?"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onConfirmEditClick"
+    @negative-click="onCancelEditClick"
+  >
+    <n-form
+      ref="formRef"
+      inline
+      :label-width="80"
+      :model="formValue"
+      :rules="rules"
+      size="large"
+      class="row"
+    >
+      <n-form-item label="Name" path="name">
+        <n-input v-model:value="formValue.name" placeholder="Input Name" />
+      </n-form-item>
+      <n-form-item label="Email" path="email">
+        <n-input v-model:value="formValue.email" placeholder="Input Email" />
+      </n-form-item>
+      <n-form-item label="Phone" path="phoneNumber">
+        <n-input
+          v-model:value="formValue.phoneNumber"
+          placeholder="Input Phone"
+        />
+      </n-form-item>
+    </n-form>
+  </n-modal>
   <div class="row flex-container">
     <div class="mb-4" style="display: contents">
       <div class="card-border mb-3" style="width: max-content">
@@ -38,7 +101,15 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import { sendRequest } from "@/utils/request-utils";
-import { NDataTable, NButton, NInput, NIcon, NDivider, NModal } from "naive-ui";
+import {
+  NDataTable,
+  NButton,
+  NInput,
+  NIcon,
+  NForm,
+  NFormItem,
+  NModal,
+} from "naive-ui";
 import type {
   RowData,
   TableColumn,
@@ -47,6 +118,22 @@ import type {
 import { Plus as plusIco, Minus as minusIco } from "@vicons/tabler";
 
 const tableData = ref();
+
+const formValue = ref({
+  id: "",
+  name: "",
+  email: "",
+  phoneNumber: "",
+  password: "",
+});
+
+const rules = {
+  name: {
+    required: true,
+    message: "Please input your name",
+    trigger: "blur",
+  },
+};
 
 const id = (row: any) => row.id;
 const checkedRowKeysRef = ref([]);
@@ -59,7 +146,8 @@ const pagination = {
   pageSize: 10,
 };
 
-const showModal = ref(false);
+const showAddModal = ref(false);
+const showEditModal = ref(false);
 
 const defaultRequestOptions = {
   searchs: [
@@ -88,31 +176,6 @@ onMounted(async () => {
   );
 });
 
-// const handleAddClick = async () => {
-//   await sendRequest("users", "POST", formValue.value.form).then(() => {
-//     sendRequest("users/search", "POST", defaultRequestOptions).then((value) => {
-//       data.value = value.records;
-//     });
-//     formValue.value.form = {
-//       name: "",
-//       login: "",
-//       password: "",
-//     };
-//   });
-// };
-
-// const handleRemoveClick = async () => {
-//   await sendRequest("users", "DELETE", checkedRowKeysRef.value).then(
-//     async () => {
-//       await sendRequest("users/search", "POST", defaultRequestOptions).then(
-//         (value) => {
-//           data.value = value.records;
-//         }
-//       );
-//     }
-//   );
-// };
-
 const usersColumns: TableColumn[] = [
   {
     type: "selection",
@@ -120,15 +183,14 @@ const usersColumns: TableColumn[] = [
   {
     title: "Name",
     key: "name",
-    render(row, index) {
-      return h(NInput, {
-        value: row.name,
-        onUpdateValue(v) {
-          tableData.value[index].name = v;
-          console.log(tableData.value[index].name);
-        },
-      });
-    },
+  },
+  {
+    title: "Email",
+    key: "email",
+  },
+  {
+    title: "Phone",
+    key: "phoneNumber",
   },
   {
     title: "",
@@ -167,29 +229,76 @@ const usersColumns: TableColumn[] = [
   },
 ];
 
-function addUser(row: any) {
-  tableData.value.push({
-    id: tableData.value.length,
-    name: "New User_" + tableData.value.length,
-  });
-  console.log("addUser");
+async function addUser() {
+  showAddModal.value = true;
 }
 
 function userInfo(row: any) {
-  showModal.value = true;
-  console.log("userInfo");
+  showEditModal.value = true;
+
+  formValue.value = row;
 }
 
-function onPositiveClick(row: any) {
+async function onConfirmAddClick(row: any) {
+  await sendRequest("users", "POST", formValue.value).then(async () => {
+    await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
+      (value) => {
+        tableData.value = value.data;
+      }
+    );
+    closeAddModal();
+  });
+
   console.log("onPositiveClick");
 }
-function onNegativeClick(row: any) {
-  showModal.value = false;
-  console.log("onNegativeClick");
+function onCancelAddClick(row: any) {
+  closeAddModal();
+}
+function closeAddModal() {
+  showAddModal.value = false;
+
+  formValue.value = {
+    id: "",
+    name: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+  };
 }
 
-function deleteUser(row: any) {
-  showModal.value = true;
-  console.log("deleteUser");
+function closeEditModal() {
+  showEditModal.value = false;
+
+  formValue.value = {
+    id: "",
+    name: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+  };
+}
+
+async function onConfirmEditClick(row: any) {
+  await sendRequest("users", "PUT", formValue.value).then(async () => {
+    await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
+      (value) => {
+        tableData.value = value.data;
+      }
+    );
+    closeAddModal();
+  });
+}
+function onCancelEditClick(row: any) {
+  closeEditModal();
+}
+
+async function deleteUser(row: any) {
+  await sendRequest("users", "DELETE", row.id).then(async () => {
+    await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
+      (value) => {
+        tableData.value = value.data;
+      }
+    );
+  });
 }
 </script>

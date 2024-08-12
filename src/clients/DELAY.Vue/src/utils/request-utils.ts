@@ -36,8 +36,20 @@ export async function sendRequest(url: string, method: string = "GET", args: obj
         console.log(ex);
         throw ex;
       });
+  }else if (method === "PUT") {
+    return await instance
+      .put(url, args)
+    .then((response) => {
+      if (response.data.Result !== undefined && response.data.Result !== 0)
+        throw response.data.Message;
+      return response.data;
+    })
+    .catch((ex) => {
+      console.log(ex);
+      throw ex;
+    });
   }
-  
+
   return await instance
     .post(url, args)
     .then((response) => {

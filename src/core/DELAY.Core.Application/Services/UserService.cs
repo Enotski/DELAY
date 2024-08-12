@@ -38,13 +38,13 @@ namespace DELAY.Core.Application.Services
             if (!user.IsValidCredentials())
                 throw new ArgumentException("Invalid user data");
 
-            if (!await userStorage.IsUniqueName(user.Name))
+            if (!string.IsNullOrWhiteSpace(user.Name) && !await userStorage.IsUniqueName(user.Name))
                 throw new ArgumentException("Such name already exist");
 
-            if (!await userStorage.IsUniqueEmail(user.Email))
+            if (!string.IsNullOrWhiteSpace(user.Email) && !await userStorage.IsUniqueEmail(user.Email))
                 throw new ArgumentException("Such email already exist");
 
-            if (!await userStorage.IsUniquePhone(user.PhoneNumber))
+            if (!string.IsNullOrWhiteSpace(user.PhoneNumber) && !await userStorage.IsUniquePhone(user.PhoneNumber))
                 throw new ArgumentException("Such phone already exist");
         }
 

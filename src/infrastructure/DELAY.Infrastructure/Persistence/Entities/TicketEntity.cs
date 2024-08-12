@@ -15,8 +15,8 @@ namespace DELAY.Infrastructure.Persistence.Entities.Base
         public Guid ChangedById { get; set; }
         public UserEntity ChangedBy { get; set; }
 
-        public Guid ListId { get; set; }
-        public TicketsListEntity List { get; set; }
+        public Guid TicketListId { get; set; }
+        public TicketsListEntity TicketList { get; set; }
 
         public ICollection<TicketUserEntity> AssignedUsers { get; set; } = new List<TicketUserEntity>();
     }

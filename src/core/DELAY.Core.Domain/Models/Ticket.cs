@@ -8,6 +8,10 @@ namespace DELAY.Core.Domain.Models
     /// </summary>
     public class Ticket : KeyNamedModel, IDescriptioin
     {
+        public Ticket()
+        {
+        }
+
         public Ticket(string name, string description, string changedBy, IEnumerable<User> assignedUsers) : base(name)
         {
             Description = description;

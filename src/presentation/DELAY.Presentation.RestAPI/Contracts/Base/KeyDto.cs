@@ -2,9 +2,9 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Base
 {
-    public class KeyApiModel : IKey
+    public class KeyDto : IKey
     {
-        public KeyApiModel() { }
+        public KeyDto() { }
 
         public Guid Id { get; set; }
     }

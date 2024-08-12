@@ -3,11 +3,11 @@ using DELAY.Core.Domain.Enums;
 
 namespace DELAY.Core.Application.Contracts.Models
 {
-    public class BoardUserApiModel
+    public class BoardUserDto
     {
         public Guid Id { get; set; }
-        public KeyNameApiModel Board { get; set; }
-        public KeyNameApiModel User { get; set; }
+        public KeyNameDto Board { get; set; }
+        public KeyNameDto User { get; set; }
         public RoleType UserRole { get; set; }
     }
 }

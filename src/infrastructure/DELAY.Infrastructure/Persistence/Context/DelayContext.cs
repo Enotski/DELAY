@@ -25,8 +25,10 @@ namespace DELAY.Infrastructure.Persistence.Context
         public DelayContext(DbContextOptions<DelayContext> options)
             : base(ModifyOptions(options))
         {
-            Database.EnsureCreated();
+            //Database.EnsureDeleted();
+            //Database.EnsureCreated();
         }
+
         private static DbContextOptions<DelayContext> ModifyOptions(DbContextOptions<DelayContext> options)
         {
             var optionsBuilder = new DbContextOptionsBuilder<DelayContext>(options);
@@ -35,14 +37,16 @@ namespace DELAY.Infrastructure.Persistence.Context
 
             return optionsBuilder.Options;
         }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(typeof(DelayContext).Assembly);
 
-            builder.Seed();
+            //builder.Seed();
 
             base.OnModelCreating(builder);
         }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);

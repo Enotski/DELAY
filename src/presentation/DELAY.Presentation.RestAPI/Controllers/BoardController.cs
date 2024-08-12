@@ -39,7 +39,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// Получение активности по ключу
         /// </summary>
         /// <param name="id">Ключ записи</param>
-        /// <returns><inheritdoc cref="UserApiModel"/></returns>
+        /// <returns><inheritdoc cref="UserDto"/></returns>
         /// <remarks>
         /// Пример запроса:
         ///
@@ -80,7 +80,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
 
-                var result = mapper.Map<UserApiModel>(user);
+                var result = mapper.Map<UserDto>(user);
 
                 logger.LogInformation("Получение объекта активности по ключу {id}: {result}", result, id);
 
@@ -97,7 +97,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <summary>
         /// Add user
         /// </summary>
-        /// <param name="model"><inheritdoc cref="UserApiModel"/></param>
+        /// <param name="model"><inheritdoc cref="UserDto"/></param>
         /// <returns>User's key</returns>
         /// <remarks>
         /// Request:
@@ -122,12 +122,12 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddBoard([FromBody] BoardApiModel model)
+        public async Task<IActionResult> AddBoard([FromBody] BoardDto model)
         {
             try
             {
-                //var result = await boardService.AddAsync(mapper.Map<Board>(model), HttpContext.User.Identity.Name);
-                var result = Guid.NewGuid();
+                var result = await boardService.AddAsync(mapper.Map<Board>(model), HttpContext.User.Identity.Name);
+            
                 logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
 
                 return Created(result.ToString(), result);

@@ -2,9 +2,8 @@
 
 namespace DELAY.Infrastructure.Persistence.Entities.Base
 {
-    public class TicketsListEntity : IName
+    public class TicketsListEntity : KeyNamedModelEntity
     {
-        public string Name { get; set; }
         public ICollection<TicketEntity> Tickets { get; set; }
     }
 }

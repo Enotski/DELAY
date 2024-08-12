@@ -31,6 +31,6 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         /// <param name="options">Search options</param>
         /// <returns></returns>
-        Task<PagedDataDto<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination);
+        Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination);
     }
 }

@@ -11,7 +11,7 @@ namespace DELAY.Core.Application.Abstractions.Storages
     {
         Task<int> CountAsync(IEnumerable<SearchOptions> options, CancellationToken cancellationToken = default);
 
-        Task<PagedDataDto<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default);
+        Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<User>> GetAssigedUsersToTicketAsync(Guid ticketId, CancellationToken cancellationToken = default);
 

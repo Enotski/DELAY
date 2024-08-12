@@ -53,6 +53,9 @@ namespace DELAY.Core.Application.Services
             if (model == null)
                 throw new ArgumentNullException(nameof(User));
 
+            if (triggeredBy == null)
+                throw new ArgumentNullException(nameof(triggeredBy));
+
             var triggered = await ValidatePermissionToOperation(Domain.Enums.RoleType.Administrator, triggeredBy);
 
             model.Password = cryptoService.GetHash(model.Password);
@@ -119,7 +122,7 @@ namespace DELAY.Core.Application.Services
             return await userStorage.GetAsync(id);
         }
 
-        public async Task<PagedDataDto<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
+        public async Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
         {
             return await userStorage.GetRecordsAsync(searchOptions, sortOptions, pagination);
         }

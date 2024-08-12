@@ -1,6 +1,8 @@
 ﻿using DELAY.Core.Application.Abstractions.Mapper;
+using DELAY.Core.Application.Abstractions.Services.Base;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Mapper;
+using DELAY.Infrastructure.Cryptography;
 using DELAY.Infrastructure.Persistence.Context;
 using DELAY.Infrastructure.Persistence.Repositories;
 using Mapster;
@@ -18,6 +20,7 @@ namespace DELAY.Infrastructure
         {
             services.AddPersistence(config)
                 .AddStorages()
+                .AddServices(config)
                 .AddMapperService();
 
             return services;
@@ -32,6 +35,15 @@ namespace DELAY.Infrastructure
                 connectionString = config.GetConnectionString("PgConnection");
                 services.AddDbContext<DelayContext>(c => c.UseNpgsql(connectionString, serverOptions => serverOptions.CommandTimeout(120)));
             }
+
+            return services;
+        }
+
+        private static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<SecurityConfig>(options => configuration.GetSection(SecurityConfig.SectionName).Bind(options));
+
+            services.AddScoped<ICryptographyService, CryptographyService>();
 
             return services;
         }

@@ -27,42 +27,42 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <summary>
         /// Add record
         /// </summary>
-        /// <param name="entity">Record</param>
+        /// <param name="model">Record</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<Guid?> AddAsync(T entity, CancellationToken cancellationToken = default);
+        Task<Guid?> AddAsync(T model, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Add records
         /// </summary>
-        /// <param name="entities">Records</param>
+        /// <param name="models">Records</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<int> AddAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        Task<int> AddAsync(IEnumerable<T> models, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update record
         /// </summary>
-        /// <param name="entity">Record</param>
+        /// <param name="model">Record</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(T entity, CancellationToken cancellationToken = default);
+        Task<int> UpdateAsync(T model, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update records
         /// </summary>
-        /// <param name="entities">Records</param>
+        /// <param name="models">Records</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        Task<int> UpdateAsync(IEnumerable<T> models, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete record
         /// </summary>
-        /// <param name="entity">Key</param>
+        /// <param name="model">Key</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(T entity, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(T model, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete record by key
@@ -83,9 +83,9 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <summary>
         /// Delete records
         /// </summary>
-        /// <param name="entities">Records</param>
+        /// <param name="models">Records</param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(IEnumerable<T> models, CancellationToken cancellationToken = default);
     }
 }

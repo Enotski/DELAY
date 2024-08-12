@@ -46,7 +46,7 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <param name="paginationOption"><inheritdoc cref="PaginationOptions"/></param>
         /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
         /// <returns></returns>
-        Task<PagedDataDto<KeyNamedModel>> GetKeyNameRecordsAsync(string term, PaginationOptions pagination, CancellationToken cancellationToken = default);
+        Task<PagedDataModel<KeyNamedModel>> GetKeyNameRecordsAsync(string term, PaginationOptions pagination, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get key-name records by keys

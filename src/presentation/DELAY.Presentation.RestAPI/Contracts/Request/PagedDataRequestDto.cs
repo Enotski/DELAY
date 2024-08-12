@@ -2,9 +2,9 @@
 
 namespace DELAY.Presentation.RestAPI.Contracts.Request
 {
-    public class PagedDataRequest
+    public class PagedDataRequestDto
     {
-        public PagedDataRequest()
+        public PagedDataRequestDto()
         {
         }
 

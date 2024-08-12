@@ -5,6 +5,10 @@ namespace DELAY.Core.Domain.Models
 {
     public class Room : KeyNamedModel, IDescriptioin
     {
+        public Room()
+        {
+        }
+
         public Room(string name, string description, IEnumerable<RoomUser> roomUsers) : base(name)
         {
             Description = description;

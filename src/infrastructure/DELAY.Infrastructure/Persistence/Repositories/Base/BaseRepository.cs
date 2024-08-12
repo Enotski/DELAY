@@ -1,4 +1,5 @@
-﻿using DELAY.Core.Application.Abstractions.Storages.Base;
+﻿using DELAY.Core.Application.Abstractions.Mapper;
+using DELAY.Core.Application.Abstractions.Storages.Base;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Interfaces;
 using DELAY.Infrastructure.Persistence.Context;
@@ -8,12 +9,17 @@ using Z.EntityFramework.Plus;
 
 namespace DELAY.Infrastructure.Persistence.Repositories.Base
 {
-    internal class BaseRepository<TEntity> : IBaseStorage<TEntity> where TEntity : class, IKey
+    internal class BaseRepository<TEntity, TDomain> : IBaseStorage<TDomain> 
+        where TDomain : class, IKey
+        where TEntity : class, IKey
     {
         protected readonly DelayContext context;
 
-        protected BaseRepository(DelayContext context)
+        protected readonly IModelMapperService mapper;
+
+        protected BaseRepository(DelayContext context, IModelMapperService mapper)
         {
+            this.mapper = mapper;
             this.context = context;
         }
 
@@ -101,8 +107,10 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
             return await context.Set<TEntity>().Where(predicate).DeleteAsync(cancellationToken);
         }
 
-        public async Task<Guid?> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async Task<Guid?> AddAsync(TDomain model, CancellationToken cancellationToken = default)
         {
+            var entity = mapper.Map<TEntity>(model);
+
             context.Set<TEntity>().Add(entity);
 
             var res = await context.SaveChangesAsync(cancellationToken);
@@ -113,20 +121,24 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
                 return null;
         }
 
-        public async Task<int> AddAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public async Task<int> AddAsync(IEnumerable<TDomain> models, CancellationToken cancellationToken = default)
         {
-            if (!entities.Any())
+            if (!models.Any())
             {
                 return 0;
             }
+
+            var entities = mapper.Map<IEnumerable<TEntity>>(models);
 
             context.Set<TEntity>().AddRange(entities);
 
             return await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<int> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async Task<int> DeleteAsync(TDomain model, CancellationToken cancellationToken = default)
         {
+            var entity = mapper.Map<TEntity>(model);
+
             context.Set<TEntity>().Remove(entity);
 
             return await context.SaveChangesAsync(cancellationToken);
@@ -167,12 +179,14 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
             return deleted;
         }
 
-        public async Task<int> DeleteAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public async Task<int> DeleteAsync(IEnumerable<TDomain> models, CancellationToken cancellationToken = default)
         {
-            if (!entities.Any())
+            if (!models.Any())
             {
                 return 0;
             }
+
+            var entities = mapper.Map<IEnumerable<TEntity>>(models);
 
             foreach (var entity in entities)
             {
@@ -182,28 +196,34 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
             return await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<TEntity> GetAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<TDomain> GetAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var filter = ByKeySearchSpecification(id);
 
-            return await context.Set<TEntity>().FirstOrDefaultAsync(filter, cancellationToken);
+            var result = await context.Set<TEntity>().FirstOrDefaultAsync(filter, cancellationToken);
+
+            return mapper.Map<TDomain>(result);
         }
 
-        public async Task<IReadOnlyList<TEntity>> GetAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<TDomain>> GetAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
         {
             var filter = ByKeysSearchSpecification(ids);
 
-            return await BuildQuery(filter).ToListAsync(cancellationToken);
+            var result = await BuildQuery(filter).ToListAsync(cancellationToken);
+
+            return mapper.Map<IReadOnlyList<TDomain>>(result);
         }
 
-        public async Task<int> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async Task<int> UpdateAsync(TDomain model, CancellationToken cancellationToken = default)
         {
+            var entity = mapper.Map<TEntity>(model);
+
             context.Entry(entity).State = EntityState.Modified;
 
             return await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<int> UpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public async Task<int> UpdateAsync(IEnumerable<TDomain> entities, CancellationToken cancellationToken = default)
         {
             if (!entities.Any())
             {

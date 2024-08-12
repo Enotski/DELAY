@@ -5,6 +5,10 @@ namespace DELAY.Core.Domain.Models
 {
     public class BoardUser : KeyModel
     {
+        public BoardUser()
+        {
+        }
+
         public BoardUser(Board board, User user, RoleType userRole)
         {
             Board = board;

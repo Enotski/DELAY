@@ -1,4 +1,5 @@
-﻿using DELAY.Core.Application.Abstractions.Storages.Base;
+﻿using DELAY.Core.Application.Abstractions.Mapper;
+using DELAY.Core.Application.Abstractions.Storages.Base;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Interfaces;
@@ -11,10 +12,11 @@ using System.Linq.Expressions;
 
 namespace DELAY.Infrastructure.Persistence.Repositories.Base
 {
-    internal abstract class NamedRepository<TEntity> : BaseRepository<TEntity>, INamedStorage<TEntity>
+    internal abstract class NamedRepository<TEntity, TDomain> : BaseRepository<TEntity, TDomain>, INamedStorage<TDomain>
         where TEntity : class, IKey, IName
+        where TDomain : class, IKey, IName
     {
-        protected NamedRepository(DelayContext context) : base(context)
+        protected NamedRepository(DelayContext context, IModelMapperService mapper) : base(context, mapper)
         {
         }
 
@@ -83,7 +85,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<PagedDataDto<KeyNamedModel>> GetKeyNameRecordsAsync(string name, PaginationOptions pagination, CancellationToken cancellationToken)
+        public async Task<PagedDataModel<KeyNamedModel>> GetKeyNameRecordsAsync(string name, PaginationOptions pagination, CancellationToken cancellationToken)
         {
             var filter = PredicateBuilder.True<TEntity>();
             if (!string.IsNullOrWhiteSpace(name))
@@ -97,7 +99,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
             var records = await BuildQuery(filter, m => m.OrderBy(m => m.Name), pagination)
                 .Select(m => new KeyNamedModel(m.Id, m.Name)).ToListAsync(cancellationToken);
 
-            return new PagedDataDto<KeyNamedModel>(count, records);
+            return new PagedDataModel<KeyNamedModel>(count, records);
         }
     }
 }

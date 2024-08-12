@@ -1,15 +1,17 @@
-﻿using DELAY.Core.Application.Abstractions.Storages;
+﻿using DELAY.Core.Application.Abstractions.Mapper;
+using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Models;
 using DELAY.Infrastructure.Persistence.Context;
+using DELAY.Infrastructure.Persistence.Entities.Base;
 using DELAY.Infrastructure.Persistence.Repositories.Base;
 
 namespace DELAY.Infrastructure.Persistence.Repositories
 {
-    internal class BoardRepository : NamedRepository<Board>, IBoardStorage
+    internal class BoardRepository : NamedRepository<BoardEntity, Board>, IBoardStorage
     {
-        public BoardRepository(DelayContext context) : base(context)
+        public BoardRepository(DelayContext context, IModelMapperService mapper) : base(context, mapper)
         {
         }
 

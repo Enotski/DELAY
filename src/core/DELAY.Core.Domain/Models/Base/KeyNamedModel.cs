@@ -8,7 +8,9 @@ namespace DELAY.Core.Domain.Models.Base
         {
             Name = name;
         }
-
+        public KeyNamedModel() : base()
+        {
+        }
         public KeyNamedModel(string name) : base()
         {
             Name = name;

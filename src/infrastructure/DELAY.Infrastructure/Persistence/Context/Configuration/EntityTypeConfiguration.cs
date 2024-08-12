@@ -3,6 +3,7 @@ using DELAY.Core.Domain.Models;
 using DELAY.Infrastructure.Persistence.Entities.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using static DELAY.Infrastructure.Persistence.Context.Configuration.EntityTypeConfiguration;
 
 namespace DELAY.Infrastructure.Persistence.Context.Configuration
 {
@@ -20,24 +21,47 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
                 builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
             }
         }
-
         internal abstract class DbKeyModelEntityConfiguration<TEntity>
-            : IEntityTypeConfiguration<TEntity> where TEntity : class, IKey
+            : IEntityTypeConfiguration<TEntity>
+            where TEntity : class, IKey
         {
+            protected string TableName;
+            protected string PrimaryKeyPropertyName;
+
+            protected void IntiTableAndPrimaryKeyNames(string modelName)
+            {
+                TableName = modelName + "s";
+                PrimaryKeyPropertyName = modelName + "Id";
+            }
+
             public virtual void Configure(EntityTypeBuilder<TEntity> builder)
             {
-                var entityName = typeof(TEntity).Name;
-                var tableName = entityName + "s";
-                var idColumnName = entityName + "Id";
+                IntiTableAndPrimaryKeyNames(typeof(TEntity).Name.Replace("Entity", ""));
 
-                builder.ToTable(tableName).HasKey(p => p.Id);
+                builder.ToTable(TableName).HasKey(p => p.Id);
 
-                builder.Property(p => p.Id).HasColumnName(idColumnName);
+                builder.Property(p => p.Id).HasColumnName(PrimaryKeyPropertyName);
             }
         }
 
-        internal abstract class DbKeyNamedModelEntityConfiguration<TEntity>
-            : DbKeyModelEntityConfiguration<TEntity> where TEntity : class, IKey, IName
+        internal abstract class DbKeyModelEntityConfiguration<TEntity, TDomain> : DbKeyModelEntityConfiguration<TEntity>
+            where TEntity : class, IKey
+            where TDomain : class, IKey
+        {
+            public virtual void Configure(EntityTypeBuilder<TEntity> builder)
+            {
+                IntiTableAndPrimaryKeyNames(typeof(TDomain).Name);
+
+                builder.ToTable(TableName).HasKey(p => p.Id);
+
+                builder.Property(p => p.Id).HasColumnName(PrimaryKeyPropertyName);
+            }
+        }
+
+        internal abstract class DbKeyNamedModelEntityConfiguration<TEntity, TDomain>
+            : DbKeyModelEntityConfiguration<TEntity, TDomain> 
+            where TEntity : class, IKey, IName
+            where TDomain : class, IKey, IName
         {
             public override void Configure(EntityTypeBuilder<TEntity> builder)
             {
@@ -48,7 +72,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
         }
 
         internal sealed class DbTicketEntityConfiguration
-            : DbKeyNamedModelEntityConfiguration<TicketEntity>
+            : DbKeyNamedModelEntityConfiguration<TicketEntity, Ticket>
         {
             public override void Configure(EntityTypeBuilder<TicketEntity> builder)
             {
@@ -57,8 +81,8 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
                 builder.HasOne(p => p.ChangedBy).WithMany(p => p.ChangedTickets)
                     .HasForeignKey(p => p.ChangedById).OnDelete(DeleteBehavior.SetNull);
 
-                builder.HasOne(p => p.List).WithMany(p => p.Tickets)
-                    .HasForeignKey(p => p.ListId).OnDelete(DeleteBehavior.SetNull);
+                builder.HasOne(p => p.TicketList).WithMany(p => p.Tickets)
+                    .HasForeignKey(p => p.TicketListId).OnDelete(DeleteBehavior.SetNull);
 
                 builder.HasMany(p => p.AssignedUsers).WithOne(p => p.Ticket)
                     .HasForeignKey(p => p.TicketId).OnDelete(DeleteBehavior.Cascade);
@@ -66,16 +90,19 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
         }
 
         internal sealed class DbTicketsListEntityConfiguration
-            : DbKeyNamedModelEntityConfiguration<TicketsList>
+            : DbKeyNamedModelEntityConfiguration<TicketsListEntity, TicketsList>
         {
-            public override void Configure(EntityTypeBuilder<TicketsList> builder)
+            public override void Configure(EntityTypeBuilder<TicketsListEntity> builder)
             {
                 base.Configure(builder);
+
+                builder.HasMany(p => p.Tickets).WithOne(p => p.TicketList)
+                    .HasForeignKey(p => p.TicketListId).OnDelete(DeleteBehavior.Cascade);
             }
         }
 
         internal sealed class DbUserEntityConfiguration
-            : DbKeyNamedModelEntityConfiguration<UserEntity>
+            : DbKeyNamedModelEntityConfiguration<UserEntity, User>
         {
             public override void Configure(EntityTypeBuilder<UserEntity> builder)
             {
@@ -93,7 +120,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
         }
 
         internal sealed class DbBoardEntityConfiguration
-            : DbKeyNamedModelEntityConfiguration<BoardEntity>
+            : DbKeyNamedModelEntityConfiguration<BoardEntity, Board>
         {
             public override void Configure(EntityTypeBuilder<BoardEntity> builder)
             {
@@ -107,7 +134,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
         }
 
         internal sealed class DbRoomEntityConfiguration
-            : DbKeyNamedModelEntityConfiguration<RoomEntity>
+            : DbKeyNamedModelEntityConfiguration<RoomEntity, Room>
         {
             public override void Configure(EntityTypeBuilder<RoomEntity> builder)
             {
@@ -125,21 +152,25 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
         {
             public override void Configure(EntityTypeBuilder<TicketUserEntity> builder)
             {
+                IntiTableAndPrimaryKeyNames("TecketUser");
+
                 base.Configure(builder);
             }
         }
 
         internal sealed class DbRoomUserEntityConfiguration
-            : DbKeyModelEntityConfiguration<RoomUserEntity>
+            : DbKeyModelEntityConfiguration<RoomUserEntity, RoomUser>
         {
             public override void Configure(EntityTypeBuilder<RoomUserEntity> builder)
             {
                 base.Configure(builder);
+
+
             }
         }
 
         internal sealed class DbBoardUserEntityConfiguration
-            : DbKeyModelEntityConfiguration<BoardUserEntity>
+            : DbKeyModelEntityConfiguration<BoardUserEntity, BoardUser>
         {
             public override void Configure(EntityTypeBuilder<BoardUserEntity> builder)
             {

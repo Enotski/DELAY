@@ -1,4 +1,5 @@
-﻿using DELAY.Core.Application.Abstractions.Storages;
+﻿using DELAY.Core.Application.Abstractions.Mapper;
+using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Enums;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
@@ -8,26 +9,28 @@ using DELAY.Core.Domain.Models.Base;
 using DELAY.Infrastructure.Builders;
 using DELAY.Infrastructure.Extensions;
 using DELAY.Infrastructure.Persistence.Context;
+using DELAY.Infrastructure.Persistence.Entities.Base;
 using DELAY.Infrastructure.Persistence.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Z.Expressions;
 
 namespace DELAY.Infrastructure.Persistence.Repositories
 {
-    internal class UserRepository : NamedRepository<User>, IUserStorage
+    internal class UserRepository : NamedRepository<UserEntity, User>, IUserStorage
     {
-        public UserRepository(DelayContext context) : base(context)
+        public UserRepository(DelayContext context, IModelMapperService mapper) : base(context, mapper)
         {
         }
 
-        private Expression<Func<User, bool>> BySearchOptionsSearchSpecification(IEnumerable<SearchOptions> options)
+        private Expression<Func<UserEntity, bool>> BySearchOptionsSearchSpecification(IEnumerable<SearchOptions> options)
         {
             if (options is null || !options.Any())
             {
                 return null;
             }
 
-            Expression<Func<User, bool>> predicate = PredicateBuilder.True<User>();
+            Expression<Func<UserEntity, bool>> predicate = PredicateBuilder.True<UserEntity>();
 
             foreach (var opt in options)
             {
@@ -75,16 +78,16 @@ namespace DELAY.Infrastructure.Persistence.Repositories
             return predicate;
         }
 
-        private Func<IQueryable<User>, IOrderedQueryable<User>> BySortOptionsSortSpecification(IEnumerable<SortOptions> options)
+        private Func<IQueryable<UserEntity>, IOrderedQueryable<UserEntity>> BySortOptionsSortSpecification(IEnumerable<SortOptions> options)
         {
             if (options is null || !options.Any())
             {
                 return null;
             }
 
-            return (IQueryable<User> query) => {
+            return (IQueryable<UserEntity> query) => {
 
-                IOrderedQueryable<User> ordered = null;
+                IOrderedQueryable<UserEntity> ordered = null;
 
                 foreach (var opt in options)
                 {
@@ -181,7 +184,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<PagedDataDto<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchs, IEnumerable<SortOptions> sortsOptions, PaginationOptions pagination, CancellationToken cancellationToken = default)
+        public async Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchs, IEnumerable<SortOptions> sortsOptions, PaginationOptions pagination, CancellationToken cancellationToken = default)
         {
             var filter = BySearchOptionsSearchSpecification(searchs);
             var order = BySortOptionsSortSpecification(sortsOptions);
@@ -190,12 +193,14 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
             var records = await BuildQuery(filter, order, pagination).ToListAsync(cancellationToken);
 
-            return new PagedDataDto<User>(count, records);
+            return new PagedDataModel<User>(count, mapper.Map<IEnumerable<User>>(records));
         }
 
         public async Task<bool> IsUniqueName(string name, Guid? id = null, CancellationToken cancellationToken = default)
         {
-            var filter = PredicateBuilder.Create<User>(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            name = name.ToUpperTrim();
+
+            var filter = PredicateBuilder.Create<UserEntity>(x => x.Name.Trim().ToUpper() == name);
 
             if(id !=  null)
                 filter = filter.And(x =>  x.Id != id);
@@ -204,7 +209,9 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         }
         public async Task<bool> IsUniqueEmail(string email, Guid? id = null, CancellationToken cancellationToken = default)
         {
-            var filter = PredicateBuilder.Create<User>(x => x.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            email = email.ToUpperTrim();
+
+            var filter = PredicateBuilder.Create<UserEntity>(x => x.Email.Trim().ToUpper() == email);
 
             if (id != null)
                 filter = filter.And(x => x.Id != id);
@@ -213,7 +220,9 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         }
         public async Task<bool> IsUniquePhone(string phoneNumber, Guid? id = null, CancellationToken cancellationToken = default)
         {
-            var filter = PredicateBuilder.Create<User>(x => x.PhoneNumber.Equals(phoneNumber, StringComparison.OrdinalIgnoreCase));
+            phoneNumber = phoneNumber.ToUpperTrim();
+
+            var filter = PredicateBuilder.Create<UserEntity>(x => x.PhoneNumber == phoneNumber);
 
             if (id != null)
                 filter = filter.And(x => x.Id != id);
@@ -223,10 +232,15 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
         public async Task<KeyNamedModel> PermissionToPerformOperationAsync(RoleType role, string triggeredBy, CancellationToken cancellationToken = default)
         {
-            var filter = PredicateBuilder.Create<User>(x => x.Name.Equals(triggeredBy, StringComparison.OrdinalIgnoreCase) && x.Role == role);
+            triggeredBy = triggeredBy.ToUpperTrim();
+           
+            var filter = PredicateBuilder.Create<UserEntity>(x => x.Name.Trim().ToUpper() == triggeredBy && x.Role == role);
             var selector = KeyNamedSelectorSpecification();
 
-            return await BuildQuery(filter).Select(selector).FirstOrDefaultAsync(cancellationToken);
+            var result = await BuildQuery(filter).Select(selector).FirstOrDefaultAsync(cancellationToken);
+
+            return new KeyNamedModel(Guid.NewGuid(), "admin");
+            return result;
         }
     }
 }

@@ -18,6 +18,10 @@ namespace DELAY.Core.Domain.Models
             Description = description;
         }
 
+        public Board()
+        {
+        }
+
         public void Update(string name, string description, string changedBy)
         {
             Description = description;

@@ -22,7 +22,27 @@ namespace DELAY.Core.Domain.Models
 
         public bool IsValidCredentials()
         {
-            return !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Password) && IsValidEmail(Email) && IsValidPhoneNumber(PhoneNumber);
+            if (string.IsNullOrWhiteSpace(Password))
+                return false;
+
+            bool isValidLogin = false;
+
+            if (!string.IsNullOrWhiteSpace(Name))
+            {
+                isValidLogin = true;
+            }
+
+            if(!string.IsNullOrWhiteSpace(Email))
+            {
+                isValidLogin = IsValidEmail(Email);
+            }
+
+            if (!string.IsNullOrWhiteSpace(PhoneNumber))
+            {
+                isValidLogin = IsValidPhoneNumber(PhoneNumber);
+            }
+
+            return isValidLogin;
         }
 
         bool IsValidPhoneNumber(string phoneNumber)
@@ -99,6 +119,10 @@ namespace DELAY.Core.Domain.Models
             ChangedDate = CreateDate;
             ChangedBy = changedBy;
             Role = RoleType.User;
+        }
+
+        public User()
+        {
         }
 
         public void Update(string name, string email, string phoneNumber, RoleType role, string changedBy)

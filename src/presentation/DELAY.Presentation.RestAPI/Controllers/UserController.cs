@@ -40,7 +40,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// Получение активности по ключу
         /// </summary>
         /// <param name="id">Ключ записи</param>
-        /// <returns><inheritdoc cref="UserApiModel"/></returns>
+        /// <returns><inheritdoc cref="UserDto"/></returns>
         /// <remarks>
         /// Пример запроса:
         ///
@@ -82,7 +82,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
 
-                var result = mapper.Map<UserApiModel>(user);
+                var result = mapper.Map<UserDto>(user);
 
                 logger.LogInformation("Получение объекта активности по ключу {id}: {result}", result, id);
 
@@ -100,7 +100,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// Получение активности по ключу
         /// </summary>
         /// <param name="id">Ключ записи</param>
-        /// <returns><inheritdoc cref="UserApiModel"/></returns>
+        /// <returns><inheritdoc cref="UserDto"/></returns>
         /// <remarks>
         /// Пример запроса:
         ///
@@ -142,7 +142,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
 
-                var result = mapper.Map<IEnumerable<UserApiModel>>(user);
+                var result = mapper.Map<IEnumerable<UserDto>>(user);
 
                 logger.LogInformation("Получение объекта активности по ключу {id}: {result}", result, id);
 
@@ -160,7 +160,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// Получение активности по ключу
         /// </summary>
         /// <param name="id">Ключ записи</param>
-        /// <returns><inheritdoc cref="UserApiModel"/></returns>
+        /// <returns><inheritdoc cref="UserDto"/></returns>
         /// <remarks>
         /// Пример запроса:
         ///
@@ -202,7 +202,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
 
-                var result = mapper.Map<UserApiModel>(user);
+                var result = mapper.Map<UserDto>(user);
 
                 logger.LogInformation("Получение объекта активности по ключу {id}: {result}", result, id);
 
@@ -219,7 +219,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <summary>
         /// Получение страницы активностей по заданным параметрам
         /// </summary>
-        /// <param name="options"><inheritdoc cref="PagedDataRequest"/></param>
+        /// <param name="options"><inheritdoc cref="PagedDataRequestDto"/></param>
         /// <returns><inheritdoc cref="PagedDataApiModel"/></returns>
         /// <remarks>
         /// Пример запроса:
@@ -259,13 +259,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllAsync([FromBody] PagedDataRequest options)
+        public async Task<IActionResult> GetAllAsync([FromBody] PagedDataRequestDto options)
         {
             try
             {
                 var data = await userService.GetRecordsAsync(options.Searchs, options.Sorts, options.Pagination);
 
-                var result = mapper.Map<PagedDataApiModel<UserApiModel>>(data);
+                var result = mapper.Map<PagedDataDto<UserDto>>(data);
 
                 logger.LogInformation("Получение страницы активностей по заданным параметрам {options}: {result}", result, options);
 
@@ -283,7 +283,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// Получение активности по ключу
         /// </summary>
         /// <param name="id">Ключ записи</param>
-        /// <returns><inheritdoc cref="UserApiModel"/></returns>
+        /// <returns><inheritdoc cref="UserDto"/></returns>
         /// <remarks>
         /// Пример запроса:
         ///
@@ -325,7 +325,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
 
-                var result = mapper.Map<UserApiModel>(user);
+                var result = mapper.Map<UserDto>(user);
 
                 logger.LogInformation("Получение объекта активности по ключу {ids}: {result}", result, ids);
 
@@ -343,7 +343,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// Получение активности по ключу
         /// </summary>
         /// <param name="id">Ключ записи</param>
-        /// <returns><inheritdoc cref="UserApiModel"/></returns>
+        /// <returns><inheritdoc cref="UserDto"/></returns>
         /// <remarks>
         /// Пример запроса:
         ///
@@ -385,7 +385,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                     return Problem(message, statusCode: StatusCodes.Status404NotFound);
                 }
 
-                var result = mapper.Map<UserApiModel>(user);
+                var result = mapper.Map<UserDto>(user);
 
                 logger.LogInformation("Получение объекта активности по ключу {ids}: {result}", result, ids);
 
@@ -402,7 +402,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <summary>
         /// Add user
         /// </summary>
-        /// <param name="model"><inheritdoc cref="UserApiModel"/></param>
+        /// <param name="model"><inheritdoc cref="UserDto"/></param>
         /// <returns>User's key</returns>
         /// <remarks>
         /// Request:
@@ -427,11 +427,11 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddAsync([FromBody] UserApiModel model)
+        public async Task<IActionResult> AddAsync([FromBody] UserDto model)
         {
             try
             {
-                var result = await userService.AddAsync(mapper.Map<User>(model), HttpContext.User.Identity.Name);
+                var result = await userService.AddAsync(mapper.Map<User>(model), UserIdentityName);
 
                 logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
 
@@ -448,7 +448,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <summary>
         /// Update user
         /// </summary>
-        /// <param name="model"><inheritdoc cref="UserApiModel"/></param>
+        /// <param name="model"><inheritdoc cref="UserDto"/></param>
         /// <returns>Updated count</returns>
         /// <remarks>
         /// Request:
@@ -473,11 +473,11 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateAsync([FromBody] UserApiModel model)
+        public async Task<IActionResult> UpdateAsync([FromBody] UserDto model)
         {
             try
             {
-                var result = await userService.UpdateAsync(mapper.Map<User>(model), HttpContext.User.Identity.Name);
+                var result = await userService.UpdateAsync(mapper.Map<User>(model), UserIdentityName);
 
                 logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
 
@@ -515,7 +515,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                var deletedCount = await userService.DeleteAsync(id, HttpContext.User.Identity.Name);
+                var deletedCount = await userService.DeleteAsync(id, UserIdentityName);
 
                 logger.LogInformation("Удалено {deletedCount} активностей по параметрам фильтра {filter}", deletedCount, id);
 
@@ -556,7 +556,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                var deletedCount = await userService.DeleteAsync(ids, HttpContext.User.Identity.Name);
+                var deletedCount = await userService.DeleteAsync(ids, UserIdentityName);
 
                 logger.LogInformation("Удалено {deletedCount} активностей по параметрам фильтра {filter}", deletedCount, ids);
 

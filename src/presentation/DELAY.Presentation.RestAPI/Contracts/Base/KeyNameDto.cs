@@ -2,9 +2,9 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Base
 {
-    public class KeyNameApiModel : KeyApiModel, IName
+    public class KeyNameDto : KeyDto, IName
     {
-        public KeyNameApiModel() : base()
+        public KeyNameDto() : base()
         { }
 
         public string Name { get; set; }

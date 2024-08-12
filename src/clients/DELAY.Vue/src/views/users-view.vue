@@ -46,56 +46,7 @@ import type {
 
 import { Plus as plusIco, Minus as minusIco } from "@vicons/tabler";
 
-const tableData = ref([
-  {
-    id: 0,
-    name: "John Brown",
-  },
-  {
-    id: 1,
-    name: "Jim Green",
-  },
-  {
-    id: 2,
-    name: "Joe Black",
-  },
-  {
-    id: 11,
-    name: "John Brown",
-  },
-  {
-    id: 22,
-    name: "Jim Green",
-  },
-  {
-    id: 33,
-    name: "Joe Black",
-  },
-  {
-    id: 12,
-    name: "John Brown",
-  },
-  {
-    id: 31,
-    name: "Jim Green",
-  },
-  {
-    id: 21,
-    name: "Joe Black",
-  },
-  {
-    id: 10,
-    name: "John Brown",
-  },
-  {
-    id: 41,
-    name: "Jim Green",
-  },
-  {
-    id: 92,
-    name: "Joe Black",
-  },
-]);
+const tableData = ref();
 
 const id = (row: any) => row.id;
 const checkedRowKeysRef = ref([]);
@@ -111,25 +62,31 @@ const pagination = {
 const showModal = ref(false);
 
 const defaultRequestOptions = {
-  searchOptions: [
+  searchs: [
     {
       column: "",
       value: "",
     },
   ],
-  sortOptions: [
+  sorts: [
     {
       column: "",
       order: 0,
     },
   ],
-  paginatedOption: {
+  pagination: {
     skip: 0,
-    take: 0,
+    take: 10,
   },
 };
 
-onMounted(async () => {});
+onMounted(async () => {
+  await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
+    (value) => {
+      tableData.value = value.data;
+    }
+  );
+});
 
 // const handleAddClick = async () => {
 //   await sendRequest("users", "POST", formValue.value.form).then(() => {

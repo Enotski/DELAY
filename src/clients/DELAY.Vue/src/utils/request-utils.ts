@@ -1,11 +1,11 @@
-export const apiUrl = "http://192.168.112.1:32773/api/";
+export const apiUrl = "https://localhost:7259/api/";
 import axios from "axios";
 
 const instance = axios.create({
   baseURL: apiUrl,
   headers: {
     "Content-Type": "application/json",
-    //"Access-Control-Allow-Origin": "http://localhost:8084",
+    //"Access-Control-Allow-Origin": "https://localhost:8084",
   },
 });
 
@@ -37,6 +37,7 @@ export async function sendRequest(url: string, method: string = "GET", args: obj
         throw ex;
       });
   }
+  
   return await instance
     .post(url, args)
     .then((response) => {

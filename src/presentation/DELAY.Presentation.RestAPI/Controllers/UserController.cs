@@ -37,9 +37,9 @@ namespace DELAY.Core.Application.Abstractions.Services
         }
 
         /// <summary>
-        /// Получение активности по ключу
+        /// Get user by key
         /// </summary>
-        /// <param name="id">Ключ записи</param>
+        /// <param name="id">Key</param>
         /// <returns><inheritdoc cref="UserDto"/></returns>
         /// <remarks>
         /// Пример запроса:
@@ -92,7 +92,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка получения объекта активности по ключу {id}: {exp}", id, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -152,7 +152,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка получения объекта активности по ключу {id}: {exp}", id, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -212,7 +212,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка получения объекта активности по ключу {id}: {exp}", id, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -275,7 +275,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка получения страницы активностей по заданным параметрам {options}: {exp}", options, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -335,7 +335,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка получения объекта активности по ключу {ids}: {exp}", ids, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -395,7 +395,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка получения объекта активности по ключу {ids}: {exp}", ids, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -441,7 +441,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка создания объекта активности по параметрам: {exp}", exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -487,7 +487,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка создания объекта активности по параметрам: {exp}", exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -525,7 +525,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка удаления активностей по параметрам фильтра {filter}: {exp}", id, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
         /// <summary>
@@ -566,7 +566,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 logger.LogError("Ошибка удаления активностей по параметрам фильтра {filter}: {exp}", ids, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
     }

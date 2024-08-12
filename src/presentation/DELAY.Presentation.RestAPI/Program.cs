@@ -16,6 +16,8 @@ namespace DELAY.Presentation.RestAPI
 
             builder.ConfigureWebApplication();
 
+            builder.Services.AddCors();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -24,6 +26,13 @@ namespace DELAY.Presentation.RestAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            // отключение cors
+            app.UseCors(x => {
+                x.AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowAnyOrigin();
+            });
 
             app.UseHttpsRedirection();
 

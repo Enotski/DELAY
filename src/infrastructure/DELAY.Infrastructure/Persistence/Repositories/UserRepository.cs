@@ -102,7 +102,6 @@ namespace DELAY.Infrastructure.Persistence.Repositories
                             ordered = opt.Order == OrderType.Asc ? ordered.ThenBy(m => m.Name) : ordered.ThenByDescending(m => m.Name);
                         }
                     }
-
                     else if (string.Equals(nameof(User.Email), opt.Column, StringComparison.OrdinalIgnoreCase))
                     {
                         if (ordered == null)
@@ -114,7 +113,6 @@ namespace DELAY.Infrastructure.Persistence.Repositories
                             ordered = opt.Order == OrderType.Asc ? ordered.ThenBy(m => m.Email) : ordered.ThenByDescending(m => m.Email);
                         }
                     }
-
                     else if (string.Equals(nameof(User.PhoneNumber), opt.Column, StringComparison.OrdinalIgnoreCase))
                     {
                         if (ordered == null)
@@ -126,7 +124,6 @@ namespace DELAY.Infrastructure.Persistence.Repositories
                             ordered = opt.Order == OrderType.Asc ? ordered.ThenBy(m => m.PhoneNumber) : ordered.ThenByDescending(m => m.PhoneNumber);
                         }
                     }
-
                     else if (string.Equals(nameof(User.ChangedBy), opt.Column, StringComparison.OrdinalIgnoreCase))
                     {
                         if (ordered == null)
@@ -138,19 +135,6 @@ namespace DELAY.Infrastructure.Persistence.Repositories
                             ordered = opt.Order == OrderType.Asc ? ordered.ThenBy(m => m.ChangedBy) : ordered.ThenByDescending(m => m.ChangedBy);
                         }
                     }
-
-                    else if (string.Equals(nameof(User.CreateDate), opt.Column, StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (ordered == null)
-                        {
-                            ordered = opt.Order == OrderType.Asc ? query.OrderBy(m => m.CreateDate) : query.OrderByDescending(m => m.CreateDate);
-                        }
-                        else
-                        {
-                            ordered = opt.Order == OrderType.Asc ? ordered.ThenBy(m => m.CreateDate) : ordered.ThenByDescending(m => m.CreateDate);
-                        }
-                    }
-
                     else if (string.Equals(nameof(User.ChangedDate), opt.Column, StringComparison.OrdinalIgnoreCase))
                     {
                         if (ordered == null)
@@ -160,6 +144,17 @@ namespace DELAY.Infrastructure.Persistence.Repositories
                         else
                         {
                             ordered = opt.Order == OrderType.Asc ? ordered.ThenBy(m => m.ChangedDate) : ordered.ThenByDescending(m => m.ChangedDate);
+                        }
+                    }
+                    else
+                    {
+                        if (ordered == null)
+                        {
+                            ordered = opt.Order == OrderType.Asc ? query.OrderBy(m => m.CreateDate) : query.OrderByDescending(m => m.CreateDate);
+                        }
+                        else
+                        {
+                            ordered = opt.Order == OrderType.Asc ? ordered.ThenBy(m => m.CreateDate) : ordered.ThenByDescending(m => m.CreateDate);
                         }
                     }
                 }

@@ -36,6 +36,7 @@ namespace DELAY.Core.Domain.Models
             return !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(CreatedBy);
         }
 
+        public Room Room { get; set; }
         public string Description { get; set; }
         public string CreatedBy { get; set; }
         public string ChangedBy { get; set; }

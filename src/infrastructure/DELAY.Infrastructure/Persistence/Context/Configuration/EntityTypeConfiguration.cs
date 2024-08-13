@@ -130,6 +130,9 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
 
                 builder.HasMany(p => p.BoardUsers).WithOne(p => p.Board)
                     .HasForeignKey(p => p.BoardId).OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(p => p.Room).WithMany(p => p.Boards)
+                    .HasForeignKey(p => p.RoomId).OnDelete(DeleteBehavior.SetNull);
             }
         }
 
@@ -144,6 +147,10 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
 
                 builder.HasMany(p => p.RoomUsers).WithOne(p => p.Room)
                     .HasForeignKey(p => p.RoomId).OnDelete(DeleteBehavior.Cascade);
+
+
+                builder.HasMany(p => p.Boards).WithOne(p => p.Room)
+                    .HasForeignKey(p => p.RoomId).OnDelete(DeleteBehavior.SetNull);
             }
         }
 

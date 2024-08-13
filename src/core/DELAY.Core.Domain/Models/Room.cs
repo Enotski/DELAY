@@ -21,6 +21,7 @@ namespace DELAY.Core.Domain.Models
             RoomUsers = roomUsers;
         }
 
+        public IEnumerable<Board> Boards { get; set; }
         public IEnumerable<RoomUser> RoomUsers { get; set; }
 
         public string Description { get; set; }

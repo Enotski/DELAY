@@ -12,7 +12,7 @@ namespace DELAY.Infrastructure.Persistence.Entities.Base
 
         public DateTime ChangedDate { get; set; }
 
-        public Guid ChangedById { get; set; }
+        public Guid? ChangedById { get; set; }
         public UserEntity ChangedBy { get; set; }
 
         public Guid TicketListId { get; set; }

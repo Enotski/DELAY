@@ -1,9 +1,18 @@
 <template>
   <n-modal
+    v-model:show="showConfirmRemoveModal"
+    preset="dialog"
+    title="Remove users"
+    content="Are you sure?"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onConfirmRemoveClick"
+    @negative-click="onCancelRemoveClick"
+  />
+  <n-modal
     v-model:show="showAddModal"
     preset="dialog"
     title="Add user"
-    content="Are you sure?"
     positive-text="Confirm"
     negative-text="Cancel"
     @positive-click="onConfirmAddClick"
@@ -14,7 +23,7 @@
       inline
       :label-width="80"
       :model="formValue"
-      :rules="rules"
+      :rules="addRules"
       size="large"
       class="row"
     >
@@ -43,7 +52,6 @@
     v-model:show="showEditModal"
     preset="dialog"
     title="Edit user"
-    content="Are you sure?"
     positive-text="Confirm"
     negative-text="Cancel"
     @positive-click="onConfirmEditClick"
@@ -54,7 +62,7 @@
       inline
       :label-width="80"
       :model="formValue"
-      :rules="rules"
+      :rules="editRules"
       size="large"
       class="row"
     >
@@ -78,6 +86,12 @@
         <n-button type="success" @click="addUser">
           <template #icon>
             <n-icon><plus-ico /></n-icon>
+          </template>
+        </n-button>
+        <n-divider vertical style="height: 2em" />
+        <n-button type="error" @click="removeUsers">
+          <template #icon>
+            <n-icon><minus-ico /></n-icon>
           </template>
         </n-button>
       </div>
@@ -109,6 +123,7 @@ import {
   NForm,
   NFormItem,
   NModal,
+  NDivider,
 } from "naive-ui";
 import type {
   RowData,
@@ -127,7 +142,19 @@ const formValue = ref({
   password: "",
 });
 
-const rules = {
+const addRules = {
+  name: {
+    required: true,
+    message: "Please input your name",
+    trigger: "blur",
+  },
+  password: {
+    required: true,
+    message: "Please input your password",
+    trigger: "blur",
+  },
+};
+const editRules = {
   name: {
     required: true,
     message: "Please input your name",
@@ -148,6 +175,7 @@ const pagination = {
 
 const showAddModal = ref(false);
 const showEditModal = ref(false);
+const showConfirmRemoveModal = ref(false);
 
 const defaultRequestOptions = {
   searchs: [
@@ -232,14 +260,18 @@ const usersColumns: TableColumn[] = [
 async function addUser() {
   showAddModal.value = true;
 }
+async function removeUsers() {
+  showConfirmRemoveModal.value = true;
+}
 
 function userInfo(row: any) {
   showEditModal.value = true;
 
   formValue.value = row;
+  formValue.value.password = "";
 }
 
-async function onConfirmAddClick(row: any) {
+async function onConfirmAddClick() {
   await sendRequest("users", "POST", formValue.value).then(async () => {
     await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
       (value) => {
@@ -248,15 +280,11 @@ async function onConfirmAddClick(row: any) {
     );
     closeAddModal();
   });
-
-  console.log("onPositiveClick");
 }
-function onCancelAddClick(row: any) {
+function onCancelAddClick() {
   closeAddModal();
 }
 function closeAddModal() {
-  showAddModal.value = false;
-
   formValue.value = {
     id: "",
     name: "",
@@ -264,11 +292,11 @@ function closeAddModal() {
     phoneNumber: "",
     password: "",
   };
+
+  showAddModal.value = false;
 }
 
 function closeEditModal() {
-  showEditModal.value = false;
-
   formValue.value = {
     id: "",
     name: "",
@@ -276,9 +304,11 @@ function closeEditModal() {
     phoneNumber: "",
     password: "",
   };
+
+  showEditModal.value = false;
 }
 
-async function onConfirmEditClick(row: any) {
+async function onConfirmEditClick() {
   await sendRequest("users", "PUT", formValue.value).then(async () => {
     await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
       (value) => {
@@ -288,7 +318,7 @@ async function onConfirmEditClick(row: any) {
     closeAddModal();
   });
 }
-function onCancelEditClick(row: any) {
+function onCancelEditClick() {
   closeEditModal();
 }
 
@@ -300,5 +330,22 @@ async function deleteUser(row: any) {
       }
     );
   });
+}
+async function onConfirmRemoveClick() {
+  await sendRequest(
+    "users/delete-multiple",
+    "POST",
+    checkedRowKeysRef.value
+  ).then(async () => {
+    await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
+      (value) => {
+        tableData.value = value.data;
+      }
+    );
+  });
+  showConfirmRemoveModal.value = false;
+}
+function onCancelRemoveClick() {
+  showConfirmRemoveModal.value = false;
 }
 </script>

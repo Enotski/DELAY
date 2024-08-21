@@ -35,3 +35,6 @@ body {
   height: 100%;
   /* Полное покрытие видового поля экрана */
 }
+svg {
+  vertical-align: baseline !important;
+}

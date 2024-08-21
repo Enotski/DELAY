@@ -43,7 +43,7 @@ namespace DELAY.Infrastructure
         {
             services.Configure<SecurityConfig>(options => configuration.GetSection(SecurityConfig.SectionName).Bind(options));
 
-            services.AddScoped<ICryptographyService, CryptographyService>();
+            services.AddSingleton<ICryptographyService, CryptographyService>();
 
             return services;
         }

@@ -130,7 +130,7 @@ import type {
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
 
-import { Plus as plusIco, Minus as minusIco } from "@vicons/tabler";
+import { Add as plusIco, Remove as minusIco } from "@vicons/ionicons5";
 
 const tableData = ref();
 

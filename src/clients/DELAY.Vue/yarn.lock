@@ -279,15 +279,22 @@
   dependencies:
     undici-types "~5.26.4"
 
-"@vicons/tabler@^0.12.0":
+"@vicons/ionicons5@^0.12.0":
   version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@vicons/tabler/-/tabler-0.12.0.tgz#11924d2288e9346d47b44dd643ac20e72a32e089"
-  integrity sha512-3+wUFuxb7e8OzZ8Wryct1pzfA2vyoF4lwW98O9s27ZrfCGaJGNmqG+q8A7vQ92Mf+COCgxpK+rhNPTtTvaU6qw==
+  resolved "https://registry.yarnpkg.com/@vicons/ionicons5/-/ionicons5-0.12.0.tgz#c39fda04420dfae3b58053faf8aaf3555253299d"
+  integrity sha512-Iy1EUVRpX0WWxeu1VIReR1zsZLMc4fqpt223czR+Rpnrwu7pt46nbnC2ycO7ItI/uqDLJxnbcMC7FujKs9IfFA==
 
 "@vitejs/plugin-vue@^5.0.5":
   version "5.1.0"
   resolved "https://registry.npmjs.org/@vitejs/plugin-vue/-/plugin-vue-5.1.0.tgz"
   integrity sha512-QMRxARyrdiwi1mj3AW4fLByoHTavreXq0itdEW696EihXglf1MB3D4C2gBvE0jMPH29ZjC3iK8aIaUMLf4EOGA==
+
+"@vkid/sdk@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@vkid/sdk/-/sdk-2.2.0.tgz#703a46850356bd61b578f43f31f8467203249bd4"
+  integrity sha512-aTtZpBq4Uo6DuyhRtJYSiEzvTJiuUg/KUX+mZx3xkDLYtyEGOv/tMimnOiw6jjNm+fW3UzN/SSURg1jQsthiHw==
+  dependencies:
+    crypto-js "^4.1.1"
 
 "@volar/language-core@2.4.0-alpha.18", "@volar/language-core@~2.4.0-alpha.18":
   version "2.4.0-alpha.18"
@@ -482,6 +489,11 @@ cross-spawn@^7.0.3:
     path-key "^3.1.0"
     shebang-command "^2.0.0"
     which "^2.0.1"
+
+crypto-js@^4.1.1:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.2.0.tgz#4d931639ecdfd12ff80e8186dba6af2c2e856631"
+  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
 
 css-render@^0.15.10, css-render@^0.15.12:
   version "0.15.14"
@@ -950,6 +962,11 @@ vue-tsc@^2.0.21:
     "@volar/typescript" "~2.4.0-alpha.18"
     "@vue/language-core" "2.0.28"
     semver "^7.5.4"
+
+vue3-google-login@^2.0.33:
+  version "2.0.33"
+  resolved "https://registry.yarnpkg.com/vue3-google-login/-/vue3-google-login-2.0.33.tgz#0b3b3a653b6026cbb2d39b92fc1782f0057c1d43"
+  integrity sha512-Hx3JJUREXWCFOOB4AzZKy/x7C+X18kxmT0AquBekm0TRubp11nrWijOLEgmhuij48dQPNumyaAi5IQAeDKk7yw==
 
 vue@^3.4.29:
   version "3.4.33"

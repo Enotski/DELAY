@@ -131,10 +131,10 @@ import type {
 } from "naive-ui/es/data-table/src/interface";
 
 import {
-  Plus as plusIco,
-  Minus as minusIco,
-  Send as sendIco,
-} from "@vicons/tabler";
+  Remove as plusIco,
+  Add as minusIco,
+  ChatboxOutline as sendIco,
+} from "@vicons/ionicons5";
 
 const roomsData = ref([
   {

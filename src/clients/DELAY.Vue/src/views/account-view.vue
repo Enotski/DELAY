@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { NForm, NFormItem, NInput, NButton, NDivider, NIcon } from "naive-ui";
-import { Check as plusIco, X as minusIco } from "@vicons/tabler";
+import { Add as plusIco, Remove as minusIco } from "@vicons/ionicons5";
 
 const formValue = ref({
   name: "",

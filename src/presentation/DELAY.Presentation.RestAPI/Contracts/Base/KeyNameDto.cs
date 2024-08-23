@@ -7,6 +7,11 @@ namespace DELAY.Core.Application.Contracts.Models.Base
         public KeyNameDto() : base()
         { }
 
+        public KeyNameDto(Guid id, string name) : base(id)
+        {
+            Name = name;
+        }
+
         public string Name { get; set; }
     }
 }

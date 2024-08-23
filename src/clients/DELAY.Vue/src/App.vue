@@ -2,16 +2,6 @@
   <n-message-provider>
     <n-dialog-provider>
       <n-modal
-        v-model:show="showModal"
-        preset="dialog"
-        title="Dialog"
-        content="Are you sure?"
-        positive-text="Confirm"
-        negative-text="Cancel"
-        @positive-click="onPositiveClick"
-        @negative-click="onNegativeClick"
-      />
-      <n-modal
         v-model:show="showSignInModal"
         preset="dialog"
         title="SignIn / SingUp"
@@ -30,16 +20,15 @@
           class="row"
         >
           <n-radio-group
-            v-model:value="radioGroupValue"
-            name="radiogroupLoginType"
+            v-model:value="radioSignModalTypeGroupValue"
+            name="radiogroupSingType"
           >
-            <n-radio-button value="name"> Name </n-radio-button>
-            <n-radio-button value="email"> Email </n-radio-button>
-            <n-radio-button value="phone"> Phone </n-radio-button>
+            <n-radio-button value="signIn"> Sign In </n-radio-button>
+            <n-radio-button value="signUp"> Sign Up </n-radio-button>
           </n-radio-group>
           <n-form-item
+            v-if="radioSignModalTypeGroupValue == 'signUp'"
             :style="{ width: '100%' }"
-            v-if="radioGroupValue == 'name'"
             path="name"
           >
             <n-input-group>
@@ -50,9 +39,18 @@
               />
             </n-input-group>
           </n-form-item>
+          <n-form-item>
+            <n-radio-group
+              v-model:value="radioSignInTypeGroupValue"
+              name="radiogroupLoginType"
+            >
+              <n-radio-button value="email"> Email </n-radio-button>
+              <n-radio-button value="phone"> Phone </n-radio-button>
+            </n-radio-group>
+          </n-form-item>
           <n-form-item
             :style="{ width: '100%' }"
-            v-if="radioGroupValue == 'email'"
+            v-if="radioSignInTypeGroupValue == 'email'"
             path="email"
           >
             <n-input-group
@@ -65,7 +63,7 @@
           </n-form-item>
           <n-form-item
             :style="{ width: '100%' }"
-            v-if="radioGroupValue == 'phone'"
+            v-if="radioSignInTypeGroupValue == 'phone'"
             path="phoneNumber"
           >
             <n-input-group
@@ -151,7 +149,7 @@ import {
 } from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import { useRouter } from "vue-router";
-
+import { sendRequest } from "@/utils/request-utils";
 import {
   HomeOutline as homeIco,
   PersonOutline as userIco,
@@ -182,13 +180,12 @@ function renderIcon(icon: Component) {
 const router = useRouter();
 const currentRouteName: any = computed(() => router.currentRoute.value.name);
 const isAuthorized = ref(true);
-const showModal = ref(false);
 
 const showSignInModal = ref(false);
-const radioGroupValue = ref("name");
+const radioSignInTypeGroupValue = ref("email");
+const radioSignModalTypeGroupValue = ref("signIn");
 
 const formValue = ref({
-  id: "",
   name: "",
   email: "",
   phoneNumber: "",
@@ -214,27 +211,41 @@ const loginGoogle = () => {
       .initCodeClient({
         client_id: clientid,
         scope: "email profile openid",
-        callback: (response) => {
-          console.log("Handle the response", response);
+        state: "supernumber",
+        redirect_uri: "https://localhost:443",
+        callback: async (response) => {
+          console.log("Google response", response);
+          await sendRequest("auth/signin-google", "POST", {
+            code: response.code,
+          }).then((value) => {
+            console.log(value);
+          });
         },
       })
       .requestCode();
   });
 };
+
 const loginVk = () => {
   Config.init({
     app: vkclientid, // Идентификатор приложения.
     redirectUrl: "https://localhost:443", // Адрес для перехода после авторизации.
     state: "dj29fnsadjsd82", // Произвольная строка состояния приложения.
     codeVerifier: "FGH767Gd65", // Верификатор в виде случайной строки. Обеспечивает защиту передаваемых данных.
-    scope: "email", // Список прав доступа, которые нужны приложению.
+    scope: "email",
     mode: ConfigAuthMode.InNewWindow,
     responseMode: ConfigResponseMode.Callback,
   });
 
   Auth.login()
-    .then((response) => {
-      console.log(response);
+    .then(async (response: any) => {
+      console.log("Vk response", response);
+      await sendRequest("auth/signin-vk", "POST", {
+        code: response.code,
+        deviceId: response.device_id,
+      }).then((value) => {
+        console.log(value);
+      });
     })
     .catch((e: AuthError) => {
       console.error("Ошибка Auth.login()", e);
@@ -245,7 +256,21 @@ function onSignInModalOpen() {
   showSignInModal.value = true;
 }
 
-function onConfirmSignInClick() {
+async function onConfirmSignInClick() {
+  if (radioSignModalTypeGroupValue.value == "signIn") {
+    await sendRequest("auth/signin-form", "POST", formValue.value).then(
+      (response) => {
+        console.log(response);
+      }
+    );
+  } else {
+    await sendRequest("auth/signup-form", "POST", formValue.value).then(
+      (response) => {
+        console.log(response);
+      }
+    );
+  }
+
   showSignInModal.value = false;
 }
 
@@ -253,17 +278,6 @@ function onCancelSignInClick() {
   showSignInModal.value = false;
 }
 
-function auth() {
-  showModal.value = true;
-  console.log("boardInfo");
-}
-function onPositiveClick(row: any) {
-  console.log("onPositiveClick");
-}
-function onNegativeClick(row: any) {
-  showModal.value = false;
-  console.log("onNegativeClick");
-}
 const menuOptions: MenuOption[] = [
   {
     label: () =>
@@ -328,23 +342,6 @@ const menuOptions: MenuOption[] = [
     show: isAuthorized.value,
     key: "account",
     icon: renderIcon(accountIco),
-  },
-  {
-    label: () =>
-      h(
-        NButton,
-        {
-          ghost: true,
-          type: "success",
-          strong: true,
-          size: "medium",
-          icon: renderIcon(accountIco),
-          onClick: () => auth(),
-        },
-        { default: () => "LogIn" }
-      ),
-    show: !isAuthorized.value,
-    key: "auth",
   },
 ];
 </script>

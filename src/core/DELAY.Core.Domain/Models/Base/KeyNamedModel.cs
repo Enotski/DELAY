@@ -18,7 +18,7 @@ namespace DELAY.Core.Domain.Models.Base
 
         public string Name
         {
-            get => name; 
+            get => name;
             set {
                 if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentNullException(nameof(Name));

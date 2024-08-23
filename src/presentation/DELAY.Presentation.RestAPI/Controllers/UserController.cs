@@ -1,7 +1,7 @@
 ﻿using DELAY.Core.Application.Abstractions.Mapper;
+using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Domain.Models;
-using DELAY.Presentation.RestAPI.Contracts.Request;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
 
@@ -217,7 +217,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <summary>
         /// Получение страницы активностей по заданным параметрам
         /// </summary>
-        /// <param name="options"><inheritdoc cref="PagedDataRequestDto"/></param>
+        /// <param name="options"><inheritdoc cref="PagedDataRequest"/></param>
         /// <returns><inheritdoc cref="PagedDataApiModel"/></returns>
         /// <remarks>
         /// Пример запроса:
@@ -257,7 +257,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllAsync([FromBody] PagedDataRequestDto options)
+        public async Task<IActionResult> GetAllAsync([FromBody] PagedDataRequest options)
         {
             try
             {
@@ -512,7 +512,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteAsync([FromBody]Guid id)
+        public async Task<IActionResult> DeleteAsync([FromBody] Guid id)
         {
             try
             {

@@ -6,6 +6,11 @@ namespace DELAY.Core.Application.Contracts.Models.Base
     {
         public KeyDto() { }
 
+        public KeyDto(Guid id)
+        {
+            Id = id;
+        }
+
         public Guid Id { get; set; }
     }
 }

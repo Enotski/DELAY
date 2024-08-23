@@ -1,6 +1,8 @@
-﻿using DELAY.Core.Application.Abstractions.Services;
-using DELAY.Core.Application.Abstractions.Services.Base;
+﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Abstractions.Services.Tickets;
+using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Services;
+using DELAY.Core.Application.Services.Auth;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DELAY.Core.Application
@@ -11,7 +13,7 @@ namespace DELAY.Core.Application
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IBoardService, BoardService>();
-            services.AddScoped<ICryptographyService, CryptographyService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

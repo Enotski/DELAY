@@ -9,7 +9,7 @@ namespace DELAY.Core.Domain.Models
         {
         }
 
-        public BoardUser(Board board, User user, RoleType userRole)
+        public BoardUser(Board board, KeyNamedModel user, RoleType userRole)
         {
             Board = board;
             User = user;

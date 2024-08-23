@@ -1,4 +1,4 @@
-﻿using DELAY.Core.Application.Abstractions.Services;
+﻿using DELAY.Core.Application.Abstractions.Services.Tickets;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
@@ -40,7 +40,7 @@ namespace DELAY.Core.Application.Services
 
             var board = new Board(model.Name, model.Description, triggered.Name);
 
-            board.BoardUsers = new List<BoardUser>() { new BoardUser(board, new User(triggered.Id, triggered.Name), Domain.Enums.RoleType.Administrator)};
+            board.BoardUsers = new List<BoardUser>() { new BoardUser(board, new KeyNamedModel(triggered.Id, triggered.Name), Domain.Enums.RoleType.Administrator) };
 
             if (!board.IsValid())
                 throw new ArgumentException("Invalid board data");

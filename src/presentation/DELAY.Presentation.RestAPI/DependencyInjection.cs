@@ -1,6 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
 using Serilog;
-using System.Reflection;
 
 namespace DELAY.Presentation.RestAPI
 {

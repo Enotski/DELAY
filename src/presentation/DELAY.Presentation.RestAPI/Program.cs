@@ -1,8 +1,8 @@
 using DELAY.Core.Application;
+using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Infrastructure;
-using DELAY.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 
 namespace DELAY.Presentation.RestAPI
 {
@@ -18,7 +18,7 @@ namespace DELAY.Presentation.RestAPI
                 .AddPresentation();
 
             builder.ConfigureWebApplication();
-
+            builder.Services.AddHttpClient();
             builder.Services.AddCors();
 
             var tokensSettings = new TokensSettings();
@@ -26,26 +26,22 @@ namespace DELAY.Presentation.RestAPI
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(tokensSettings.SchemeName, options =>
-                options.TokenValidationParameters = new TokenValidationParameters()
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = tokensSettings.Issuer,
-                    ValidAudience = tokensSettings.Audience,
-                    IssuerSigningKey = JwtGenerator.GetSymmetricSecurityKey(tokensSettings.SecretKey),
-                    LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) => expires > DateTime.UtcNow,
-                })
-                .AddVkontakte(options =>
-                {
-                    options.ClientId = builder.Configuration["Authentication:Vk:ClientId"];
-                    options.ClientSecret = builder.Configuration["Authentication:Vk:ClientSecret"];
-                })
-                .AddGoogle(options =>
-                {
-                    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+                    using var provider = builder.Services.BuildServiceProvider();
+
+                    options.TokenValidationParameters = provider.GetRequiredService<ITokensService>().GetTokenValidationParameters();
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = ctx =>
+                        {
+                            ctx.Request.Cookies.TryGetValue("access_token", out var accessToken);
+                            if (!string.IsNullOrEmpty(accessToken))
+                                ctx.Token = accessToken;
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             var app = builder.Build();

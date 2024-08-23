@@ -1,6 +1,4 @@
-﻿using DELAY.Core.Application.Contracts.Models;
-using DELAY.Core.Application.Contracts.Models.SelectOptions;
-using DELAY.Core.Domain.Interfaces;
+﻿using DELAY.Core.Domain.Interfaces;
 using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Application.Abstractions.Services

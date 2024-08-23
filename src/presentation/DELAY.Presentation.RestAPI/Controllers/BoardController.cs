@@ -1,9 +1,10 @@
 ﻿using DELAY.Core.Application.Abstractions.Mapper;
+using DELAY.Core.Application.Abstractions.Services.Tickets;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Domain.Models;
+using DELAY.Infrastructure.Extensions;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
-using DELAY.Infrastructure.Extensions;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {
@@ -127,7 +128,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             try
             {
                 var result = await boardService.AddAsync(mapper.Map<Board>(model), HttpContext.User.Identity.Name);
-            
+
                 logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
 
                 return Created(result.ToString(), result);

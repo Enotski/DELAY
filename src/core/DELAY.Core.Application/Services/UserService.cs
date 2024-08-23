@@ -1,5 +1,5 @@
-﻿using DELAY.Core.Application.Abstractions.Services;
-using DELAY.Core.Application.Abstractions.Services.Base;
+﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
@@ -11,13 +11,13 @@ namespace DELAY.Core.Application.Services
 {
     internal class UserService : BaseService, IUserService
     {
-        private readonly ICryptographyService cryptoService;
+        private readonly IPasswordHelper _passwordHelper;
 
         protected readonly IUserStorage userStorage;
 
-        public UserService(IUserStorage userStorage, ICryptographyService cryptoService)
+        public UserService(IUserStorage userStorage, IPasswordHelper passwordHelper)
         {
-            this.cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(ICryptographyService));
+            this._passwordHelper = passwordHelper ?? throw new ArgumentNullException(nameof(IPasswordHelper));
 
             this.userStorage = userStorage ?? throw new ArgumentNullException(nameof(IUserStorage));
         }
@@ -58,7 +58,7 @@ namespace DELAY.Core.Application.Services
 
             var triggered = await ValidatePermissionToOperation(Domain.Enums.RoleType.Administrator, triggeredBy);
 
-            model.Password = cryptoService.GetHash(model.Password);
+            model.Password = _passwordHelper.GetHash(model.Password);
 
             await ValidateUserAsync(model);
 
@@ -122,7 +122,7 @@ namespace DELAY.Core.Application.Services
             return await userStorage.GetAsync(id);
         }
 
-        public async Task<PagedDataModel<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
+        public async Task<PagedData<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
         {
             return await userStorage.GetRecordsAsync(searchOptions, sortOptions, pagination);
         }

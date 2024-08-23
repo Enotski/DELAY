@@ -1,10 +1,10 @@
-﻿using DELAY.Presentation.RestAPI.Contracts.Request;
+﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Contracts.Models.Auth;
+using DELAY.Presentation.RestAPI.Contracts.Response;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace DELAY.Presentation.RestAPI.Controllers
 {
@@ -12,109 +12,175 @@ namespace DELAY.Presentation.RestAPI.Controllers
     [Route("api/auth")]
     public class AuthController : BaseController
     {
-        private readonly IAuthenticationService authenticationService;
+        private readonly IAuthService _authService;
 
-        public AuthController(IAuthenticationService authenticationService)
+        private readonly TokensSettings tokensSettings;
+
+        public AuthController(IAuthService authService, IOptions<TokensSettings> tokensSettings)
         {
-            ArgumentNullException.ThrowIfNull(authenticationService, nameof(IAuthenticationService));
+            ArgumentNullException.ThrowIfNull(authService, nameof(IAuthenticationService));
 
-            this.authenticationService = authenticationService;
+            _authService = authService;
+            this.tokensSettings = tokensSettings.Value;
         }
 
-        [HttpPost]
-        [Route("login-form")]
-        public async Task<IActionResult> LoginFormAsync([FromBody] AuthRequestDto options)
+        private AuthResponseDto CreateAuthResponse(AuthResult authResult)
         {
-            return Ok();
-            //try
-            //{
-            //    var model = await _serviceManager.AuthenticationService.LoginFormAsync(options, RemoteIpAddress, UserAgentData);
-            //    if (model is null || model.Result == ResponseResultType.Error || model.Data is null)
-            //    {
-            //        return Unauthorized();
-            //    }
-            //    return Ok(model);
-            //}
-            //catch (Exception exp)
-            //{
-            //    return Unauthorized(exp.Message);
-            //}
-        }
+            var endpoints = new List<string>();
 
-        [HttpPost]
-        [Route("register-form")]
-        public async Task<IActionResult> RegisterFormAsync([FromBody] AuthRequestDto options)
-        {
-            return Ok();
-            //try
-            //{
-            //    var model = await _serviceManager.AuthenticationService.RegisterFormAsync(options, RemoteIpAddress, UserAgentData);
-            //    if (model is null || model.Result == ResponseResultType.Error || model.Data is null)
-            //    {
-            //        return Unauthorized();
-            //    }
-            //    return Ok(model);
-            //}
-            //catch (Exception exp)
-            //{
-            //    return Unauthorized(exp.Message);
-            //}
-        }
-
-        [HttpPost]
-        [Route("login-google")]
-        public IActionResult LoginGoogle()
-        {
-            var properties = new AuthenticationProperties()
+            if (authResult.Role == Core.Domain.Enums.RoleType.None)
             {
-                RedirectUri = Url.Action("GoogleResponse")
-            };
+                endpoints.Add("home");
+            }
+            else if (authResult.Role == Core.Domain.Enums.RoleType.User)
+            {
+                endpoints.AddRange(["home", "boards", "rooms", "account"]);
+            }
+            else if (authResult.Role == Core.Domain.Enums.RoleType.Administrator)
+            {
+                endpoints.AddRange(["home", "boards", "rooms", "account", "users"]);
+            }
 
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
-            //try
-            //{
-            //    var model = await _serviceManager.AuthenticationService.LoginFormAsync(options, RemoteIpAddress, UserAgentData);
-            //    if (model is null || model.Result == ResponseResultType.Error || model.Data is null)
-            //    {
-            //        return Unauthorized();
-            //    }
-            //    return Ok(model);
-            //}
-            //catch (Exception exp)
-            //{
-            //    return Unauthorized(exp.Message);
-            //}
+            return new AuthResponseDto(authResult.Id, authResult.Name, endpoints);
+        }
+
+        private void SetTokensInsideCookie(Tokens tokenDto, HttpContext context)
+        {
+            context.Response.Cookies.Append("access_token", tokenDto.AccessToken,
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(tokensSettings.AccessTokenExpirationMinutes),
+                    HttpOnly = true,
+                    IsEssential = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
+
+            context.Response.Cookies.Append("refresh_token", tokenDto.RefreshToken,
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(tokensSettings.RefreshTokenExpirationDays),
+                    HttpOnly = true,
+                    IsEssential = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
         }
 
         [HttpPost]
-        [Route("google-response")]
-        public async Task<IActionResult> GoogleResponse()
+        [Route("refresh-tokens")]
+        public async Task<IActionResult> RefreshTokensAsync()
         {
-            var result = await HttpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
-
-            var claims = result.Principal.Identities.FirstOrDefault().Claims.Select(x =>
-            new
+            try
             {
-                x.Issuer,
-                x.OriginalIssuer,
-                x.Type,
-                x.Value
-            });
+                HttpContext.Request.Cookies.TryGetValue("refresh_token", out var refreshToken);
 
-            return Ok(result);
-            //try
-            //{
-            //    var model = await _serviceManager.AuthenticationService.LoginFormAsync(options, RemoteIpAddress, UserAgentData);
-            //    if (model is null || model.Result == ResponseResultType.Error || model.Data is null)
-            //    {
-            //        return Unauthorized();
-            //    }
-            //    return Ok(model);
-            //}
-            //catch (Exception exp)
-            //{
-            //    return Unauthorized(exp.Message);
-            //}
+                var tokens = await _authService.RefreshTokensAsync(refreshToken);
+
+                if (tokens is null)
+                {
+                    return Unauthorized();
+                }
+
+                SetTokensInsideCookie(tokens, HttpContext);
+
+                return Ok();
+            }
+            catch (Exception exp)
+            {
+                return Unauthorized(exp.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("signin-form")]
+        public async Task<IActionResult> SignInFormAsync([FromBody] SignInRequest model)
+        {
+            try
+            {
+                var authResultModel = await _authService.SignInAsync(model);
+
+                if (authResultModel is null)
+                {
+                    return Unauthorized();
+                }
+
+                SetTokensInsideCookie(authResultModel.Tokens, HttpContext);
+
+                return Ok(CreateAuthResponse(authResultModel));
+            }
+            catch (Exception exp)
+            {
+                return Unauthorized(exp.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("singup")]
+        public async Task<IActionResult> SignUpAsync([FromBody] SignUpRequest model)
+        {
+            try
+            {
+                var authResultModel = await _authService.SignUpAsync(model);
+
+                if (authResultModel is null)
+                {
+                    return Unauthorized();
+                }
+
+                SetTokensInsideCookie(authResultModel.Tokens, HttpContext);
+
+                return Ok(CreateAuthResponse(authResultModel));
+            }
+            catch (Exception exp)
+            {
+                return Unauthorized(exp.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("signin-google")]
+        public async Task<IActionResult> SignInGoogle([FromBody] GoogleAuthRequest model)
+        {
+            try
+            {
+                var authResultModel = await _authService.SignInGoogleAsync(model);
+
+                if (authResultModel is null)
+                {
+                    return Unauthorized();
+                }
+
+                SetTokensInsideCookie(authResultModel.Tokens, HttpContext);
+
+                return Ok(CreateAuthResponse(authResultModel));
+            }
+            catch (Exception exp)
+            {
+                return Unauthorized(exp.Message);
+            }
+        }
+        [HttpPost]
+        [Route("signin-vk")]
+        public async Task<IActionResult> SignInVk([FromBody] VkAuthRequest model)
+        {
+            try
+            {
+                var authResultModel = await _authService.SignInVkAsync(model);
+
+                if (authResultModel is null)
+                {
+                    return Unauthorized();
+                }
+
+                SetTokensInsideCookie(authResultModel.Tokens, HttpContext);
+
+                return Ok(CreateAuthResponse(authResultModel));
+            }
+            catch (Exception exp)
+            {
+                return Unauthorized(exp.Message);
+            }
         }
     }
 }

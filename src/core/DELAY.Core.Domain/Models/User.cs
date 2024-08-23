@@ -1,24 +1,27 @@
 ﻿using DELAY.Core.Domain.Enums;
+using DELAY.Core.Domain.Interfaces;
 using DELAY.Core.Domain.Models.Base;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace DELAY.Core.Domain.Models
 {
-    public class User : KeyNamedModel
+    public class User : KeyModel, IName
     {
+        public string? Name { get; set; }
+
         public string Email { get; set; }
 
         public string PhoneNumber { get; set; }
 
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         public DateTime ChangedDate { get; set; }
 
         public DateTime CreateDate { get; set; }
 
-        public string ChangedBy {  get; set; }
-        public RoleType Role {  get; set; }
+        public string ChangedBy { get; set; }
+        public RoleType Role { get; set; }
 
         public bool IsValidCredentials()
         {
@@ -27,12 +30,7 @@ namespace DELAY.Core.Domain.Models
 
             bool isValidLogin = false;
 
-            if (!string.IsNullOrWhiteSpace(Name))
-            {
-                isValidLogin = true;
-            }
-
-            if(!string.IsNullOrWhiteSpace(Email))
+            if (!string.IsNullOrWhiteSpace(Email))
             {
                 isValidLogin = IsValidEmail(Email);
             }
@@ -106,18 +104,30 @@ namespace DELAY.Core.Domain.Models
             }
         }
 
-        public User(Guid id, string name) : base(id, name)
+        public User(Guid id, string name) : base(id)
         {
+            Name = name;
         }
 
-        public User(string name, string email, string phoneNumber, string password, string changedBy) : base(name)
+        public User(string name, string email, string phoneNumber, string password, string changedBy)
         {
+            Name = name;
             Email = email;
             PhoneNumber = phoneNumber;
             Password = password;
             CreateDate = DateTime.UtcNow;
             ChangedDate = CreateDate;
             ChangedBy = changedBy;
+            Role = RoleType.User;
+        }
+        public User(string name, string email, string phoneNumber, string password)
+        {
+            Name = name;
+            Email = email;
+            PhoneNumber = phoneNumber;
+            Password = password;
+            CreateDate = DateTime.UtcNow;
+            ChangedDate = CreateDate;
             Role = RoleType.User;
         }
 
@@ -132,8 +142,7 @@ namespace DELAY.Core.Domain.Models
             ChangedBy = changedBy;
             ChangedDate = DateTime.UtcNow;
             Role = role;
-
-            base.Update(name);
+            Name = name;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace DELAY.Infrastructure.Caching
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddCachingervices(this IServiceCollection services)
+        public static IServiceCollection AddCachingServices(this IServiceCollection services)
         {
             services.AddMemoryCache();
             services.AddScoped<ICachingService, MemoryCacheService>();

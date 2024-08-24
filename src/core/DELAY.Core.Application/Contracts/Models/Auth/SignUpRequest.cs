@@ -2,7 +2,7 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Auth
 {
-    public class SignUpRequest
+    public class SignUpRequest : AuthUserAgentRequest
     {
         public SignUpRequest()
         {

@@ -9,7 +9,7 @@ namespace DELAY.Infrastructure.Persistence
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddPersistenceServices(this IServiceCollection services, ConfigurationManager config)
+        public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration config)
         {
             var dbServerType = config["DbServerType"];
             string connectionString;
@@ -27,7 +27,6 @@ namespace DELAY.Infrastructure.Persistence
         {
             services.AddScoped<IUserStorage, UserRepository>();
             services.AddScoped<IBoardStorage, BoardRepository>();
-            services.AddScoped<IAccountStorage, AccountRepository>();
             services.AddScoped<ISessionLogStorage, SessionLogRepository>();
 
             return services;

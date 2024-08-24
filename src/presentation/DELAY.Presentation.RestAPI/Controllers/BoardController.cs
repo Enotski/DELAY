@@ -10,7 +10,7 @@ namespace DELAY.Core.Application.Abstractions.Services
 {
     [ApiController]
     [Route("boards")]
-    public class BoardController : BaseController
+    public class BoardController : AuthorizedController
     {
         /// <summary>
         /// <inheritdoc cref="IUserService"/>

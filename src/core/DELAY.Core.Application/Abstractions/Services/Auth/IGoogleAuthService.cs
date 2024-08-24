@@ -4,6 +4,6 @@ namespace DELAY.Core.Application.Abstractions.Services.Auth
 {
     public interface IGoogleAuthService
     {
-        Task<GoogleUserCredentials> GetUserCredentialsByCodeAsync(string singleUseExchangeCode, string clientId, string clientSecret);
+        Task<GoogleUserCredentials> GetUserCredentialsByCodeAsync(string singleUseExchangeCode);
     }
 }

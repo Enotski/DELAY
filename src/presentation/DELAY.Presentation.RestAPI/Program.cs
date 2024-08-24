@@ -1,7 +1,7 @@
 using DELAY.Core.Application;
 using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Contracts.Models.Auth;
-using DELAY.Infrastructure;
+using DELAY.Infrastructure.DependencyInjections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace DELAY.Presentation.RestAPI
@@ -13,36 +13,11 @@ namespace DELAY.Presentation.RestAPI
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services
+                .AddInfrastructure(builder.Configuration)
                 .AddApplication()
-                .AddInfrasturcture(builder.Configuration)
                 .AddPresentation();
 
             builder.ConfigureWebApplication();
-            builder.Services.AddHttpClient();
-            builder.Services.AddCors();
-
-            var tokensSettings = new TokensSettings();
-            builder.Configuration.Bind(TokensSettings.SectionName, tokensSettings);
-
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(tokensSettings.SchemeName, options =>
-                {
-
-                    using var provider = builder.Services.BuildServiceProvider();
-
-                    options.TokenValidationParameters = provider.GetRequiredService<ITokensService>().GetTokenValidationParameters();
-
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = ctx =>
-                        {
-                            ctx.Request.Cookies.TryGetValue("access_token", out var accessToken);
-                            if (!string.IsNullOrEmpty(accessToken))
-                                ctx.Token = accessToken;
-                            return Task.CompletedTask;
-                        }
-                    };
-                });
 
             var app = builder.Build();
 

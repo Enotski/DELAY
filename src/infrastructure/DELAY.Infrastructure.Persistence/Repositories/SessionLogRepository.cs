@@ -13,7 +13,12 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         {
         }
 
-        public Task<SessionLog> GetSession(Guid userId, string ip, string userAgent)
+        public Task<SessionLog> GetSessionAsync(Guid userId, string ip, string userAgent, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SessionLog> GetSessionByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

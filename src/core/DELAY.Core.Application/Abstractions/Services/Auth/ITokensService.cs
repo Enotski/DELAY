@@ -6,12 +6,10 @@ namespace DELAY.Core.Application.Abstractions.Services.Auth
 {
     public interface ITokensService
     {
-        bool ValidateToken(string token);
+        bool IsValidToken(string token);
 
         ClaimsPrincipal GetPrincipal(string token);
 
-        Tokens CreateTokens(Guid userId, string userLogin);
-
-        TokenValidationParameters GetTokenValidationParameters();
+        Tokens CreateTokens();
     }
 }

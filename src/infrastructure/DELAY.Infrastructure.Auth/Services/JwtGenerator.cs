@@ -1,5 +1,7 @@
 ﻿using DELAY.Core.Application.Contracts.Models.Auth;
+using DELAY.Core.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
+using System.CodeDom.Compiler;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -33,6 +35,21 @@ namespace DELAY.Infrastructure.Auth.Services
         /// <returns></returns>
         public static SymmetricSecurityKey GetSymmetricSecurityKey(string key) => new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 
+        public static TokenValidationParameters CreateTokenValidationParameters(string key, string issuer, string audience)
+        {
+            return new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = issuer,
+                ValidAudience = audience,
+                IssuerSigningKey = JwtGenerator.GetSymmetricSecurityKey(key),
+                LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) => expires >= DateTime.UtcNow,
+            };
+        }
+
         public JwtGenerator(TokensSettings jwtSettings)
         {
             _jwtSettings = jwtSettings ?? throw new ArgumentNullException(nameof(TokensSettings));
@@ -56,39 +73,26 @@ namespace DELAY.Infrastructure.Auth.Services
                 signingCredentials: signingCredentials);
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
-        public TokenValidationParameters CreateTokenValidationParameters()
-        {
-            return new TokenValidationParameters()
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = _jwtSettings.Issuer,
-                ValidAudience = _jwtSettings.Audience,
-                IssuerSigningKey = JwtGenerator.GetSymmetricSecurityKey(_jwtSettings.SecretKey),
-                LifetimeValidator = (DateTime? notBefore, DateTime? expires, SecurityToken securityToken, TokenValidationParameters validationParameters) => expires >= DateTime.UtcNow,
-            };
-        }
-        public string CreateAccessToken(Guid userId, string userLogin)
+        public string CreateAccessToken()
         {
             var signingCredentials = new SigningCredentials(GetSymmetricSecurityKey(_jwtSettings.SecretKey), SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim(ClaimTypes.Sid, userId.ToString()),
-                new Claim(ClaimTypes.GivenName, userLogin),
+                new Claim(ClaimTypes.Sid, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Expiration, AccessTokenExpirationTime.ToString()),
             };
             return CreateToken(_jwtSettings.Issuer, _jwtSettings.Audience, AccessTokenExpirationTime, claims, signingCredentials);
         }
         public string CreateRefreshToken()
         {
             var signingCredentials = new SigningCredentials(GetSymmetricSecurityKey(_jwtSettings.SecretKey), SecurityAlgorithms.HmacSha256);
+
             return CreateToken(_jwtSettings.Issuer, _jwtSettings.Audience, RefreshTokenExpirationTime, signingCredentials: signingCredentials);
         }
         public ClaimsPrincipal GetPrincipal(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenValidationParameters = CreateTokenValidationParameters();
+            var tokenValidationParameters = CreateTokenValidationParameters(_jwtSettings.SecretKey, _jwtSettings.Issuer, _jwtSettings.Audience);
 
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
             var jwtSecurityToken = securityToken as JwtSecurityToken;
@@ -103,7 +107,7 @@ namespace DELAY.Infrastructure.Auth.Services
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var tokenValidationParameters = CreateTokenValidationParameters();
+                var tokenValidationParameters = CreateTokenValidationParameters(_jwtSettings.SecretKey, _jwtSettings.Issuer, _jwtSettings.Audience);
                 tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
                 return securityToken != null;
             }

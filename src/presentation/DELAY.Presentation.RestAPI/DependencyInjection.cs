@@ -12,6 +12,9 @@ namespace DELAY.Presentation.RestAPI
         /// <returns></returns>
         public static IServiceCollection AddPresentation(this IServiceCollection services)
         {
+            services.AddHttpClient();
+            services.AddCors();
+
             services.AddControllers();
             services.AddEndpointsApiExplorer();
 

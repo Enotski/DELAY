@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 
 namespace DELAY.Infrastructure.Persistence.Repositories
 {
+    
     internal class UserRepository : NamedRepository<UserEntity, User>, IUserStorage
     {
         public UserRepository(DelayContext context, IModelMapperService mapper) : base(context, mapper)
@@ -170,6 +171,24 @@ namespace DELAY.Infrastructure.Persistence.Repositories
             return await BuildQuery(filter).CountAsync(cancellationToken);
         }
 
+        public async Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+        {
+            email = email.ToUpperTrim();
+
+            var user = await BuildQuery(x => x.Email.Trim().ToUpper() == email).FirstOrDefaultAsync(cancellationToken);
+
+            return _mapper.Map<User>(user);
+        }
+
+        public async Task<User> GetByPhoneAsync(string phone, CancellationToken cancellationToken = default)
+        {
+            phone = phone.Trim();
+
+            var user = await BuildQuery(x => x.PhoneNumber.Trim() == phone).FirstOrDefaultAsync(cancellationToken);
+
+            return _mapper.Map<User>(user);
+        }
+
         public Task<IEnumerable<User>> GetAssigedUsersToTicketAsync(Guid ticketId, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
@@ -189,7 +208,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
             var records = await BuildQuery(filter, order, pagination).ToListAsync(cancellationToken);
 
-            return new PagedData<User>(count, mapper.Map<IEnumerable<User>>(records));
+            return new PagedData<User>(count, _mapper.Map<IEnumerable<User>>(records));
         }
 
         public async Task<bool> IsUniqueName(string name, Guid? id = null, CancellationToken cancellationToken = default)

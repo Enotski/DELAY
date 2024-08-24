@@ -14,7 +14,7 @@ namespace DELAY.Infrastructure.Persistence.Context
             // получаем конфигурацию из файла appsettings.json
             IConfigurationRoot config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("infrastructure.settings.json")
+                .AddJsonFile("persistence.settings.json")
                 .Build();
 
             var dbServerType = config["DbServerType"];

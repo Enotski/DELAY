@@ -69,13 +69,13 @@ namespace DELAY.Presentation.RestAPI.Controllers
 
         [HttpPost]
         [Route("refresh-tokens")]
-        public async Task<IActionResult> RefreshTokensAsync()
+        public IActionResult RefreshTokens()
         {
             try
             {
                 HttpContext.Request.Cookies.TryGetValue("refresh_token", out var refreshToken);
 
-                var tokens = await _authService.RefreshTokensAsync(refreshToken);
+                var tokens = _authService.RefreshTokens(refreshToken);
 
                 if (tokens is null)
                 {
@@ -93,11 +93,13 @@ namespace DELAY.Presentation.RestAPI.Controllers
         }
 
         [HttpPost]
-        [Route("signin-form")]
-        public async Task<IActionResult> SignInFormAsync([FromBody] SignInRequest model)
+        [Route("signin")]
+        public async Task<IActionResult> SignInAsync([FromBody] SignInRequest model)
         {
             try
             {
+                model.SetUserAgentData(UserAgentData, RemoteIpAddress);
+
                 var authResultModel = await _authService.SignInAsync(model);
 
                 if (authResultModel is null)
@@ -116,11 +118,13 @@ namespace DELAY.Presentation.RestAPI.Controllers
         }
 
         [HttpPost]
-        [Route("singup")]
+        [Route("signup")]
         public async Task<IActionResult> SignUpAsync([FromBody] SignUpRequest model)
         {
             try
             {
+                model.SetUserAgentData(UserAgentData, RemoteIpAddress);
+
                 var authResultModel = await _authService.SignUpAsync(model);
 
                 if (authResultModel is null)
@@ -144,6 +148,8 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
+                model.SetUserAgentData(UserAgentData, RemoteIpAddress);
+
                 var authResultModel = await _authService.SignInGoogleAsync(model);
 
                 if (authResultModel is null)
@@ -166,6 +172,8 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
+                model.SetUserAgentData(UserAgentData, RemoteIpAddress);
+
                 var authResultModel = await _authService.SignInVkAsync(model);
 
                 if (authResultModel is null)
@@ -180,6 +188,21 @@ namespace DELAY.Presentation.RestAPI.Controllers
             catch (Exception exp)
             {
                 return Unauthorized(exp.Message);
+            }
+        }
+        [HttpPost]
+        [Route("signout")]
+        public async Task<IActionResult> SignOut()
+        {
+            try
+            {
+                _authService.SignOut();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
     }

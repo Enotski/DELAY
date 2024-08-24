@@ -4,7 +4,7 @@ namespace DELAY.Core.Application.Abstractions.Services.Auth
 {
     public interface IAuthService
     {
-        Task<Tokens> RefreshTokensAsync(string refreshToken);
+        Tokens RefreshTokens(string refreshToken);
 
         Task<AuthResult> SignInAsync(SignInRequest model);
 
@@ -13,5 +13,7 @@ namespace DELAY.Core.Application.Abstractions.Services.Auth
         Task<AuthResult> SignInGoogleAsync(GoogleAuthRequest model);
 
         Task<AuthResult> SignInVkAsync(VkAuthRequest model);
+
+        Task SignOut();
     }
 }

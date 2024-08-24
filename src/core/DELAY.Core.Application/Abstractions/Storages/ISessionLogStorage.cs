@@ -5,6 +5,8 @@ namespace DELAY.Core.Application.Abstractions.Storages
 {
     public interface ISessionLogStorage : IBaseStorage<SessionLog>
     {
-        Task<SessionLog> GetSession(Guid userId, string ip, string userAgent);
+        Task<SessionLog> GetSessionAsync(Guid userId, string ip, string userAgent, CancellationToken cancellationToken = default);
+
+        Task<SessionLog> GetSessionByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
     }
 }

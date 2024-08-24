@@ -3,6 +3,7 @@ using System;
 using DELAY.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DELAY.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(DelayContext))]
-    partial class DelayContextModelSnapshot : ModelSnapshot
+    [Migration("20240824213458_AuthMigration_2")]
+    partial class AuthMigration_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,6 +238,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .HasColumnName("UserId");
 
                     b.Property<string>("ChangedBy")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ChangedDate")

@@ -2,19 +2,27 @@
 using DELAY.Core.Application.Contracts.Models.Auth;
 using Google.Apis.Auth;
 using Google.Apis.Auth.OAuth2.Flows;
+using Microsoft.Extensions.Options;
 
 namespace DELAY.Infrastructure.Auth.Services
 {
     internal class GoogleAuthService : IGoogleAuthService
     {
-        public async Task<GoogleUserCredentials> GetUserCredentialsByCodeAsync(string singleUseExchangeCode, string clientId, string clientSecret)
+        private readonly GoogleApiSecrets _googleApiSecrets;
+
+        public GoogleAuthService(IOptions<GoogleApiSecrets> googleApiSecrets)
+        {
+            _googleApiSecrets = googleApiSecrets.Value;
+        }
+
+        public async Task<GoogleUserCredentials> GetUserCredentialsByCodeAsync(string singleUseExchangeCode)
         {
             var initializer = new AuthorizationCodeFlow.Initializer("https://localhost", "https://oauth2.googleapis.com/token")
             {
                 ClientSecrets = new Google.Apis.Auth.OAuth2.ClientSecrets()
                 {
-                    ClientId = clientId,
-                    ClientSecret = clientSecret
+                    ClientId = _googleApiSecrets.ClientId,
+                    ClientSecret = _googleApiSecrets.ClientSecret
                 },
             };
 

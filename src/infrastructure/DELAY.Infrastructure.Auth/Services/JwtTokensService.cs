@@ -1,7 +1,6 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Contracts.Models.Auth;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
 namespace DELAY.Infrastructure.Auth.Services
@@ -16,22 +15,13 @@ namespace DELAY.Infrastructure.Auth.Services
             _tokenGenerator = new JwtGenerator(jwtSettings.Value);
         }
 
-        public TokenValidationParameters GetTokenValidationParameters() => _tokenGenerator.CreateTokenValidationParameters();
+        public bool IsValidToken(string token) =>
+            _tokenGenerator.ValidateToken(token.Replace("Bearer", "").Trim());
 
-        public bool ValidateToken(string token)
-        {
-            return _tokenGenerator.ValidateToken(token.Replace("Bearer", "").Trim());
-        }
-        public ClaimsPrincipal GetPrincipal(string token)
-        {
-            return _tokenGenerator.GetPrincipal(token.Replace("Bearer", "").Trim());
-        }
-        public Tokens CreateTokens(Guid userId, string userLogin)
-        {
-            var access_token = _tokenGenerator.CreateAccessToken(userId, userLogin);
-            var refresh_token = _tokenGenerator.CreateRefreshToken();
+        public ClaimsPrincipal GetPrincipal(string token) =>
+            _tokenGenerator.GetPrincipal(token.Replace("Bearer", "").Trim());
 
-            return new Tokens(access_token, refresh_token);
-        }
+        public Tokens CreateTokens() =>
+            new Tokens(_tokenGenerator.CreateAccessToken(), _tokenGenerator.CreateRefreshToken());
     }
 }

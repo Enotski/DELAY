@@ -24,11 +24,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DELAY.Infrastructure.Persistence", "src\infrastructure\DELAY.Infrastructure.Persistence\DELAY.Infrastructure.Persistence.csproj", "{208270F5-E610-4C80-9B93-D36594622142}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DELAY.Infrastructure.Auth", "src\infrastructure\DELAY.Infrastructure.Auth\DELAY.Infrastructure.Auth.csproj", "{73311548-889B-4694-BAB7-92B4BFCF0463}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DELAY.Infrastructure.Auth", "src\infrastructure\DELAY.Infrastructure.Auth\DELAY.Infrastructure.Auth.csproj", "{73311548-889B-4694-BAB7-92B4BFCF0463}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DELAY.Infrastructure.DependencyInjection", "src\infrastructure\DELAY.Infrastructure.DependencyInjection\DELAY.Infrastructure.DependencyInjection.csproj", "{D5BCC4B3-3A08-4BF9-BCF2-C4579630A629}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DELAY.Infrastructure.DependencyInjections", "src\infrastructure\DELAY.Infrastructure.DependencyInjection\DELAY.Infrastructure.DependencyInjections.csproj", "{D5BCC4B3-3A08-4BF9-BCF2-C4579630A629}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DELAY.Infrastructure.Caching", "src\infrastructure\DELAY.Infrastructure.Caching\DELAY.Infrastructure.Caching.csproj", "{168EDAA6-D522-40BF-BA23-AABA6ECC3AAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DELAY.Infrastructure.Caching", "src\infrastructure\DELAY.Infrastructure.Caching\DELAY.Infrastructure.Caching.csproj", "{168EDAA6-D522-40BF-BA23-AABA6ECC3AAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

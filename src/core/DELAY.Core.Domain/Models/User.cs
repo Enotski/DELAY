@@ -8,11 +8,13 @@ namespace DELAY.Core.Domain.Models
 {
     public class User : KeyModel, IName
     {
+        public string DisplayName { get => !string.IsNullOrWhiteSpace(Name) ? Name : !string.IsNullOrWhiteSpace(Email) ? Email : PhoneNumber; }
+
         public string? Name { get; set; }
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         public string? Password { get; set; }
 
@@ -20,12 +22,12 @@ namespace DELAY.Core.Domain.Models
 
         public DateTime CreateDate { get; set; }
 
-        public string ChangedBy { get; set; }
+        public string? ChangedBy { get; set; }
         public RoleType Role { get; set; }
 
-        public bool IsValidCredentials()
+        public bool IsValidCredentials(bool isValidatePassword = true)
         {
-            if (string.IsNullOrWhiteSpace(Password))
+            if (isValidatePassword && string.IsNullOrWhiteSpace(Password))
                 return false;
 
             bool isValidLogin = false;
@@ -130,6 +132,15 @@ namespace DELAY.Core.Domain.Models
             ChangedDate = CreateDate;
             Role = RoleType.User;
         }
+        public User(string name, string email, string phoneNumber)
+        {
+            Name = name;
+            Email = email;
+            PhoneNumber = phoneNumber;
+            CreateDate = DateTime.UtcNow;
+            ChangedDate = CreateDate;
+            Role = RoleType.User;
+        }
 
         public User()
         {
@@ -144,5 +155,7 @@ namespace DELAY.Core.Domain.Models
             Role = role;
             Name = name;
         }
+
+        public void SetPassword(string password) => Password = password;
     }
 }

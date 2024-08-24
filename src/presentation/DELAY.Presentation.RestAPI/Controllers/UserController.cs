@@ -9,7 +9,8 @@ namespace DELAY.Core.Application.Abstractions.Services
 {
     [ApiController]
     [Route("api/users")]
-    public class UserController : BaseController
+    
+    public class UserController : AuthorizedController
     {
         /// <summary>
         /// <inheritdoc cref="IUserService"/>

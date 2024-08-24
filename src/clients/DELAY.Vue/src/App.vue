@@ -258,13 +258,13 @@ function onSignInModalOpen() {
 
 async function onConfirmSignInClick() {
   if (radioSignModalTypeGroupValue.value == "signIn") {
-    await sendRequest("auth/signin-form", "POST", formValue.value).then(
+    await sendRequest("auth/signin", "POST", formValue.value).then(
       (response) => {
         console.log(response);
       }
     );
   } else {
-    await sendRequest("auth/signup-form", "POST", formValue.value).then(
+    await sendRequest("auth/signup", "POST", formValue.value).then(
       (response) => {
         console.log(response);
       }

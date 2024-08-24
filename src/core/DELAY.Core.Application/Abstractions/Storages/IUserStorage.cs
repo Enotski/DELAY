@@ -21,6 +21,10 @@ namespace DELAY.Core.Application.Abstractions.Storages
         Task<bool> IsUniqueEmail(string email, Guid? id = null, CancellationToken cancellationToken = default);
         Task<bool> IsUniquePhone(string phoneNumber, Guid? id = null, CancellationToken cancellationToken = default);
 
+        Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+
+        Task<User> GetByPhoneAsync(string phone, CancellationToken cancellationToken = default);
+
         Task<KeyNamedModel> PermissionToPerformOperationAsync(RoleType role, string triggeredBy, CancellationToken cancellationToken = default);
     }
 }

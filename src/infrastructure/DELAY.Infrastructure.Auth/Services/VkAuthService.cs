@@ -1,6 +1,7 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Infrastructure.Auth.Models;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
 using System.Web;
 
@@ -8,21 +9,25 @@ namespace DELAY.Infrastructure.Auth.Services
 {
     internal class VkAuthService : IVkAuthService
     {
+        private readonly VkApiSecrets _vkApiSecrets;
+
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public VkAuthService(IHttpClientFactory httpClientFactory)
+        public VkAuthService(IHttpClientFactory httpClientFactory, IOptions<VkApiSecrets> vkApiSecrets)
         {
             _httpClientFactory = httpClientFactory;
+
+            _vkApiSecrets = vkApiSecrets.Value;
         }
 
-        public async Task<VkUserCredentials> GetUserCredentialsByCodeAsync(string singleUseExchangeCode, string deviceId, string clientId, string codeVerifier)
+        public async Task<VkUserCredentials> GetUserCredentialsByCodeAsync(string singleUseExchangeCode, string deviceId, string codeVerifier)
         {
             using var client = _httpClientFactory.CreateClient();
 
             var queryParams = new Dictionary<string, string>()
             {
                 { "grant_type", "authorization_code" },
-                { "client_id", clientId },
+                { "client_id", _vkApiSecrets.ClientId },
                 { "state", Guid.NewGuid().ToString().Replace("-", "") },
                 { "code_verifier", codeVerifier },
                 { "redirect_uri", "https://localhost:443" },
@@ -37,13 +42,13 @@ namespace DELAY.Infrastructure.Auth.Services
 
             var authResult = await response.Content.ReadFromJsonAsync<VkApiCodeExchangeResponse>();
 
-            using var getUserContent = new FormUrlEncodedContent([new KeyValuePair<string, string>("client_id", clientId), new KeyValuePair<string, string>("access_token", authResult.access_token)]);
+            using var getUserContent = new FormUrlEncodedContent([new KeyValuePair<string, string>("client_id", _vkApiSecrets.ClientId), new KeyValuePair<string, string>("access_token", authResult.access_token)]);
 
             using var userDataResponse = await client.PostAsync("https://id.vk.com/oauth2/user_info", getUserContent);
 
             var userData = await userDataResponse.Content.ReadFromJsonAsync<VkUserInfoResponse>();
 
-            return new VkUserCredentials(userData.user.email, userData.user.first_name, userData.user.first_name + " " + userData.user.last_name, userData.user.last_name);
+            return new VkUserCredentials(userData.user.email, userData.user.first_name, userData.user.last_name);
         }
     }
 }

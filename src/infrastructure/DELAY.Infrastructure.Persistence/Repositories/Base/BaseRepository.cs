@@ -15,11 +15,11 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
     {
         protected readonly DelayContext context;
 
-        protected readonly IModelMapperService mapper;
+        protected readonly IModelMapperService _mapper;
 
         protected BaseRepository(DelayContext context, IModelMapperService mapper)
         {
-            this.mapper = mapper;
+            this._mapper = mapper;
             this.context = context;
         }
 
@@ -109,7 +109,9 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
 
         public async Task<Guid> AddAsync(TDomain model, CancellationToken cancellationToken = default)
         {
-            var entity = mapper.Map<TEntity>(model);
+            var entity = _mapper.Map<TEntity>(model);
+
+            entity.Id = Guid.NewGuid();
 
             context.Set<TEntity>().Add(entity);
 
@@ -125,7 +127,9 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
                 return 0;
             }
 
-            var entities = mapper.Map<IEnumerable<TEntity>>(models);
+            var entities = _mapper.Map<IEnumerable<TEntity>>(models);
+
+            entities.Select(x => x.Id = Guid.NewGuid());
 
             context.Set<TEntity>().AddRange(entities);
 
@@ -134,7 +138,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
 
         public async Task<int> DeleteAsync(TDomain model, CancellationToken cancellationToken = default)
         {
-            var entity = mapper.Map<TEntity>(model);
+            var entity = _mapper.Map<TEntity>(model);
 
             context.Set<TEntity>().Remove(entity);
 
@@ -183,7 +187,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
                 return 0;
             }
 
-            var entities = mapper.Map<IEnumerable<TEntity>>(models);
+            var entities = _mapper.Map<IEnumerable<TEntity>>(models);
 
             foreach (var entity in entities)
             {
@@ -199,7 +203,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
 
             var result = await context.Set<TEntity>().FirstOrDefaultAsync(filter, cancellationToken);
 
-            return mapper.Map<TDomain>(result);
+            return _mapper.Map<TDomain>(result);
         }
 
         public async Task<IReadOnlyList<TDomain>> GetAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
@@ -208,12 +212,12 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
 
             var result = await BuildQuery(filter).ToListAsync(cancellationToken);
 
-            return mapper.Map<IReadOnlyList<TDomain>>(result);
+            return _mapper.Map<IReadOnlyList<TDomain>>(result);
         }
 
         public async Task<int> UpdateAsync(TDomain model, CancellationToken cancellationToken = default)
         {
-            var entity = mapper.Map<TEntity>(model);
+            var entity = _mapper.Map<TEntity>(model);
 
             context.Entry(entity).State = EntityState.Modified;
 

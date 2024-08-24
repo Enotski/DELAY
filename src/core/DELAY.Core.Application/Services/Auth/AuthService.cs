@@ -21,36 +21,38 @@ namespace DELAY.Core.Application.Services.Auth
 
         private readonly ITokensService _tokensService;
 
-        private readonly IAccountStorage _accountStorage;
-
         private readonly ISessionLogStorage _sessionLogStorage;
 
         private readonly IUserStorage _userStorage;
 
         private readonly TokensSettings _tokensSettings;
 
-        private readonly GoogleApiSecrets _googleApiSecrets;
-
-        private readonly VkApiSecrets _vkApiSecrets;
-
-        public AuthService(IGoogleAuthService googleAuthService, IVkAuthService vkAuthService, IPasswordHelper passwordHelper, ICachingService cacheService, ITokensService tokensService, IAccountStorage accountStorage, ISessionLogStorage sessionLogStorage, IUserStorage userStorage, IOptions<TokensSettings> tokensSettings, IOptions<GoogleApiSecrets> googleApiSecrets, IOptions<VkApiSecrets> vkApiSecrets)
+        public AuthService(IGoogleAuthService googleAuthService, IVkAuthService vkAuthService, IPasswordHelper passwordHelper, ICachingService cacheService, ITokensService tokensService, ISessionLogStorage sessionLogStorage, IUserStorage userStorage, IOptions<TokensSettings> tokensSettings)
         {
             _googleAuthService = googleAuthService;
             _vkAuthService = vkAuthService;
             _passwordHelper = passwordHelper;
             _cacheService = cacheService;
             _tokensService = tokensService;
-            _accountStorage = accountStorage;
             _sessionLogStorage = sessionLogStorage;
             _userStorage = userStorage;
             _tokensSettings = tokensSettings.Value;
-            _googleApiSecrets = googleApiSecrets.Value;
-            _vkApiSecrets = vkApiSecrets.Value;
         }
 
-        public Task<Tokens> RefreshTokensAsync(string refreshToken)
+        public Tokens RefreshTokens(string refreshToken)
         {
-            throw new NotImplementedException();
+            var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
+
+            if (!_tokensService.IsValidToken(cachedSession.RefreshToken))
+                return null;
+
+            var tokens = _tokensService.CreateTokens();
+
+            _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
+
+            _cacheService.SetValueToCache(tokens.RefreshToken, new SessionCache(tokens.RefreshToken, cachedSession.SessionId, cachedSession.UserId), DateTimeOffset.UtcNow.AddDays(_tokensSettings.RefreshTokenExpirationDays));
+
+            return tokens;
         }
 
         public async Task<AuthResult> SignInAsync(SignInRequest model)
@@ -59,11 +61,11 @@ namespace DELAY.Core.Application.Services.Auth
 
             if (!string.IsNullOrWhiteSpace(model.Email))
             {
-                user = await _accountStorage.GetByEmailAsync(model.Email);
+                user = await _userStorage.GetByEmailAsync(model.Email);
             }
             else
             {
-                user = await _accountStorage.GetByEmailAsync(model.Phone);
+                user = await _userStorage.GetByPhoneAsync(model.Phone);
             }
 
             if (user == null || !_passwordHelper.IsEqual(model.Password, user.Password))
@@ -71,47 +73,72 @@ namespace DELAY.Core.Application.Services.Auth
                 throw new ArgumentException("Wrong login or password");
             }
 
-            return await AuthUserSessionAsync(user);
+            return await SetUserSessionAsync(user, model.UserAgent, model.IpAddress);
         }
 
         public async Task<AuthResult> SignUpAsync(SignUpRequest model)
         {
             var user = new User(model.Name, model.Email, model.Phone, _passwordHelper.GetHash(model.Password));
 
-            await ValidateUserAsync(user);
+            await ValidateUserAsync(user, true);
 
             user.Id = await _userStorage.AddAsync(user);
 
-            return await AuthUserSessionAsync(user);
+            return await SetUserSessionAsync(user, model.UserAgent, model.IpAddress);
         }
 
         public async Task<AuthResult> SignInGoogleAsync(GoogleAuthRequest model)
         {
-            var res = await _googleAuthService.GetUserCredentialsByCodeAsync(model.Code, _googleApiSecrets.ClientId, _googleApiSecrets.ClientSecret);
-            throw new NotImplementedException();
+            var res = await _googleAuthService.GetUserCredentialsByCodeAsync(model.Code);
+
+            return await AuthenticateUserFromExternalService(res, model.UserAgent, model.IpAddress);
         }
 
         public async Task<AuthResult> SignInVkAsync(VkAuthRequest model)
         {
-            var res = await _vkAuthService.GetUserCredentialsByCodeAsync(model.Code, model.DeviceId, _vkApiSecrets.ClientId, model.CodeVerifier);
+            var res = await _vkAuthService.GetUserCredentialsByCodeAsync(model.Code, model.DeviceId, model.CodeVerifier);
+
+            return await AuthenticateUserFromExternalService(res, model.UserAgent, model.IpAddress);
+        }
+
+        public Task SignOut()
+        {
             throw new NotImplementedException();
         }
 
-        private async Task<AuthResult> AuthUserSessionAsync(User user)
+        private async Task<AuthResult> AuthenticateUserFromExternalService(UserExternalServiceCredentials userCreds, string userAgent, string ipAddress)
         {
-            var tokens = _tokensService.CreateTokens(user.Id, user.Name);
+            User user = null;
 
-            var sessionId = await AddSessionAsync(user.Id, "", "", tokens.RefreshToken, AuthProviderType.Internal);
+            if (!string.IsNullOrWhiteSpace(userCreds.Email))
+            {
+                user = await _userStorage.GetByEmailAsync(userCreds.Email);
+            }
+
+            if (user == null)
+            {
+                user = new User(userCreds.GivenName, userCreds.Email, "");
+
+                user.Id = await _userStorage.AddAsync(user);
+            }
+
+            return await SetUserSessionAsync(user, userAgent, ipAddress);
+        }
+
+        private async Task<AuthResult> SetUserSessionAsync(User user, string userAgent, string ip)
+        {
+            var tokens = _tokensService.CreateTokens();
+
+            var sessionId = await AddSessionAsync(user.Id, userAgent, ip, AuthProviderType.Internal);
 
             _cacheService.SetValueToCache(tokens.RefreshToken, new SessionCache(tokens.RefreshToken, sessionId, user.Id), DateTimeOffset.UtcNow.AddDays(_tokensSettings.RefreshTokenExpirationDays));
 
-            return new AuthResult(user.Id, user.Name, user.Role, tokens);
+            return new AuthResult(user.Id, user.DisplayName, user.Role, tokens);
         }
 
-        private async Task<Guid> AddSessionAsync(Guid userId, string userAgent, string ip, string refreshToken, AuthProviderType authProvider)
+        private async Task<Guid> AddSessionAsync(Guid userId, string userAgent, string ip, AuthProviderType authProvider)
         {
-
-            var session = await _sessionLogStorage.GetSession(userId, ip, userAgent);
+            var session = await _sessionLogStorage.GetSessionAsync(userId, ip, userAgent);
 
             if (session == null || session.Ip != ip || session.UserAgent != userAgent || session.AuthProvider != authProvider)
             {
@@ -129,16 +156,24 @@ namespace DELAY.Core.Application.Services.Auth
             return session.Id;
         }
 
-        private async Task ValidateUserAsync(User user)
+        private async Task ValidateUserAsync(User user, bool isValidatePassword)
         {
-            if (!user.IsValidCredentials())
+            if (!user.IsValidCredentials(isValidatePassword))
                 throw new ArgumentException("Invalid user data");
 
-            if (!string.IsNullOrWhiteSpace(user.Email) && !await _userStorage.IsUniqueEmail(user.Email))
-                throw new ArgumentException("Such email already exist");
+            if (!string.IsNullOrWhiteSpace(user.Email))
+            {
+                if (!await _userStorage.IsUniqueEmail(user.Email))
+                    throw new ArgumentException("Such email already exist");
+            }
+            else
+            {
+                if(string.IsNullOrWhiteSpace(user.PhoneNumber))
+                    throw new ArgumentException("Email or phone required");
 
-            else if (!await _userStorage.IsUniquePhone(user.PhoneNumber))
-                throw new ArgumentException("Such phone already exist");
+                if (!await _userStorage.IsUniquePhone(user.PhoneNumber))
+                    throw new ArgumentException("Such phone already exist");
+            }
         }
     }
 }

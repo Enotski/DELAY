@@ -32,7 +32,7 @@ namespace DELAY.Infrastructure.Auth.Services
 
             var creds = await GoogleJsonWebSignature.ValidateAsync(tokens.IdToken);
 
-            return new GoogleUserCredentials(creds.Email, creds.Name, creds.GivenName, creds.FamilyName);
+            return new GoogleUserCredentials(creds.Email, creds.GivenName, creds.Name, creds.FamilyName);
         }
     }
 }

@@ -39,17 +39,29 @@ namespace DELAY.Core.Application.Services.Auth
             _tokensSettings = tokensSettings.Value;
         }
 
-        public Tokens RefreshTokens(string refreshToken)
+        public async Task<Tokens> RefreshTokensAsync(string refreshToken)
         {
             var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
 
-            if (!_tokensService.IsValidToken(cachedSession.RefreshToken))
+            if (cachedSession == null)
                 return null;
-
-            var tokens = _tokensService.CreateTokens();
 
             _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
 
+            var session = await _sessionLogStorage.GetAsync(cachedSession.SessionId);
+
+            if(session == null)
+                return null;
+
+            if (!_tokensService.IsValidToken(cachedSession.RefreshToken))
+            {
+                await _sessionLogStorage.DeleteAsync(cachedSession.SessionId);
+
+                return null;
+            }
+                
+            var tokens = _tokensService.CreateTokens();
+                        
             _cacheService.SetValueToCache(tokens.RefreshToken, new SessionCache(tokens.RefreshToken, cachedSession.SessionId, cachedSession.UserId), DateTimeOffset.UtcNow.AddDays(_tokensSettings.RefreshTokenExpirationDays));
 
             return tokens;
@@ -73,7 +85,7 @@ namespace DELAY.Core.Application.Services.Auth
                 throw new ArgumentException("Wrong login or password");
             }
 
-            return await SetUserSessionAsync(user, model.UserAgent, model.IpAddress);
+            return await SetUserSessionAsync(user, model.UserAgent, model.IpAddress, AuthProviderType.Internal);
         }
 
         public async Task<AuthResult> SignUpAsync(SignUpRequest model)
@@ -84,29 +96,48 @@ namespace DELAY.Core.Application.Services.Auth
 
             user.Id = await _userStorage.AddAsync(user);
 
-            return await SetUserSessionAsync(user, model.UserAgent, model.IpAddress);
+            return await SetUserSessionAsync(user, model.UserAgent, model.IpAddress, AuthProviderType.Internal);
         }
 
         public async Task<AuthResult> SignInGoogleAsync(GoogleAuthRequest model)
         {
             var res = await _googleAuthService.GetUserCredentialsByCodeAsync(model.Code);
 
-            return await AuthenticateUserFromExternalService(res, model.UserAgent, model.IpAddress);
+            return await AuthenticateUserFromExternalService(res, model.UserAgent, model.IpAddress, AuthProviderType.Google);
         }
 
         public async Task<AuthResult> SignInVkAsync(VkAuthRequest model)
         {
             var res = await _vkAuthService.GetUserCredentialsByCodeAsync(model.Code, model.DeviceId, model.CodeVerifier);
 
-            return await AuthenticateUserFromExternalService(res, model.UserAgent, model.IpAddress);
+            return await AuthenticateUserFromExternalService(res, model.UserAgent, model.IpAddress, AuthProviderType.Vk);
         }
 
-        public Task SignOut()
+        public async Task SignOutAsync(string refreshToken)
         {
-            throw new NotImplementedException();
+            var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
+
+            if (cachedSession != null)
+            {
+                _cacheService.RemoveValueFromCache(cachedSession);
+
+                await _sessionLogStorage.DeleteAsync(cachedSession.SessionId);
+            }
         }
 
-        private async Task<AuthResult> AuthenticateUserFromExternalService(UserExternalServiceCredentials userCreds, string userAgent, string ipAddress)
+        public async Task SignOutAllAsync(string refreshToken)
+        {
+            var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
+
+            if (cachedSession != null)
+            {
+                _cacheService.RemoveValueFromCache(cachedSession);
+
+                await _sessionLogStorage.DeleteByUserAsync(cachedSession.UserId);
+            }
+        }
+
+        private async Task<AuthResult> AuthenticateUserFromExternalService(UserExternalServiceCredentials userCreds, string userAgent, string ipAddress, AuthProviderType authProvider)
         {
             User user = null;
 
@@ -122,25 +153,25 @@ namespace DELAY.Core.Application.Services.Auth
                 user.Id = await _userStorage.AddAsync(user);
             }
 
-            return await SetUserSessionAsync(user, userAgent, ipAddress);
+            return await SetUserSessionAsync(user, userAgent, ipAddress, authProvider);
         }
 
-        private async Task<AuthResult> SetUserSessionAsync(User user, string userAgent, string ip)
+        private async Task<AuthResult> SetUserSessionAsync(User user, string userAgent, string ip, AuthProviderType authProvider)
         {
             var tokens = _tokensService.CreateTokens();
 
-            var sessionId = await AddSessionAsync(user.Id, userAgent, ip, AuthProviderType.Internal);
+            var sessionId = await AddSessionAsync(user.Id, userAgent, ip, authProvider);
 
             _cacheService.SetValueToCache(tokens.RefreshToken, new SessionCache(tokens.RefreshToken, sessionId, user.Id), DateTimeOffset.UtcNow.AddDays(_tokensSettings.RefreshTokenExpirationDays));
 
-            return new AuthResult(user.Id, user.DisplayName, user.Role, tokens);
+            return new AuthResult(user.Email, user.PhoneNumber, user.DisplayName, user.Role, tokens);
         }
 
         private async Task<Guid> AddSessionAsync(Guid userId, string userAgent, string ip, AuthProviderType authProvider)
         {
             var session = await _sessionLogStorage.GetSessionAsync(userId, ip, userAgent);
 
-            if (session == null || session.Ip != ip || session.UserAgent != userAgent || session.AuthProvider != authProvider)
+            if (session == null || session.IpAddress != ip || session.UserAgent != userAgent || session.AuthProvider != authProvider)
             {
                 session = new SessionLog(userId, userAgent, ip, DateTime.UtcNow, authProvider);
 
@@ -148,7 +179,7 @@ namespace DELAY.Core.Application.Services.Auth
             }
             else
             {
-                session.Update();
+                session.Update(authProvider);
 
                 await _sessionLogStorage.UpdateAsync(session);
             }
@@ -168,7 +199,7 @@ namespace DELAY.Core.Application.Services.Auth
             }
             else
             {
-                if(string.IsNullOrWhiteSpace(user.PhoneNumber))
+                if (string.IsNullOrWhiteSpace(user.PhoneNumber))
                     throw new ArgumentException("Email or phone required");
 
                 if (!await _userStorage.IsUniquePhone(user.PhoneNumber))

@@ -4,7 +4,7 @@
     {
         public GoogleUserCredentials(string email, string name, string givenName, string familyName) : base(givenName, email)
         {
-            GivenName = givenName;
+            Name = name;
             FamilyName = familyName;
         }
 

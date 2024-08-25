@@ -41,7 +41,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                 endpoints.AddRange(["home", "boards", "rooms", "account", "users"]);
             }
 
-            return new AuthResponseDto(authResult.Id, authResult.Name, endpoints);
+            return new AuthResponseDto(authResult.Email, authResult.Phone, authResult.Name, endpoints);
         }
 
         private void SetTokensInsideCookie(Tokens tokenDto, HttpContext context)
@@ -69,13 +69,13 @@ namespace DELAY.Presentation.RestAPI.Controllers
 
         [HttpPost]
         [Route("refresh-tokens")]
-        public IActionResult RefreshTokens()
+        public async Task<IActionResult> RefreshTokensAsync()
         {
             try
             {
                 HttpContext.Request.Cookies.TryGetValue("refresh_token", out var refreshToken);
 
-                var tokens = _authService.RefreshTokens(refreshToken);
+                var tokens = await _authService.RefreshTokensAsync(refreshToken);
 
                 if (tokens is null)
                 {
@@ -196,7 +196,26 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                _authService.SignOut();
+                HttpContext.Request.Cookies.TryGetValue("refresh_token", out string refreshToken);
+
+                await _authService.SignOutAsync(refreshToken);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+        [HttpPost]
+        [Route("signout-all")]
+        public async Task<IActionResult> SignOutAll()
+        {
+            try
+            {
+                HttpContext.Request.Cookies.TryGetValue("refresh_token", out string refreshToken);
+
+                await _authService.SignOutAllAsync(refreshToken);
 
                 return Ok();
             }

@@ -2,17 +2,22 @@
 
 namespace DELAY.Presentation.RestAPI.Contracts.Response
 {
-    public class AuthResponseDto : KeyNameDto
+    public class AuthResponseDto
     {
         public AuthResponseDto()
         {
         }
 
-        public AuthResponseDto(Guid id, string name, IEnumerable<string> endpoints) : base(id, name)
+        public AuthResponseDto(string email, string phone, string name, IEnumerable<string> endpoints)
         {
+            Email = email;
+            Phone = phone;
+            Name = name;
             Endpoints = endpoints;
         }
-
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
         public IEnumerable<string> Endpoints { get; set; }
     }
 }

@@ -227,11 +227,13 @@ const loginGoogle = () => {
 };
 
 const loginVk = () => {
+  let codeVerifier = "FGH767Gd65";
+
   Config.init({
     app: vkclientid, // Идентификатор приложения.
     redirectUrl: "https://localhost:443", // Адрес для перехода после авторизации.
     state: "dj29fnsadjsd82", // Произвольная строка состояния приложения.
-    codeVerifier: "FGH767Gd65", // Верификатор в виде случайной строки. Обеспечивает защиту передаваемых данных.
+    codeVerifier: codeVerifier, // Верификатор в виде случайной строки. Обеспечивает защиту передаваемых данных.
     scope: "email",
     mode: ConfigAuthMode.InNewWindow,
     responseMode: ConfigResponseMode.Callback,
@@ -243,6 +245,7 @@ const loginVk = () => {
       await sendRequest("auth/signin-vk", "POST", {
         code: response.code,
         deviceId: response.device_id,
+        codeVerifier: codeVerifier,
       }).then((value) => {
         console.log(value);
       });

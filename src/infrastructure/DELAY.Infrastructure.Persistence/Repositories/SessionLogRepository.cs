@@ -4,6 +4,8 @@ using DELAY.Core.Domain.Models;
 using DELAY.Infrastructure.Persistence.Context;
 using DELAY.Infrastructure.Persistence.Entities;
 using DELAY.Infrastructure.Persistence.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
+using Z.EntityFramework.Plus;
 
 namespace DELAY.Infrastructure.Persistence.Repositories
 {
@@ -13,14 +15,20 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         {
         }
 
-        public Task<SessionLog> GetSessionAsync(Guid userId, string ip, string userAgent, CancellationToken cancellationToken = default)
+        public async Task<SessionLog> GetSessionAsync(Guid userId, string ip, string userAgent, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var res = await BuildQuery(x => x.UserId == userId && x.IpAddress == ip && x.UserAgent == userAgent).FirstOrDefaultAsync(cancellationToken);
+
+            return _mapper.Map<SessionLog>(res);
         }
 
-        public Task<SessionLog> GetSessionByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+        public async Task<int> DeleteByUserAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var entities = context.UserSessions.Where(x => x.UserId == userId);
+
+            context.Set<SessionLogEntity>().RemoveRange(entities);
+
+            return await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

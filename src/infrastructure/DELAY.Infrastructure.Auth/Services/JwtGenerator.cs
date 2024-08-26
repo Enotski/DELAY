@@ -2,7 +2,9 @@
 using DELAY.Core.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.CodeDom.Compiler;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.Numerics;
 using System.Security.Claims;
 using System.Text;
 
@@ -73,21 +75,31 @@ namespace DELAY.Infrastructure.Auth.Services
                 signingCredentials: signingCredentials);
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
-        public string CreateAccessToken()
+        public string CreateAccessToken(Guid userId, string name, string email, string phone, string role)
         {
             var signingCredentials = new SigningCredentials(GetSymmetricSecurityKey(_jwtSettings.SecretKey), SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
                 new Claim(ClaimTypes.Sid, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Expiration, AccessTokenExpirationTime.ToString()),
+                new Claim("ueid", userId.ToString()),
+                new Claim(ClaimTypes.Name, name),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.MobilePhone, phone),
+                new Claim(ClaimTypes.Role, role),
             };
             return CreateToken(_jwtSettings.Issuer, _jwtSettings.Audience, AccessTokenExpirationTime, claims, signingCredentials);
         }
-        public string CreateRefreshToken()
+        public string CreateRefreshToken(Guid userId)
         {
             var signingCredentials = new SigningCredentials(GetSymmetricSecurityKey(_jwtSettings.SecretKey), SecurityAlgorithms.HmacSha256);
 
-            return CreateToken(_jwtSettings.Issuer, _jwtSettings.Audience, RefreshTokenExpirationTime, signingCredentials: signingCredentials);
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Sid, Guid.NewGuid().ToString()),
+                new Claim("ueid", userId.ToString()),
+            };
+
+            return CreateToken(_jwtSettings.Issuer, _jwtSettings.Audience, RefreshTokenExpirationTime, claims, signingCredentials);
         }
         public ClaimsPrincipal GetPrincipal(string token)
         {

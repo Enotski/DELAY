@@ -160,7 +160,7 @@ import {
   LogoGoogle as googleIco,
   LogoVk as vkIco,
 } from "@vicons/ionicons5";
-
+import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { googleSdkLoaded } from "vue3-google-login";
 import {
   Config,
@@ -169,6 +169,9 @@ import {
   ConfigResponseMode,
   type AuthError,
 } from "@vkid/sdk";
+
+const fpPromise = FingerprintJS.load();
+let fingerprint = "";
 
 const clientid = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const vkclientid = import.meta.env.VITE_VK_CLIENT_ID;
@@ -190,6 +193,7 @@ const formValue = ref({
   email: "",
   phoneNumber: "",
   password: "",
+  fingerprint: "",
 });
 
 const addRules = {
@@ -215,8 +219,12 @@ const loginGoogle = () => {
         redirect_uri: "https://localhost:443",
         callback: async (response) => {
           console.log("Google response", response);
+
+          if (fingerprint === "") await setFingerprint();
+
           await sendRequest("auth/signin-google", "POST", {
             code: response.code,
+            fingerprint: fingerprint,
           }).then((value) => {
             console.log(value);
           });
@@ -242,10 +250,14 @@ const loginVk = () => {
   Auth.login()
     .then(async (response: any) => {
       console.log("Vk response", response);
+
+      if (fingerprint === "") await setFingerprint();
+
       await sendRequest("auth/signin-vk", "POST", {
         code: response.code,
         deviceId: response.device_id,
         codeVerifier: codeVerifier,
+        fingerprint: fingerprint,
       }).then((value) => {
         console.log(value);
       });
@@ -260,6 +272,10 @@ function onSignInModalOpen() {
 }
 
 async function onConfirmSignInClick() {
+  if (fingerprint === "") await setFingerprint();
+
+  formValue.value.fingerprint = fingerprint;
+
   if (radioSignModalTypeGroupValue.value == "signIn") {
     await sendRequest("auth/signin", "POST", formValue.value).then(
       (response) => {
@@ -273,12 +289,17 @@ async function onConfirmSignInClick() {
       }
     );
   }
-
   showSignInModal.value = false;
 }
 
 function onCancelSignInClick() {
   showSignInModal.value = false;
+}
+
+async function setFingerprint() {
+  let fp = await fpPromise;
+  let result = await fp.get();
+  fingerprint = result.visitorId;
 }
 
 const menuOptions: MenuOption[] = [

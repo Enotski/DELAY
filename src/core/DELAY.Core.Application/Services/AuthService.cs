@@ -7,7 +7,7 @@ using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
 using Microsoft.Extensions.Options;
 
-namespace DELAY.Core.Application.Services.Auth
+namespace DELAY.Core.Application.Services
 {
     internal class AuthService : IAuthService
     {
@@ -21,26 +21,26 @@ namespace DELAY.Core.Application.Services.Auth
 
         private readonly ITokensService _tokensService;
 
-        private readonly ISessionLogStorage _sessionLogStorage;
-
         private readonly IUserStorage _userStorage;
 
         private readonly TokensSettings _tokensSettings;
 
-        public AuthService(IGoogleAuthService googleAuthService, IVkAuthService vkAuthService, IPasswordHelper passwordHelper, ICachingService cacheService, ITokensService tokensService, ISessionLogStorage sessionLogStorage, IUserStorage userStorage, IOptions<TokensSettings> tokensSettings)
+        public AuthService(IGoogleAuthService googleAuthService, IVkAuthService vkAuthService, IPasswordHelper passwordHelper, ICachingService cacheService, ITokensService tokensService, IUserStorage userStorage, IOptions<TokensSettings> tokensSettings)
         {
             _googleAuthService = googleAuthService;
             _vkAuthService = vkAuthService;
             _passwordHelper = passwordHelper;
             _cacheService = cacheService;
             _tokensService = tokensService;
-            _sessionLogStorage = sessionLogStorage;
             _userStorage = userStorage;
             _tokensSettings = tokensSettings.Value;
         }
 
         public async Task<Tokens> RefreshTokensAsync(string refreshToken)
         {
+            if (!_tokensService.IsValidToken(refreshToken))
+                return null;
+
             var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
 
             if (cachedSession == null)
@@ -48,21 +48,16 @@ namespace DELAY.Core.Application.Services.Auth
 
             _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
 
-            var session = await _sessionLogStorage.GetAsync(cachedSession.SessionId);
-
-            if(session == null)
-                return null;
-
             if (!_tokensService.IsValidToken(cachedSession.RefreshToken))
             {
-                await _sessionLogStorage.DeleteAsync(cachedSession.SessionId);
-
                 return null;
             }
-                
-            var tokens = _tokensService.CreateTokens();
-                        
-            _cacheService.SetValueToCache(tokens.RefreshToken, new SessionCache(tokens.RefreshToken, cachedSession.SessionId, cachedSession.UserId), DateTimeOffset.UtcNow.AddDays(_tokensSettings.RefreshTokenExpirationDays));
+
+            var user = await _userStorage.GetAsync(cachedSession.UserId);
+
+            var tokens = _tokensService.CreateTokens(user.Id, user.DisplayName, user.Email, user.PhoneNumber, user.Role.ToString());
+
+            SetUserSessionAsync(tokens.RefreshToken, user, new AuthUserAgentRequest(cachedSession.Fingerprint, cachedSession.IpAddress, cachedSession.UserAgent), cachedSession.AuthProvider);
 
             return tokens;
         }
@@ -85,7 +80,7 @@ namespace DELAY.Core.Application.Services.Auth
                 throw new ArgumentException("Wrong login or password");
             }
 
-            return await SetUserSessionAsync(user, model.UserAgent, model.IpAddress, AuthProviderType.Internal);
+            return CreateTokensAndSetSession(user, model, AuthProviderType.Internal);
         }
 
         public async Task<AuthResult> SignUpAsync(SignUpRequest model)
@@ -96,48 +91,69 @@ namespace DELAY.Core.Application.Services.Auth
 
             user.Id = await _userStorage.AddAsync(user);
 
-            return await SetUserSessionAsync(user, model.UserAgent, model.IpAddress, AuthProviderType.Internal);
+            return CreateTokensAndSetSession(user, model, AuthProviderType.Internal);
         }
 
         public async Task<AuthResult> SignInGoogleAsync(GoogleAuthRequest model)
         {
             var res = await _googleAuthService.GetUserCredentialsByCodeAsync(model.Code);
 
-            return await AuthenticateUserFromExternalService(res, model.UserAgent, model.IpAddress, AuthProviderType.Google);
+            return await AuthenticateUserFromExternalService(res, model, AuthProviderType.Google);
         }
 
         public async Task<AuthResult> SignInVkAsync(VkAuthRequest model)
         {
             var res = await _vkAuthService.GetUserCredentialsByCodeAsync(model.Code, model.DeviceId, model.CodeVerifier);
 
-            return await AuthenticateUserFromExternalService(res, model.UserAgent, model.IpAddress, AuthProviderType.Vk);
+            return await AuthenticateUserFromExternalService(res, model, AuthProviderType.Vk);
         }
 
-        public async Task SignOutAsync(string refreshToken)
+        public void SignOut(string refreshToken)
         {
             var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
 
             if (cachedSession != null)
             {
-                _cacheService.RemoveValueFromCache(cachedSession);
+                _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
+            }
 
-                await _sessionLogStorage.DeleteAsync(cachedSession.SessionId);
+            var root = _tokensService.GetPrincipal(refreshToken)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
+
+            var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
+
+            if(cachedRootSession != null)
+            {
+                cachedRootSession.SessionsKeys = cachedRootSession.SessionsKeys.Where(x => x != refreshToken);
+
+                _cacheService.SetValueToCache(root.Value, cachedRootSession);
             }
         }
 
-        public async Task SignOutAllAsync(string refreshToken)
+        public void SignOutAll(string refreshToken)
         {
             var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
 
             if (cachedSession != null)
             {
-                _cacheService.RemoveValueFromCache(cachedSession);
+                _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
+            }
 
-                await _sessionLogStorage.DeleteByUserAsync(cachedSession.UserId);
+            var root = _tokensService.GetPrincipal(refreshToken)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
+
+            var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
+
+            if (cachedRootSession != null)
+            {
+                cachedRootSession.SessionsKeys = cachedRootSession.SessionsKeys.Where(x => x != refreshToken);
+
+                foreach (var key in cachedRootSession.SessionsKeys)
+                    _cacheService.RemoveValueFromCache(key);
+
+                _cacheService.RemoveValueFromCache(root.Value);
             }
         }
 
-        private async Task<AuthResult> AuthenticateUserFromExternalService(UserExternalServiceCredentials userCreds, string userAgent, string ipAddress, AuthProviderType authProvider)
+        private async Task<AuthResult> AuthenticateUserFromExternalService(UserExternalServiceCredentials userCreds, AuthUserAgentRequest authAgent, AuthProviderType authProvider)
         {
             User user = null;
 
@@ -153,38 +169,48 @@ namespace DELAY.Core.Application.Services.Auth
                 user.Id = await _userStorage.AddAsync(user);
             }
 
-            return await SetUserSessionAsync(user, userAgent, ipAddress, authProvider);
+            return CreateTokensAndSetSession(user, authAgent, authProvider);
         }
 
-        private async Task<AuthResult> SetUserSessionAsync(User user, string userAgent, string ip, AuthProviderType authProvider)
+        private AuthResult CreateTokensAndSetSession(User user, AuthUserAgentRequest authModel, AuthProviderType authProvider)
         {
-            var tokens = _tokensService.CreateTokens();
+            var tokens = _tokensService.CreateTokens(user.Id, user.DisplayName, user.Email, user.PhoneNumber, user.Role.ToString());
 
-            var sessionId = await AddSessionAsync(user.Id, userAgent, ip, authProvider);
-
-            _cacheService.SetValueToCache(tokens.RefreshToken, new SessionCache(tokens.RefreshToken, sessionId, user.Id), DateTimeOffset.UtcNow.AddDays(_tokensSettings.RefreshTokenExpirationDays));
+            SetUserSessionAsync(tokens.RefreshToken, user, authModel, authProvider);
 
             return new AuthResult(user.Email, user.PhoneNumber, user.DisplayName, user.Role, tokens);
         }
 
-        private async Task<Guid> AddSessionAsync(Guid userId, string userAgent, string ip, AuthProviderType authProvider)
+        private void SetUserSessionAsync(string refreshToken, User user, AuthUserAgentRequest authModel, AuthProviderType authProvider)
         {
-            var session = await _sessionLogStorage.GetSessionAsync(userId, ip, userAgent);
+            var session = new SessionCache(Guid.NewGuid(), refreshToken, user.Id, authModel.Fingerprint, authModel.IpAddress, authModel.UserAgent, DateTime.UtcNow, _tokensSettings.RefreshTokenExpirationDays, authProvider);
 
-            if (session == null || session.IpAddress != ip || session.UserAgent != userAgent || session.AuthProvider != authProvider)
+            _cacheService.SetValueToCache(refreshToken, session, DateTimeOffset.UtcNow.AddDays(_tokensSettings.RefreshTokenExpirationDays));
+
+            var root = _tokensService.GetPrincipal(refreshToken)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
+
+            var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
+
+            if (cachedRootSession == null)
             {
-                session = new SessionLog(userId, userAgent, ip, DateTime.UtcNow, authProvider);
-
-                session.Id = await _sessionLogStorage.AddAsync(session);
+                cachedRootSession = new RootUserSessionCache([refreshToken]);                
             }
             else
             {
-                session.Update(authProvider);
+                if(cachedRootSession.SessionsKeys.Count() >= 5)
+                {
+                    foreach (var key in cachedRootSession.SessionsKeys)
+                        _cacheService.RemoveValueFromCache(key);
 
-                await _sessionLogStorage.UpdateAsync(session);
+                    cachedRootSession.SessionsKeys = [refreshToken];
+                }
+                else
+                {
+                    cachedRootSession.SessionsKeys.Append(refreshToken);
+                }
             }
 
-            return session.Id;
+            _cacheService.SetValueToCache(root.Value, cachedRootSession);
         }
 
         private async Task ValidateUserAsync(User user, bool isValidatePassword)

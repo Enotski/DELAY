@@ -10,6 +10,6 @@ namespace DELAY.Core.Application.Abstractions.Services.Auth
 
         ClaimsPrincipal GetPrincipal(string token);
 
-        Tokens CreateTokens();
+        Tokens CreateTokens(Guid userId, string name, string email, string phone, string role);
     }
 }

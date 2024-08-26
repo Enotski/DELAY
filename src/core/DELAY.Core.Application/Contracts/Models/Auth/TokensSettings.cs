@@ -21,19 +21,19 @@
         /// <summary>
         /// Секретный ключ
         /// </summary>
-        public string SecretKey { get; init; } = string.Empty;
+        public string SecretKey { get; set; } = string.Empty;
         /// <summary>
         /// Идентификатор сведений о минутах истечения срока действия Access токена.
         /// </summary>
-        public int AccessTokenExpirationMinutes { get; init; } = 0;
+        public uint AccessTokenExpirationMinutes { get; init; } = 0;
         /// <summary>
         /// Идентификатор сведений о днях истечения срока действия Refresh токена.
         /// </summary>
-        public int RefreshTokenExpirationDays { get; init; } = 0;
+        public uint RefreshTokenExpirationDays { get; init; } = 0;
 
         public TokensSettings() { }
 
-        public TokensSettings(string schemeName, string issuer, string audience, string secretKey, int accessTokenExpirationMinutes, int refreshTokenExpirationDays)
+        public TokensSettings(string schemeName, string issuer, string audience, string secretKey, uint accessTokenExpirationMinutes, uint refreshTokenExpirationDays)
         {
             SchemeName = schemeName;
             Issuer = issuer;

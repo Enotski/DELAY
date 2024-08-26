@@ -2,7 +2,6 @@
 using DELAY.Core.Application.Abstractions.Services.Tickets;
 using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Services;
-using DELAY.Core.Application.Services.Auth;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DELAY.Core.Application

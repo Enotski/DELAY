@@ -30,6 +30,17 @@ namespace DELAY.Infrastructure.Persistence
             _cache.Set(key, val, absoluteExpiration);
         }
         /// <summary>
+        /// Сохранение в кэш
+        /// </summary>
+        /// <typeparam name="TValue">Тип значения</typeparam>
+        /// <param name="key">Ключ значения</param>
+        /// <param name="val">Значение</param>
+        public void SetValueToCache<TValue>(object key, TValue val) where TValue : class
+        {
+            _cache.Remove(key);
+            _cache.Set(key, val);
+        }
+        /// <summary>
         /// Получение значения из кэша
         /// </summary>
         /// <typeparam name="TValue">Тип значения</typeparam>

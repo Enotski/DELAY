@@ -18,7 +18,12 @@ namespace DELAY.Infrastructure.Auth
             services.AddSingleton<ITokensService, JwtTokensService>();
 
             services.Configure<SecurityConfig>(options => configuration.GetSection(SecurityConfig.SectionName).Bind(options));
-            services.Configure<TokensSettings>(options => configuration.GetSection(TokensSettings.SectionName).Bind(options));
+            services.Configure<TokensSettings>(options =>
+            {
+                configuration.GetSection(TokensSettings.SectionName).Bind(options);
+                options.SecretKey = configuration.GetSection($"{TokensSettings.SectionName}:{nameof(TokensSettings.SecretKey)}").Value;
+            }
+            );
 
             services.Configure<GoogleApiSecrets>(options => configuration.GetSection(GoogleApiSecrets.SectionName).Bind(options));
             services.Configure<VkApiSecrets>(options => configuration.GetSection(VkApiSecrets.SectionName).Bind(options));
@@ -30,17 +35,17 @@ namespace DELAY.Infrastructure.Auth
                 .AddJwtBearer(tokenSettings.SchemeName, options =>
                 {
                     options.TokenValidationParameters = JwtGenerator.CreateTokenValidationParameters(tokenSettings.SecretKey, tokenSettings.Issuer, tokenSettings.Audience);
-                    
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = ctx =>
-                        {
-                            ctx.Request.Cookies.TryGetValue("access_token", out var accessToken);
-                            if (!string.IsNullOrEmpty(accessToken))
-                                ctx.Token = accessToken;
-                            return Task.CompletedTask;
-                        }
-                    };
+
+                    //options.Events = new JwtBearerEvents
+                    //{
+                    //    OnMessageReceived = ctx =>
+                    //    {
+                    //        ctx.Request.Cookies.TryGetValue("access_token", out var accessToken);
+                    //        if (!string.IsNullOrEmpty(accessToken))
+                    //            ctx.Token = accessToken;
+                    //        return Task.CompletedTask;
+                    //    }
+                    //};
                 });
 
             return services;

@@ -8,16 +8,26 @@ namespace DELAY.Presentation.RestAPI.Contracts.Response
         {
         }
 
-        public AuthResponseDto(string email, string phone, string name, IEnumerable<string> endpoints)
+        public AuthResponseDto(TokensResponseDto tokens, IEnumerable<string> endpoints)
         {
-            Email = email;
-            Phone = phone;
-            Name = name;
             Endpoints = endpoints;
+            Tokens = tokens;
         }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
         public IEnumerable<string> Endpoints { get; set; }
+        public TokensResponseDto Tokens { get; set; }
+    }
+
+    public class TokensResponseDto
+    {
+        public TokensResponseDto()
+        {
+        }
+
+        public TokensResponseDto(string accessToken)
+        {
+            AccessToken = accessToken;
+        }
+
+        public string AccessToken { get; set; }
     }
 }

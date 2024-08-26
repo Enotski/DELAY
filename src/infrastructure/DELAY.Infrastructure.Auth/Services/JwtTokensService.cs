@@ -21,7 +21,7 @@ namespace DELAY.Infrastructure.Auth.Services
         public ClaimsPrincipal GetPrincipal(string token) =>
             _tokenGenerator.GetPrincipal(token.Replace("Bearer", "").Trim());
 
-        public Tokens CreateTokens() =>
-            new Tokens(_tokenGenerator.CreateAccessToken(), _tokenGenerator.CreateRefreshToken());
+        public Tokens CreateTokens(Guid userId, string name, string email, string phone, string role) =>
+            new Tokens(_tokenGenerator.CreateAccessToken(userId, name, email, phone, role), _tokenGenerator.CreateRefreshToken(userId));
     }
 }

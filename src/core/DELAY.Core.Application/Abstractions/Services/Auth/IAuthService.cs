@@ -14,8 +14,8 @@ namespace DELAY.Core.Application.Abstractions.Services.Auth
 
         Task<AuthResult> SignInVkAsync(VkAuthRequest model);
 
-        Task SignOutAsync(string refreshToken);
+        void SignOut(string refreshToken);
 
-        Task SignOutAllAsync(string refreshToken);
+        void SignOutAll(string refreshToken);
     }
 }

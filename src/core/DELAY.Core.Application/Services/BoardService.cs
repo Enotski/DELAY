@@ -40,7 +40,7 @@ namespace DELAY.Core.Application.Services
 
             var board = new Board(model.Name, model.Description, triggered.Name);
 
-            board.BoardUsers = new List<BoardUser>() { new BoardUser(board, new KeyNamedModel(triggered.Id, triggered.Name), Domain.Enums.RoleType.Administrator) };
+            board.BoardUsers = new List<BoardUser>() { new BoardUser(board, new KeyNamedModel(triggered.Id, triggered.Name), Domain.Enums.RoleType.Admin) };
 
             if (!board.IsValid())
                 throw new ArgumentException("Invalid board data");

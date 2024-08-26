@@ -56,7 +56,7 @@ namespace DELAY.Core.Application.Services
             if (triggeredBy == null)
                 throw new ArgumentNullException(nameof(triggeredBy));
 
-            var triggered = await ValidatePermissionToOperation(Domain.Enums.RoleType.Administrator, triggeredBy);
+            var triggered = await ValidatePermissionToOperation(Domain.Enums.RoleType.Admin, triggeredBy);
 
             model.Password = _passwordHelper.GetHash(model.Password);
 
@@ -72,7 +72,7 @@ namespace DELAY.Core.Application.Services
             if (model == null)
                 throw new ArgumentNullException(nameof(User));
 
-            var triggred = await ValidatePermissionToOperation(RoleType.Administrator, triggeredBy);
+            var triggred = await ValidatePermissionToOperation(RoleType.Admin, triggeredBy);
 
             if (triggred == null)
             {
@@ -95,7 +95,7 @@ namespace DELAY.Core.Application.Services
 
         public async Task<int> DeleteAsync(Guid id, string triggeredBy)
         {
-            var triggred = await ValidatePermissionToOperation(RoleType.Administrator, triggeredBy);
+            var triggred = await ValidatePermissionToOperation(RoleType.Admin, triggeredBy);
 
             if (triggred == null)
             {
@@ -107,7 +107,7 @@ namespace DELAY.Core.Application.Services
 
         public async Task<int> DeleteAsync(IEnumerable<Guid> ids, string triggeredBy)
         {
-            var triggred = await ValidatePermissionToOperation(RoleType.Administrator, triggeredBy);
+            var triggred = await ValidatePermissionToOperation(RoleType.Admin, triggeredBy);
 
             if (triggred == null)
             {

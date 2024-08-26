@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^4.4.3",
     "@microsoft/signalr": "^8.0.7",
     "@vkid/sdk": "^2.2.0",
     "axios": "^1.7.2",

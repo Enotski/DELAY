@@ -9,6 +9,7 @@
         /// <param name="key">Ключ значения</param>
         /// <param name="val">Значение</param>
         public void SetValueToCache<TValue>(object key, TValue val, DateTimeOffset absoluteExpiration) where TValue : class;
+        public void SetValueToCache<TValue>(object key, TValue val) where TValue : class;
 
         /// <summary>
         /// Удаление значения из кэша

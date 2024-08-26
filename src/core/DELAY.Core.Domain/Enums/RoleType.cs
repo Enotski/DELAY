@@ -4,20 +4,20 @@
     {
         None = 0,
         User,
-        Administrator
+        Admin
     }
     public enum BoardRoleType
     {
         None = 0,
         User,
-        Moderator,
-        Administrator,
+        Moder,
+        Admin,
     }
     public enum RoomRoleType
     {
         None = 0,
         User,
         Moderator,
-        Administrator
+        Admin
     }
 }

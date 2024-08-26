@@ -36,26 +36,16 @@ namespace DELAY.Presentation.RestAPI.Controllers
             {
                 endpoints.AddRange(["home", "boards", "rooms", "account"]);
             }
-            else if (authResult.Role == Core.Domain.Enums.RoleType.Administrator)
+            else if (authResult.Role == Core.Domain.Enums.RoleType.Admin)
             {
                 endpoints.AddRange(["home", "boards", "rooms", "account", "users"]);
             }
 
-            return new AuthResponseDto(authResult.Email, authResult.Phone, authResult.Name, endpoints);
+            return new AuthResponseDto(new TokensResponseDto(authResult.Tokens.AccessToken), endpoints);
         }
 
         private void SetTokensInsideCookie(Tokens tokenDto, HttpContext context)
         {
-            context.Response.Cookies.Append("access_token", tokenDto.AccessToken,
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(tokensSettings.AccessTokenExpirationMinutes),
-                    HttpOnly = true,
-                    IsEssential = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict
-                });
-
             context.Response.Cookies.Append("refresh_token", tokenDto.RefreshToken,
                 new CookieOptions
                 {
@@ -84,7 +74,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
 
                 SetTokensInsideCookie(tokens, HttpContext);
 
-                return Ok();
+                return Ok(new TokensResponseDto(tokens.AccessToken));
             }
             catch (Exception exp)
             {
@@ -192,13 +182,13 @@ namespace DELAY.Presentation.RestAPI.Controllers
         }
         [HttpPost]
         [Route("signout")]
-        public async Task<IActionResult> SignOut()
+        public IActionResult SignOut()
         {
             try
             {
                 HttpContext.Request.Cookies.TryGetValue("refresh_token", out string refreshToken);
 
-                await _authService.SignOutAsync(refreshToken);
+                _authService.SignOut(refreshToken);
 
                 return Ok();
             }
@@ -209,13 +199,13 @@ namespace DELAY.Presentation.RestAPI.Controllers
         }
         [HttpPost]
         [Route("signout-all")]
-        public async Task<IActionResult> SignOutAll()
+        public IActionResult SignOutAll()
         {
             try
             {
                 HttpContext.Request.Cookies.TryGetValue("refresh_token", out string refreshToken);
 
-                await _authService.SignOutAllAsync(refreshToken);
+                _authService.SignOutAll(refreshToken);
 
                 return Ok();
             }

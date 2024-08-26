@@ -27,7 +27,6 @@ namespace DELAY.Infrastructure.Persistence
         {
             services.AddScoped<IUserStorage, UserRepository>();
             services.AddScoped<IBoardStorage, BoardRepository>();
-            services.AddScoped<ISessionLogStorage, SessionLogRepository>();
 
             return services;
         }

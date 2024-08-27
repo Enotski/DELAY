@@ -1,25 +1,34 @@
 import axios from "axios";
 
 let accessToken = "";
-const apiUrl = "https://localhost:7259/api/";
+const apiUrl = import.meta.env.VITE_API_URI;
 let tokensRefreshFailed:() => void;
 
 export function setTokensRefreshFailedCallBack(callback: () => void){
   tokensRefreshFailed = callback;
 }
 
+export function setAccessToken(token: string){
+  accessToken = token;
+}
+export function clearAccessToken(){
+  accessToken = "";
+}
+
 const instance = axios.create({
   baseURL: apiUrl,
   headers: {
     "Content-Type": "application/json",
-    //"Access-Control-Allow-Origin": "https://localhost:8084",
+    "Access-Control-Allow-Origin": "https://localhost:7259",
   },
 });
 
 instance.interceptors.request.use(
   (config) => {
+    config.withCredentials = true;
+
     if (accessToken !== "") {
-      config.headers["Authorization"] = accessToken;
+      config.headers["Authorization"] = "Bearer " + accessToken;
     }
     return config;
   },
@@ -68,12 +77,6 @@ instance.interceptors.response.use(
 );
 
 class RequestUtils{
-setAccessToken(token: string){
-  accessToken = token;
-}
-clearAccessToken(){
-  accessToken = "";
-}
 
 async sendRequest(url: string, method: string = "GET", args: object = {}) {
   url = apiUrl + url;

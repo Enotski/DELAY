@@ -3,6 +3,7 @@ using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Infrastructure.DependencyInjections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.CookiePolicy;
 
 namespace DELAY.Presentation.RestAPI
 {
@@ -33,7 +34,15 @@ namespace DELAY.Presentation.RestAPI
             {
                 x.AllowAnyMethod()
                 .AllowAnyHeader()
-                .AllowAnyOrigin();
+                .WithOrigins("https://localhost", "https://localhost:443") // путь к нашему SPA клиенту
+                .AllowCredentials();
+            });
+
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = SameSiteMode.Strict,
+                HttpOnly = HttpOnlyPolicy.Always,
+                Secure = CookieSecurePolicy.Always
             });
 
             app.UseHttpsRedirection();

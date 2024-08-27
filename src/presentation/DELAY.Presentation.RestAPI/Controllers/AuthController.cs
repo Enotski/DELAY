@@ -5,6 +5,7 @@ using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 
 namespace DELAY.Presentation.RestAPI.Controllers
 {
@@ -26,36 +27,30 @@ namespace DELAY.Presentation.RestAPI.Controllers
 
         private AuthResponseDto CreateAuthResponse(AuthResult authResult)
         {
-            var endpoints = new List<string>();
+            var endpoints = new List<ApiEndpoint>();
 
-            if (authResult.Role == Core.Domain.Enums.RoleType.None)
+            if (authResult.Role == Core.Domain.Enums.RoleType.User)
             {
-                endpoints.Add("home");
-            }
-            else if (authResult.Role == Core.Domain.Enums.RoleType.User)
-            {
-                endpoints.AddRange(["home", "boards", "rooms", "account"]);
+                endpoints.AddRange([
+                    new ApiEndpoint("tickets", "Tickets"),
+                    new ApiEndpoint("rooms", "Rooms"),
+                    new ApiEndpoint("account", "Account"),
+                    new ApiEndpoint("users", "Users")
+                ]);
             }
             else if (authResult.Role == Core.Domain.Enums.RoleType.Admin)
             {
-                endpoints.AddRange(["home", "boards", "rooms", "account", "users"]);
+                endpoints.AddRange([
+                    new ApiEndpoint("tickets", "Tickets"),
+                    new ApiEndpoint("rooms", "Rooms"),
+                    new ApiEndpoint("account", "Account"),
+                    new ApiEndpoint("users", "Users"),
+                ]);
             }
 
             return new AuthResponseDto(new TokensResponseDto(authResult.Tokens.AccessToken), endpoints);
         }
 
-        private void SetTokensInsideCookie(Tokens tokenDto, HttpContext context)
-        {
-            context.Response.Cookies.Append("refresh_token", tokenDto.RefreshToken,
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddDays(tokensSettings.RefreshTokenExpirationDays),
-                    HttpOnly = true,
-                    IsEssential = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict
-                });
-        }
 
         [HttpPost]
         [Route("refresh-tokens")]
@@ -197,6 +192,22 @@ namespace DELAY.Presentation.RestAPI.Controllers
                 return Problem(ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
+
+        private void SetTokensInsideCookie(Tokens tokenDto, HttpContext context)
+        {
+            context.Response.Cookies.Append("refresh_token", tokenDto.RefreshToken,
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(tokensSettings.RefreshTokenExpirationDays),
+                    HttpOnly = true,
+                    IsEssential = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Domain = "localhost",
+                    Path = "/api/auth"
+                });
+        }
+
         [HttpPost]
         [Route("signout-all")]
         public IActionResult SignOutAll()

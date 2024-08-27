@@ -111,11 +111,21 @@
             />
           </div>
           <div>
-            <n-button type="success" @click="onSignInModalOpen">
+            <n-button
+              v-if="!isAuthorized"
+              type="success"
+              @click="onSignInModalOpen"
+            >
               <template #icon>
                 <n-icon><user-ico /></n-icon>
               </template>
               Sign In
+            </n-button>
+            <n-button v-if="isAuthorized" type="info" @click="onSignOut">
+              <template #icon>
+                <n-icon><signout-ico /></n-icon>
+              </template>
+              Sign Out
             </n-button>
           </div>
         </nav>
@@ -148,11 +158,17 @@ import {
   NRadioGroup,
 } from "naive-ui";
 import type { MenuOption } from "naive-ui";
-import { useRouter } from "vue-router";
+import router from "./router";
 import RequestUtils from "@/utils/request-utils";
-import { setTokensRefreshFailedCallBack } from "@/utils/request-utils";
+import {
+  setTokensRefreshFailedCallBack,
+  setAccessToken,
+  clearAccessToken,
+} from "@/utils/request-utils";
+import { makeId } from "@/utils/random-generator";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { googleSdkLoaded } from "vue3-google-login";
+
 import {
   HomeOutline as homeIco,
   PersonOutline as userIco,
@@ -162,6 +178,7 @@ import {
   ClipboardOutline as boardIco,
   LogoGoogle as googleIco,
   LogoVk as vkIco,
+  ExitOutline as signoutIco,
 } from "@vicons/ionicons5";
 import {
   Config,
@@ -176,20 +193,26 @@ let fingerprint = "";
 
 const clientid = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const vkclientid = import.meta.env.VITE_VK_CLIENT_ID;
+const authRedirectUri = import.meta.env.VITE_AUTH_REDIRECT_URI;
 
 function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) });
 }
+function renderSvgIcon(icon: string) {
+  return () => h(NIcon, null, { default: () => h(icon) });
+}
 
-const router = useRouter();
 const currentRouteName: any = computed(() => router.currentRoute.value.name);
-const isAuthorized = ref(true);
+const isAuthorized = ref(false);
+const currentUser = ref({});
 
 const showSignInModal = ref(false);
 const radioSignInTypeGroupValue = ref("email");
 const radioSignModalTypeGroupValue = ref("signIn");
 
 setTokensRefreshFailedCallBack(() => {
+  currentUser.value = {};
+  isAuthorized.value = false;
   console.log("silent refresh failed");
 });
 
@@ -221,7 +244,7 @@ const loginGoogle = () => {
         client_id: clientid,
         scope: "email profile openid",
         state: "supernumber",
-        redirect_uri: "https://localhost:443",
+        redirect_uri: authRedirectUri,
         callback: async (response) => {
           console.log("Google response", response);
 
@@ -230,8 +253,8 @@ const loginGoogle = () => {
           await RequestUtils.sendRequest("auth/signin-google", "POST", {
             code: response.code,
             fingerprint: fingerprint,
-          }).then((value) => {
-            console.log(value);
+          }).then((response) => {
+            onSuccessAuth(response);
           });
         },
       })
@@ -240,12 +263,12 @@ const loginGoogle = () => {
 };
 
 const loginVk = () => {
-  let codeVerifier = "FGH767Gd65";
+  let codeVerifier = makeId(10);
 
   Config.init({
     app: vkclientid, // Идентификатор приложения.
-    redirectUrl: "https://localhost:443", // Адрес для перехода после авторизации.
-    state: "dj29fnsadjsd82", // Произвольная строка состояния приложения.
+    redirectUrl: authRedirectUri, // Адрес для перехода после авторизации.
+    state: makeId(16), // Произвольная строка состояния приложения.
     codeVerifier: codeVerifier, // Верификатор в виде случайной строки. Обеспечивает защиту передаваемых данных.
     scope: "email",
     mode: ConfigAuthMode.InNewWindow,
@@ -264,9 +287,7 @@ const loginVk = () => {
         codeVerifier: codeVerifier,
         fingerprint: fingerprint,
       }).then((response) => {
-        RequestUtils.setAccessToken(response.tokens.setAccessToken);
-
-        console.log(response);
+        onSuccessAuth(response);
       });
     })
     .catch((e: AuthError) => {
@@ -286,22 +307,40 @@ async function onConfirmSignInClick() {
   if (radioSignModalTypeGroupValue.value == "signIn") {
     await RequestUtils.sendRequest("auth/signin", "POST", formValue.value).then(
       (response) => {
-        RequestUtils.setAccessToken(response.tokens.setAccessToken);
-        console.log(response);
+        onSuccessAuth(response);
       }
     );
   } else {
     await RequestUtils.sendRequest("auth/signup", "POST", formValue.value).then(
       (response) => {
-        RequestUtils.setAccessToken(response.tokens.setAccessToken);
-        console.log(response);
+        onSuccessAuth(response);
       }
     );
   }
-  showSignInModal.value = false;
 }
 function onCancelSignInClick() {
   showSignInModal.value = false;
+}
+
+function onSuccessAuth(result: any) {
+  showSignInModal.value = false;
+  setAccessToken(result.tokens.accessToken);
+  isAuthorized.value = true;
+  setMenuOptions(result.endpoints);
+  console.log(result);
+}
+
+async function onSignOut() {
+  currentUser.value = {};
+  clearAccessToken();
+  isAuthorized.value = false;
+  setMenuOptions([]);
+
+  router.push("/");
+
+  await RequestUtils.sendRequest("auth/signout", "POST").catch((error) => {
+    console.log(error);
+  });
 }
 
 async function setFingerprint() {
@@ -310,7 +349,55 @@ async function setFingerprint() {
   fingerprint = result.visitorId;
 }
 
-const menuOptions: MenuOption[] = [
+function setMenuOptions(endpoints: []) {
+  menuOptions.value = [
+    {
+      label: () =>
+        h(
+          RouterLink,
+          {
+            to: "/",
+          },
+          { default: () => "Home" }
+        ),
+      key: "home",
+      icon: renderIcon(homeIco),
+    },
+  ];
+
+  endpoints.forEach((element: any) => {
+    menuOptions.value.push({
+      label: () =>
+        h(
+          RouterLink,
+          {
+            to: "/" + element.path,
+          },
+          { default: () => element.title }
+        ),
+      key: element.route,
+      show: isAuthorized.value,
+      icon: renderIcon(getRouteItemIcon(element.path)),
+    });
+  });
+}
+
+function getRouteItemIcon(path: string): Component {
+  switch (path) {
+    case "tickets":
+      return boardIco;
+    case "rooms":
+      return messageIco;
+    case "users":
+      return usersIco;
+    case "account":
+      return accountIco;
+    default:
+      return homeIco;
+  }
+}
+
+const menuOptions = ref<MenuOption[]>([
   {
     label: () =>
       h(
@@ -323,57 +410,5 @@ const menuOptions: MenuOption[] = [
     key: "home",
     icon: renderIcon(homeIco),
   },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: "/tickets",
-        },
-        { default: () => "Tickets" }
-      ),
-    show: isAuthorized.value,
-    key: "tickets",
-    icon: renderIcon(boardIco),
-  },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: "/rooms",
-        },
-        { default: () => "ChatRooms" }
-      ),
-    show: isAuthorized.value,
-    key: "rooms",
-    icon: renderIcon(messageIco),
-  },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: "/users",
-        },
-        { default: () => "Users" }
-      ),
-    show: isAuthorized.value,
-    key: "users",
-    icon: renderIcon(usersIco),
-  },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: "/account",
-        },
-        { default: () => "Account" }
-      ),
-    show: isAuthorized.value,
-    key: "account",
-    icon: renderIcon(accountIco),
-  },
-];
+]);
 </script>

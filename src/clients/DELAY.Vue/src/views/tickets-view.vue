@@ -152,7 +152,7 @@
 
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
-import { sendRequest } from "@/utils/request-utils";
+import RequestUtils from "@/utils/request-utils";
 import { NDataTable, NButton, NIcon, NDivider, NInput, NModal } from "naive-ui";
 import type {
   RowData,

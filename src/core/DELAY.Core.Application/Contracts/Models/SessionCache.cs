@@ -9,7 +9,7 @@ namespace DELAY.Core.Application.Contracts.Models
         {
         }
 
-        public SessionCache(Guid id, string refreshToken, Guid userId, string? fingerprint, string? ipAddress, string? userAgent, DateTime createdTime, uint expiresInDays, AuthProviderType authProvider) : base(id)
+        public SessionCache(Guid id, string refreshToken, Guid userId, string? fingerprint, string? ipAddress, string? userAgent, DateTime createdTime, DateTime validTo, AuthProviderType authProvider) : base(id)
         {
             RefreshToken = refreshToken;
             UserId = userId;
@@ -17,7 +17,7 @@ namespace DELAY.Core.Application.Contracts.Models
             IpAddress = ipAddress;
             UserAgent = userAgent;
             CreatedTime = createdTime;
-            ExpiresInDays = expiresInDays;
+            ValidTo = validTo;
             AuthProvider = authProvider;
         }
 
@@ -27,7 +27,7 @@ namespace DELAY.Core.Application.Contracts.Models
         public string? IpAddress { get; set; }
         public string? UserAgent { get; set; }
         public DateTime CreatedTime { get; set; }
-        public uint ExpiresInDays { get; set; }
+        public DateTime ValidTo { get; set; }
         public AuthProviderType AuthProvider {  get; set; }
     }
 

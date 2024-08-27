@@ -98,6 +98,9 @@
     </div>
     <div class="card-border flex-stretch">
       <n-data-table
+        :style="{
+          height: '100%',
+        }"
         :max-height="600"
         :bordered="true"
         :single-line="false"
@@ -114,7 +117,7 @@
 
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
-import { sendRequest } from "@/utils/request-utils";
+import RequestUtils from "@/utils/request-utils";
 import {
   NDataTable,
   NButton,
@@ -197,11 +200,13 @@ const defaultRequestOptions = {
 };
 
 onMounted(async () => {
-  await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
-    (value) => {
-      tableData.value = value.data;
-    }
-  );
+  await RequestUtils.sendRequest(
+    "users/get-all",
+    "POST",
+    defaultRequestOptions
+  ).then((value) => {
+    tableData.value = value.data;
+  });
 });
 
 const usersColumns: TableColumn[] = [
@@ -272,14 +277,18 @@ function userInfo(row: any) {
 }
 
 async function onConfirmAddClick() {
-  await sendRequest("users", "POST", formValue.value).then(async () => {
-    await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
-      (value) => {
+  await RequestUtils.sendRequest("users", "POST", formValue.value).then(
+    async () => {
+      await RequestUtils.sendRequest(
+        "users/get-all",
+        "POST",
+        defaultRequestOptions
+      ).then((value) => {
         tableData.value = value.data;
-      }
-    );
-    closeAddModal();
-  });
+      });
+      closeAddModal();
+    }
+  );
 }
 function onCancelAddClick() {
   closeAddModal();
@@ -309,39 +318,47 @@ function closeEditModal() {
 }
 
 async function onConfirmEditClick() {
-  await sendRequest("users", "PUT", formValue.value).then(async () => {
-    await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
-      (value) => {
+  await RequestUtils.sendRequest("users", "PUT", formValue.value).then(
+    async () => {
+      await RequestUtils.sendRequest(
+        "users/get-all",
+        "POST",
+        defaultRequestOptions
+      ).then((value) => {
         tableData.value = value.data;
-      }
-    );
-    closeAddModal();
-  });
+      });
+      closeAddModal();
+    }
+  );
 }
 function onCancelEditClick() {
   closeEditModal();
 }
 
 async function deleteUser(row: any) {
-  await sendRequest("users", "DELETE", row.id).then(async () => {
-    await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
-      (value) => {
-        tableData.value = value.data;
-      }
-    );
+  await RequestUtils.sendRequest("users", "DELETE", row.id).then(async () => {
+    await RequestUtils.sendRequest(
+      "users/get-all",
+      "POST",
+      defaultRequestOptions
+    ).then((value) => {
+      tableData.value = value.data;
+    });
   });
 }
 async function onConfirmRemoveClick() {
-  await sendRequest(
+  await RequestUtils.sendRequest(
     "users/delete-multiple",
     "POST",
     checkedRowKeysRef.value
   ).then(async () => {
-    await sendRequest("users/get-all", "POST", defaultRequestOptions).then(
-      (value) => {
-        tableData.value = value.data;
-      }
-    );
+    await RequestUtils.sendRequest(
+      "users/get-all",
+      "POST",
+      defaultRequestOptions
+    ).then((value) => {
+      tableData.value = value.data;
+    });
   });
   showConfirmRemoveModal.value = false;
 }

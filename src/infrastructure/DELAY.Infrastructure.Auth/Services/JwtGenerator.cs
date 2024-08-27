@@ -101,17 +101,21 @@ namespace DELAY.Infrastructure.Auth.Services
 
             return CreateToken(_jwtSettings.Issuer, _jwtSettings.Audience, RefreshTokenExpirationTime, claims, signingCredentials);
         }
-        public ClaimsPrincipal GetPrincipal(string token)
+        public ClaimsPrincipal GetPrincipal(string token, out DateTime validTo)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenValidationParameters = CreateTokenValidationParameters(_jwtSettings.SecretKey, _jwtSettings.Issuer, _jwtSettings.Audience);
 
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
             var jwtSecurityToken = securityToken as JwtSecurityToken;
+
             if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
-                throw new SecurityTokenException("Токен не является действительным");
+                throw new SecurityTokenException("Invalid token");
             }
+
+            validTo = jwtSecurityToken.ValidTo;
+
             return principal;
         }
         public bool ValidateToken(string token)

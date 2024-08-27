@@ -113,7 +113,7 @@
 
 <script setup lang="ts">
 import { ref, h, onMounted, computed } from "vue";
-import { sendRequest } from "@/utils/request-utils";
+import RequestUtils from "@/utils/request-utils";
 import {
   NDataTable,
   NButton,

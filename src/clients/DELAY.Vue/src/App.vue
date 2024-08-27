@@ -149,7 +149,10 @@ import {
 } from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import { useRouter } from "vue-router";
-import { sendRequest } from "@/utils/request-utils";
+import RequestUtils from "@/utils/request-utils";
+import { setTokensRefreshFailedCallBack } from "@/utils/request-utils";
+import FingerprintJS from "@fingerprintjs/fingerprintjs";
+import { googleSdkLoaded } from "vue3-google-login";
 import {
   HomeOutline as homeIco,
   PersonOutline as userIco,
@@ -160,8 +163,6 @@ import {
   LogoGoogle as googleIco,
   LogoVk as vkIco,
 } from "@vicons/ionicons5";
-import FingerprintJS from "@fingerprintjs/fingerprintjs";
-import { googleSdkLoaded } from "vue3-google-login";
 import {
   Config,
   Auth,
@@ -187,6 +188,10 @@ const isAuthorized = ref(true);
 const showSignInModal = ref(false);
 const radioSignInTypeGroupValue = ref("email");
 const radioSignModalTypeGroupValue = ref("signIn");
+
+setTokensRefreshFailedCallBack(() => {
+  console.log("silent refresh failed");
+});
 
 const formValue = ref({
   name: "",
@@ -222,7 +227,7 @@ const loginGoogle = () => {
 
           if (fingerprint === "") await setFingerprint();
 
-          await sendRequest("auth/signin-google", "POST", {
+          await RequestUtils.sendRequest("auth/signin-google", "POST", {
             code: response.code,
             fingerprint: fingerprint,
           }).then((value) => {
@@ -253,13 +258,15 @@ const loginVk = () => {
 
       if (fingerprint === "") await setFingerprint();
 
-      await sendRequest("auth/signin-vk", "POST", {
+      await RequestUtils.sendRequest("auth/signin-vk", "POST", {
         code: response.code,
         deviceId: response.device_id,
         codeVerifier: codeVerifier,
         fingerprint: fingerprint,
-      }).then((value) => {
-        console.log(value);
+      }).then((response) => {
+        RequestUtils.setAccessToken(response.tokens.setAccessToken);
+
+        console.log(response);
       });
     })
     .catch((e: AuthError) => {
@@ -277,21 +284,22 @@ async function onConfirmSignInClick() {
   formValue.value.fingerprint = fingerprint;
 
   if (radioSignModalTypeGroupValue.value == "signIn") {
-    await sendRequest("auth/signin", "POST", formValue.value).then(
+    await RequestUtils.sendRequest("auth/signin", "POST", formValue.value).then(
       (response) => {
+        RequestUtils.setAccessToken(response.tokens.setAccessToken);
         console.log(response);
       }
     );
   } else {
-    await sendRequest("auth/signup", "POST", formValue.value).then(
+    await RequestUtils.sendRequest("auth/signup", "POST", formValue.value).then(
       (response) => {
+        RequestUtils.setAccessToken(response.tokens.setAccessToken);
         console.log(response);
       }
     );
   }
   showSignInModal.value = false;
 }
-
 function onCancelSignInClick() {
   showSignInModal.value = false;
 }

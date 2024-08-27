@@ -5,7 +5,6 @@ using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
-using Microsoft.Extensions.Options;
 
 namespace DELAY.Core.Application.Services
 {
@@ -23,9 +22,7 @@ namespace DELAY.Core.Application.Services
 
         private readonly IUserStorage _userStorage;
 
-        private readonly TokensSettings _tokensSettings;
-
-        public AuthService(IGoogleAuthService googleAuthService, IVkAuthService vkAuthService, IPasswordHelper passwordHelper, ICachingService cacheService, ITokensService tokensService, IUserStorage userStorage, IOptions<TokensSettings> tokensSettings)
+        public AuthService(IGoogleAuthService googleAuthService, IVkAuthService vkAuthService, IPasswordHelper passwordHelper, ICachingService cacheService, ITokensService tokensService, IUserStorage userStorage)
         {
             _googleAuthService = googleAuthService;
             _vkAuthService = vkAuthService;
@@ -33,7 +30,6 @@ namespace DELAY.Core.Application.Services
             _cacheService = cacheService;
             _tokensService = tokensService;
             _userStorage = userStorage;
-            _tokensSettings = tokensSettings.Value;
         }
 
         public async Task<Tokens> RefreshTokensAsync(string refreshToken)
@@ -117,7 +113,7 @@ namespace DELAY.Core.Application.Services
                 _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
             }
 
-            var root = _tokensService.GetPrincipal(refreshToken)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
+            var root = _tokensService.GetPrincipal(refreshToken, out DateTime validTo)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
 
             var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
 
@@ -138,7 +134,7 @@ namespace DELAY.Core.Application.Services
                 _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
             }
 
-            var root = _tokensService.GetPrincipal(refreshToken)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
+            var root = _tokensService.GetPrincipal(refreshToken, out DateTime validTo)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
 
             var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
 
@@ -183,11 +179,13 @@ namespace DELAY.Core.Application.Services
 
         private void SetUserSessionAsync(string refreshToken, User user, AuthUserAgentRequest authModel, AuthProviderType authProvider)
         {
-            var session = new SessionCache(Guid.NewGuid(), refreshToken, user.Id, authModel.Fingerprint, authModel.IpAddress, authModel.UserAgent, DateTime.UtcNow, _tokensSettings.RefreshTokenExpirationDays, authProvider);
+            var tokenClaims = _tokensService.GetPrincipal(refreshToken, out DateTime validTo)?.Claims;
 
-            _cacheService.SetValueToCache(refreshToken, session, DateTimeOffset.UtcNow.AddDays(_tokensSettings.RefreshTokenExpirationDays));
+            var session = new SessionCache(Guid.NewGuid(), refreshToken, user.Id, authModel.Fingerprint, authModel.IpAddress, authModel.UserAgent, DateTime.UtcNow, validTo, authProvider);
 
-            var root = _tokensService.GetPrincipal(refreshToken)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
+            _cacheService.SetValueToCache(refreshToken, session, validTo);
+
+            var root = tokenClaims?.FirstOrDefault(x => x.Type == "ueid");
 
             var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
 

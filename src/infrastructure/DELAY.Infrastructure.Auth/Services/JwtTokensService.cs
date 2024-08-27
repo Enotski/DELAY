@@ -18,8 +18,8 @@ namespace DELAY.Infrastructure.Auth.Services
         public bool IsValidToken(string token) =>
             _tokenGenerator.ValidateToken(token.Replace("Bearer", "").Trim());
 
-        public ClaimsPrincipal GetPrincipal(string token) =>
-            _tokenGenerator.GetPrincipal(token.Replace("Bearer", "").Trim());
+        public ClaimsPrincipal GetPrincipal(string token, out DateTime validTo) =>
+            _tokenGenerator.GetPrincipal(token.Replace("Bearer", "").Trim(), out validTo);
 
         public Tokens CreateTokens(Guid userId, string name, string email, string phone, string role) =>
             new Tokens(_tokenGenerator.CreateAccessToken(userId, name, email, phone, role), _tokenGenerator.CreateRefreshToken(userId));

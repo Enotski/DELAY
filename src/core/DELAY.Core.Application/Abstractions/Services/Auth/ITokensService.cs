@@ -8,7 +8,7 @@ namespace DELAY.Core.Application.Abstractions.Services.Auth
     {
         bool IsValidToken(string token);
 
-        ClaimsPrincipal GetPrincipal(string token);
+        ClaimsPrincipal GetPrincipal(string token, out DateTime validTo);
 
         Tokens CreateTokens(Guid userId, string name, string email, string phone, string role);
     }

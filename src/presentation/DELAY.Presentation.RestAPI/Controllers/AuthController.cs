@@ -67,7 +67,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetTokensInsideCookie(tokens, HttpContext);
+                SetRefreshTokensInsideCookie(tokens.RefreshToken, HttpContext);
 
                 return Ok(new TokensResponseDto(tokens.AccessToken));
             }
@@ -92,7 +92,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetTokensInsideCookie(authResultModel.Tokens, HttpContext);
+                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -117,7 +117,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetTokensInsideCookie(authResultModel.Tokens, HttpContext);
+                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -142,7 +142,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetTokensInsideCookie(authResultModel.Tokens, HttpContext);
+                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -166,7 +166,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetTokensInsideCookie(authResultModel.Tokens, HttpContext);
+                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -181,9 +181,18 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                HttpContext.Request.Cookies.TryGetValue("refresh_token", out string refreshToken);
+                if(HttpContext.Request.Cookies["refresh_token"] != null)
+                {
+                    var token = HttpContext.Request.Cookies["refresh_token"];
 
-                _authService.SignOut(refreshToken);
+                    _authService.SignOut(token);
+
+                    SetRefreshTokensInsideCookie("", HttpContext, -1);
+                }
+                else
+                {
+                    return BadRequest("Tokens not passed");
+                }
 
                 return Ok();
             }
@@ -193,12 +202,14 @@ namespace DELAY.Presentation.RestAPI.Controllers
             }
         }
 
-        private void SetTokensInsideCookie(Tokens tokenDto, HttpContext context)
+        private void SetRefreshTokensInsideCookie(string token, HttpContext context, int? expirationDays = null)
         {
-            context.Response.Cookies.Append("refresh_token", tokenDto.RefreshToken,
+            expirationDays = expirationDays ?? (int)tokensSettings.RefreshTokenExpirationDays;
+
+            context.Response.Cookies.Append("refresh_token", token,
                 new CookieOptions
                 {
-                    Expires = DateTimeOffset.UtcNow.AddDays(tokensSettings.RefreshTokenExpirationDays),
+                    Expires = DateTimeOffset.UtcNow.AddDays(expirationDays.Value),
                     HttpOnly = true,
                     IsEssential = true,
                     Secure = true,
@@ -214,9 +225,18 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                HttpContext.Request.Cookies.TryGetValue("refresh_token", out string refreshToken);
+                if (HttpContext.Request.Cookies["refresh_token"] != null)
+                {
+                    var token = HttpContext.Request.Cookies["refresh_token"];
 
-                _authService.SignOutAll(refreshToken);
+                    _authService.SignOutAll(token);
+
+                    SetRefreshTokensInsideCookie("", HttpContext, -1);
+                }
+                else
+                {
+                    return BadRequest("Tokens not passed");
+                }
 
                 return Ok();
             }

@@ -1,8 +1,5 @@
 using DELAY.Core.Application;
-using DELAY.Core.Application.Abstractions.Services.Auth;
-using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Infrastructure.DependencyInjections;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.CookiePolicy;
 
 namespace DELAY.Presentation.RestAPI

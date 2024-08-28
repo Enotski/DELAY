@@ -1,4 +1,9 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using DELAY.Core.Application.Contracts.Models.Auth;
+using DELAY.Infrastructure.Auth.Services;
+using DELAY.Infrastructure.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Serilog;
 
 namespace DELAY.Presentation.RestAPI
@@ -10,7 +15,7 @@ namespace DELAY.Presentation.RestAPI
         /// </summary>
         /// <param name="services"><inheritdoc cref="IServiceCollection"/></param>
         /// <returns></returns>
-        public static IServiceCollection AddPresentation(this IServiceCollection services)
+        public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHttpClient();
             services.AddCors();
@@ -19,6 +24,44 @@ namespace DELAY.Presentation.RestAPI
             services.AddEndpointsApiExplorer();
 
             services.AddSwagger();
+
+            services.ConfigureAuth(configuration);
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureAuth(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<SecurityConfig>(options => configuration.GetSection(SecurityConfig.SectionName).Bind(options));
+            services.Configure<TokensSettings>(options =>
+                {
+                    configuration.GetSection(TokensSettings.SectionName).Bind(options);
+                    options.SecretKey = configuration.GetSection($"{TokensSettings.SectionName}:{nameof(TokensSettings.SecretKey)}").Value;
+                }
+            );
+
+            services.Configure<GoogleApiSecrets>(options => configuration.GetSection(GoogleApiSecrets.SectionName).Bind(options));
+            services.Configure<VkApiSecrets>(options => configuration.GetSection(VkApiSecrets.SectionName).Bind(options));
+
+            var tokenSettings = services.BuildServiceProvider()
+                .GetRequiredService<IOptions<TokensSettings>>().Value;
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(tokenSettings.SchemeName, options =>
+                {
+                    options.TokenValidationParameters = JwtGenerator.CreateTokenValidationParameters(tokenSettings.SecretKey, tokenSettings.Issuer, tokenSettings.Audience);
+
+                    //options.Events = new JwtBearerEvents
+                    //{
+                    //    OnMessageReceived = ctx =>
+                    //    {
+                    //        ctx.Request.Cookies.TryGetValue("access_token", out var accessToken);
+                    //        if (!string.IsNullOrEmpty(accessToken))
+                    //            ctx.Token = accessToken;
+                    //        return Task.CompletedTask;
+                    //    }
+                    //};
+                });
 
             return services;
         }

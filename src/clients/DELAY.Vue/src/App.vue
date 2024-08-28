@@ -110,23 +110,37 @@
               responsive
             />
           </div>
-          <div>
-            <n-button
-              v-if="!isAuthorized"
-              type="success"
-              @click="onSignInModalOpen"
-            >
-              <template #icon>
-                <n-icon><user-ico /></n-icon>
-              </template>
-              Sign In
-            </n-button>
-            <n-button v-if="isAuthorized" type="info" @click="onSignOut">
-              <template #icon>
-                <n-icon><signout-ico /></n-icon>
-              </template>
-              Sign Out
-            </n-button>
+          <div class="d-flex">
+            <div v-if="isDisplaySignBtn" class="mx-5">
+              <n-button
+                v-if="!isAuthorized"
+                type="success"
+                @click="onSignInModalOpen"
+              >
+                <template #icon>
+                  <n-icon><user-ico /></n-icon>
+                </template>
+                Sign In
+              </n-button>
+            </div>
+            <div v-if="isAuthorized">
+              <n-tag size="large" type="success"
+                >{{ currentUser.name }}
+                <template #icon>
+                  <n-button
+                    title="Sign Out"
+                    size="small"
+                    quaternary
+                    type="success"
+                    @click="onSignOut"
+                  >
+                    <template #icon>
+                      <n-icon><signout-ico /></n-icon>
+                    </template>
+                  </n-button>
+                </template>
+              </n-tag>
+            </div>
           </div>
         </nav>
         <div class="content-container flex-stretch">
@@ -139,7 +153,7 @@
 
 <script setup lang="ts">
 import type { Component } from "vue";
-import { computed, h, ref } from "vue";
+import { computed, h, ref, onMounted } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 import {
   NMenu,
@@ -156,6 +170,7 @@ import {
   NInputGroupLabel,
   NRadioButton,
   NRadioGroup,
+  NTag,
 } from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import router from "./router";
@@ -164,6 +179,7 @@ import {
   setTokensRefreshFailedCallBack,
   setAccessToken,
   clearAccessToken,
+  parseJwt,
 } from "@/utils/request-utils";
 import { makeId } from "@/utils/random-generator";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
@@ -188,6 +204,16 @@ import {
   type AuthError,
 } from "@vkid/sdk";
 
+const tokenClaimsScheme =
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims";
+const tokenPayloadNames = {
+  role: "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+  email: tokenClaimsScheme + "/emailaddress",
+  phone: tokenClaimsScheme + "/mobilephone",
+  name: tokenClaimsScheme + "/name",
+  id: tokenClaimsScheme + "/sid",
+};
+
 const fpPromise = FingerprintJS.load();
 let fingerprint = "";
 
@@ -198,13 +224,11 @@ const authRedirectUri = import.meta.env.VITE_AUTH_REDIRECT_URI;
 function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) });
 }
-function renderSvgIcon(icon: string) {
-  return () => h(NIcon, null, { default: () => h(icon) });
-}
 
 const currentRouteName: any = computed(() => router.currentRoute.value.name);
 const isAuthorized = ref(false);
-const currentUser = ref({});
+const isDisplaySignBtn = ref(false);
+const currentUser: any = ref({});
 
 const showSignInModal = ref(false);
 const radioSignInTypeGroupValue = ref("email");
@@ -216,6 +240,28 @@ setTokensRefreshFailedCallBack(() => {
   console.log("silent refresh failed");
 });
 
+function setUserData(data: any) {
+  isAuthorized.value = true;
+
+  let tokenPayload = parseJwt(data.tokens.accessToken);
+  currentUser.value = {
+    role: tokenPayload[tokenPayloadNames.role],
+    email: tokenPayload[tokenPayloadNames.email],
+    phone: tokenPayload[tokenPayloadNames.phone],
+    name: tokenPayload[tokenPayloadNames.name],
+    id: tokenPayload[tokenPayloadNames.id],
+  };
+
+  setMenuOptions(data.endpoints);
+  console.log(currentUser.value);
+}
+
+function onSuccessAuth(result: any) {
+  showSignInModal.value = false;
+
+  setAccessToken(result.tokens.accessToken);
+  setUserData(result);
+}
 const formValue = ref({
   name: "",
   email: "",
@@ -236,6 +282,22 @@ const addRules = {
     trigger: "blur",
   },
 };
+
+onMounted(async () => {
+  if (fingerprint === "") await setFingerprint();
+
+  if (isAuthorized.value == false) {
+    await RequestUtils.sendRequest("auth/signin-transient", "GET", {
+      fingerprint: fingerprint,
+    })
+      .then((response) => {
+        onSuccessAuth(response);
+      })
+      .finally(() => {
+        isDisplaySignBtn.value = true;
+      });
+  }
+});
 
 const loginGoogle = () => {
   googleSdkLoaded((google) => {
@@ -320,14 +382,6 @@ async function onConfirmSignInClick() {
 }
 function onCancelSignInClick() {
   showSignInModal.value = false;
-}
-
-function onSuccessAuth(result: any) {
-  showSignInModal.value = false;
-  setAccessToken(result.tokens.accessToken);
-  isAuthorized.value = true;
-  setMenuOptions(result.endpoints);
-  console.log(result);
 }
 
 async function onSignOut() {

@@ -13,7 +13,7 @@ namespace DELAY.Infrastructure.DependencyInjections
             services.AddInfrasturctureServices(config)
                 .AddPersistenceServices(config)
                 .AddCachingServices()
-                .AddAuthServices(config);
+                .AddAuthServices();
 
             return services;
         }

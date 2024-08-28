@@ -4,6 +4,8 @@ namespace DELAY.Core.Application.Abstractions.Services.Auth
 {
     public interface IAuthService
     {
+        Task<AuthResult> TransientSingInByRefreshTokenAsync(string refreshToken, AuthUserAgentRequest model);
+
         Task<Tokens> RefreshTokensAsync(string refreshToken);
 
         Task<AuthResult> SignInAsync(SignInRequest model);

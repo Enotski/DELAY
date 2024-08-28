@@ -3,6 +3,7 @@ using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Presentation.RestAPI.Contracts.Response;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -51,6 +52,30 @@ namespace DELAY.Presentation.RestAPI.Controllers
             return new AuthResponseDto(new TokensResponseDto(authResult.Tokens.AccessToken), endpoints);
         }
 
+        [HttpGet]
+        [Route("signin-transient")]
+        public async Task<IActionResult> TransientSingInByRefreshTokenAsync(string fingerPrint)
+        {
+            try
+            {
+                HttpContext.Request.Cookies.TryGetValue("refresh_token", out var refreshToken);
+
+                var authResultModel = await _authService.TransientSingInByRefreshTokenAsync(refreshToken, new AuthUserAgentRequest(fingerPrint, RemoteIpAddress, UserAgentData));
+
+                if (authResultModel is null)
+                {
+                    return Unauthorized();
+                }
+
+                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
+
+                return Ok(CreateAuthResponse(authResultModel));
+            }
+            catch (Exception exp)
+            {
+                return Unauthorized(exp.Message);
+            }
+        }
 
         [HttpPost]
         [Route("refresh-tokens")]

@@ -5,6 +5,7 @@ using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
+using System.Reflection;
 
 namespace DELAY.Core.Application.Services
 {
@@ -30,6 +31,28 @@ namespace DELAY.Core.Application.Services
             _cacheService = cacheService;
             _tokensService = tokensService;
             _userStorage = userStorage;
+        }
+
+        public async Task<AuthResult> TransientSingInByRefreshTokenAsync(string refreshToken, AuthUserAgentRequest model)
+        {
+            if (!_tokensService.IsValidToken(refreshToken))
+                return null;
+
+            var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
+
+            if (cachedSession == null)
+                return null;
+
+            _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
+
+            if (!_tokensService.IsValidToken(cachedSession.RefreshToken))
+            {
+                return null;
+            }
+
+            var user = await _userStorage.GetAsync(cachedSession.UserId);
+
+            return CreateTokensAndSetSession(user, model, AuthProviderType.Internal);
         }
 
         public async Task<Tokens> RefreshTokensAsync(string refreshToken)

@@ -11,9 +11,9 @@ namespace DELAY.Presentation.RestAPI
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services
-                .AddInfrastructure(builder.Configuration)
                 .AddApplication()
-                .AddPresentation();
+                .AddInfrastructure(builder.Configuration)
+                .AddPresentation(builder.Configuration);
 
             builder.ConfigureWebApplication();
 

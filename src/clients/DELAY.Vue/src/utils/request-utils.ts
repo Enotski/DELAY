@@ -2,8 +2,12 @@ import axios from "axios";
 
 let accessToken = "";
 const apiUrl = import.meta.env.VITE_API_URI;
+let tokensRefreshSuccess:(response: any) => void;
 let tokensRefreshFailed:() => void;
 
+export function setTokensRefreshSuccessCallBack(callback: (response: any) => void){
+  tokensRefreshSuccess = callback;
+}
 export function setTokensRefreshFailedCallBack(callback: () => void){
   tokensRefreshFailed = callback;
 }
@@ -13,6 +17,16 @@ export function setAccessToken(token: string){
 }
 export function clearAccessToken(){
   accessToken = "";
+}
+
+export function parseJwt (token: string) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
 }
 
 const instance = axios.create({
@@ -62,11 +76,15 @@ instance.interceptors.response.use(
             
             tryRefresh = false;            
             
+            if(tokensRefreshSuccess !== undefined && tokensRefreshSuccess !== null)
+            tokensRefreshSuccess(parseJwt(accessToken));
+
             return instance(originalConfig);
           }
       }
       else if(err.response.status === 401){
-        tokensRefreshFailed();
+        if(tokensRefreshFailed !== undefined && tokensRefreshFailed !== null)
+            tokensRefreshFailed();
       }
       else if (err.response.status === 403 && err.response.data) {
         return Promise.reject(err.response.data);
@@ -83,7 +101,9 @@ async sendRequest(url: string, method: string = "GET", args: object = {}) {
 
   if (method === "GET") {
     return await instance
-      .get(url)
+      .get(url, {
+        params: args
+      })
       .then((response) => {
         if (response.data.Result !== undefined && response.data.Result !== 0)
           throw response.data.Message;

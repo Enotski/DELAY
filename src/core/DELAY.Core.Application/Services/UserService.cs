@@ -6,6 +6,7 @@ using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
 using DELAY.Core.Domain.Models.Base;
+using System.Reflection;
 
 namespace DELAY.Core.Application.Services
 {
@@ -35,16 +36,16 @@ namespace DELAY.Core.Application.Services
         }
         private async Task ValidateUserAsync(User user)
         {
-            if (!user.IsValidCredentials())
+            if (!user.IsValidCredentials(false))
                 throw new ArgumentException("Invalid user data");
 
-            if (!string.IsNullOrWhiteSpace(user.Name) && !await userStorage.IsUniqueName(user.Name))
+            if (!string.IsNullOrWhiteSpace(user.Name) && !await userStorage.IsUniqueName(user.Name, user.Id))
                 throw new ArgumentException("Such name already exist");
 
-            if (!string.IsNullOrWhiteSpace(user.Email) && !await userStorage.IsUniqueEmail(user.Email))
+            if (!string.IsNullOrWhiteSpace(user.Email) && !await userStorage.IsUniqueEmail(user.Email, user.Id))
                 throw new ArgumentException("Such email already exist");
 
-            if (!string.IsNullOrWhiteSpace(user.PhoneNumber) && !await userStorage.IsUniquePhone(user.PhoneNumber))
+            if (!string.IsNullOrWhiteSpace(user.PhoneNumber) && !await userStorage.IsUniquePhone(user.PhoneNumber, user.Id))
                 throw new ArgumentException("Such phone already exist");
         }
 
@@ -72,7 +73,7 @@ namespace DELAY.Core.Application.Services
             if (model == null)
                 throw new ArgumentNullException(nameof(User));
 
-            var triggred = await ValidatePermissionToOperation(RoleType.Admin, triggeredBy);
+            var triggred = await ValidatePermissionToOperation(RoleType.User, triggeredBy);
 
             if (triggred == null)
             {
@@ -86,7 +87,35 @@ namespace DELAY.Core.Application.Services
                 throw new Exception("Record not found");
             }
 
-            record.Update(model.Name, model.Email, model.PhoneNumber, model.Role, triggred.Name);
+            record.Update(model.Name, model.Email, model.PhoneNumber, record.Role, triggred.Name);
+
+            await ValidateUserAsync(record);
+
+            return await userStorage.UpdateAsync(record);
+        }
+
+        public async Task<int> UpdatePasswordAsync(Guid id, string password, string triggeredBy)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(password, nameof(password));               
+
+            if (id == Guid.Empty)
+                throw new ArgumentException(nameof(id));
+
+            var triggred = await ValidatePermissionToOperation(RoleType.User, triggeredBy);
+
+            if (triggred == null)
+            {
+                throw new Exception("No permission for operation");
+            }
+
+            var record = await userStorage.GetAsync(id);
+
+            if (record == null)
+            {
+                throw new Exception("Record not found");
+            }
+
+            record.SetPassword(_passwordHelper.GetHash(password), triggred.Name);
 
             await ValidateUserAsync(record);
 

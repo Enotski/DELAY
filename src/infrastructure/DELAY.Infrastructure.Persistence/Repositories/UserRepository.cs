@@ -249,7 +249,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         {
             triggeredBy = triggeredBy.ToUpperTrim();
 
-            var filter = PredicateBuilder.Create<UserEntity>(x => x.Name.Trim().ToUpper() == triggeredBy && x.Role == role);
+            var filter = PredicateBuilder.Create<UserEntity>(x => x.Name.Trim().ToUpper() == triggeredBy && x.Role >= role);
             var selector = KeyNamedSelectorSpecification();
 
             var result = await BuildQuery(filter).Select(selector).FirstOrDefaultAsync(cancellationToken);

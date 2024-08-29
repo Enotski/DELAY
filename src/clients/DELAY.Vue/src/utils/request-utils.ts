@@ -137,6 +137,18 @@ async sendRequest(url: string, method: string = "GET", args: object = {}) {
       console.log(ex);
       throw ex;
     });
+  }else if (method === "PATCH") {
+    return await instance
+      .patch(url, args)
+    .then((response) => {
+      if (response.data.Result !== undefined && response.data.Result !== 0)
+        throw response.data.Message;
+      return response.data;
+    })
+    .catch((ex) => {
+      console.log(ex);
+      throw ex;
+    });
   }
 
   return await instance

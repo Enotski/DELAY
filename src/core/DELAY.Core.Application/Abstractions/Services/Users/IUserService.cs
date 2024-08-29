@@ -19,6 +19,7 @@ namespace DELAY.Core.Application.Abstractions.Services.Users
         /// <param name="user">User updated model</param>
         /// <returns></returns>
         Task<int> UpdateAsync(User user, string triggeredBy);
+        Task<int> UpdatePasswordAsync(Guid id, string password, string triggeredBy);
 
         Task<IEnumerable<User>> GetUsersByTicketAsync(Guid ticketId);
 

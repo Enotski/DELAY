@@ -156,6 +156,11 @@ namespace DELAY.Core.Domain.Models
             Name = name;
         }
 
-        public void SetPassword(string password) => Password = password;
+        public void SetPassword(string password, string changedBy)
+        {
+            Password = password;
+            ChangedBy = changedBy;
+            ChangedDate = DateTime.UtcNow;
+        }
     }
 }

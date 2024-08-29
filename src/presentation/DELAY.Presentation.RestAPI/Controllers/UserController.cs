@@ -4,6 +4,7 @@ using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Domain.Models;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {
@@ -82,6 +83,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                 }
 
                 var result = mapper.Map<UserDto>(user);
+                result.Password = "password";
 
                 logger.LogInformation("Получение объекта активности по ключу {id}: {result}", result, id);
 
@@ -480,7 +482,54 @@ namespace DELAY.Core.Application.Abstractions.Services
 
                 logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
 
-                return Created(result.ToString(), result);
+                return Accepted(result.ToString(), result);
+            }
+            catch (Exception exp)
+            {
+                logger.LogError("Ошибка создания объекта активности по параметрам: {exp}", exp);
+
+                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Update user
+        /// </summary>
+        /// <param name="model"><inheritdoc cref="UserDto"/></param>
+        /// <returns>Updated count</returns>
+        /// <remarks>
+        /// Request:
+        ///
+        ///     PUT /api/users
+        ///     {
+        ///       "name": "string",
+        ///       "email": "string",
+        ///       "phoneNumber": "string",
+        ///       "description": "string",
+        ///       "password": "string"
+        ///     }
+        ///
+        /// Response:
+        /// 
+        ///     "0"
+        /// 
+        /// </remarks>
+        /// <response code="202">Accepted</response>
+        /// <response code="500">Internal server error</response>
+        [HttpPatch]
+        [Route("password")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdatePasswordAsync([FromBody] UserrPasswordUpdateRequestDto model)
+        {
+            try
+            {
+                var result = await userService.UpdatePasswordAsync(model.Id, model.Password, UserIdentityName);
+
+                logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
+
+                return Accepted(result.ToString(), result);
             }
             catch (Exception exp)
             {

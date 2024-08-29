@@ -125,7 +125,7 @@
             </div>
             <div v-if="isAuthorized">
               <n-tag size="large" type="success"
-                >{{ currentUser.name }}
+                >{{ store.state.user.name }}
                 <template #icon>
                   <n-button
                     title="Sign Out"
@@ -174,6 +174,7 @@ import {
 } from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import router from "./router";
+import store from "./store";
 import RequestUtils from "@/utils/request-utils";
 import {
   setTokensRefreshFailedCallBack,
@@ -206,12 +207,13 @@ import {
 
 const tokenClaimsScheme =
   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims";
+
 const tokenPayloadNames = {
   role: "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
   email: tokenClaimsScheme + "/emailaddress",
   phone: tokenClaimsScheme + "/mobilephone",
   name: tokenClaimsScheme + "/name",
-  id: tokenClaimsScheme + "/sid",
+  id: "ueid",
 };
 
 const fpPromise = FingerprintJS.load();
@@ -228,14 +230,13 @@ function renderIcon(icon: Component) {
 const currentRouteName: any = computed(() => router.currentRoute.value.name);
 const isAuthorized = ref(false);
 const isDisplaySignBtn = ref(false);
-const currentUser: any = ref({});
 
 const showSignInModal = ref(false);
 const radioSignInTypeGroupValue = ref("email");
 const radioSignModalTypeGroupValue = ref("signIn");
 
 setTokensRefreshFailedCallBack(() => {
-  currentUser.value = {};
+  store.commit("clearUser");
   isAuthorized.value = false;
   console.log("silent refresh failed");
 });
@@ -244,16 +245,18 @@ function setUserData(data: any) {
   isAuthorized.value = true;
 
   let tokenPayload = parseJwt(data.tokens.accessToken);
-  currentUser.value = {
+  console.log(tokenPayload);
+
+  store.commit("setUser", {
     role: tokenPayload[tokenPayloadNames.role],
     email: tokenPayload[tokenPayloadNames.email],
     phone: tokenPayload[tokenPayloadNames.phone],
     name: tokenPayload[tokenPayloadNames.name],
     id: tokenPayload[tokenPayloadNames.id],
-  };
+  });
 
   setMenuOptions(data.endpoints);
-  console.log(currentUser.value);
+  console.log(store.state.user);
 }
 
 function onSuccessAuth(result: any) {
@@ -385,7 +388,7 @@ function onCancelSignInClick() {
 }
 
 async function onSignOut() {
-  currentUser.value = {};
+  store.commit("clearUser");
   clearAccessToken();
   isAuthorized.value = false;
   setMenuOptions([]);

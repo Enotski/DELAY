@@ -33,7 +33,7 @@ const instance = axios.create({
   baseURL: apiUrl,
   headers: {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "https://localhost:7259",
+    "Access-Control-Allow-Origin": "https://localhost:32768",
   },
 });
 

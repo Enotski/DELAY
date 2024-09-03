@@ -3,10 +3,8 @@ using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Presentation.RestAPI.Contracts.Response;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
 
 namespace DELAY.Presentation.RestAPI.Controllers
 {
@@ -17,6 +15,8 @@ namespace DELAY.Presentation.RestAPI.Controllers
         private readonly IAuthService _authService;
 
         private readonly TokensSettings tokensSettings;
+
+        private string refreshTokenName = "refresh_token";
 
         public AuthController(IAuthService authService, IOptions<TokensSettings> tokensSettings)
         {
@@ -58,7 +58,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                HttpContext.Request.Cookies.TryGetValue("refresh_token", out var refreshToken);
+                HttpContext.Request.Cookies.TryGetValue(refreshTokenName, out var refreshToken);
 
                 var authResultModel = await _authService.TransientSingInByRefreshTokenAsync(refreshToken, new AuthUserAgentRequest(fingerPrint, RemoteIpAddress, UserAgentData));
 
@@ -67,7 +67,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
+                SetRefreshTokensInsideCookie(refreshTokenName, authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -83,7 +83,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                HttpContext.Request.Cookies.TryGetValue("refresh_token", out var refreshToken);
+                HttpContext.Request.Cookies.TryGetValue(refreshTokenName, out var refreshToken);
 
                 var tokens = await _authService.RefreshTokensAsync(refreshToken);
 
@@ -92,7 +92,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetRefreshTokensInsideCookie(tokens.RefreshToken, HttpContext);
+                SetRefreshTokensInsideCookie(refreshTokenName,tokens.RefreshToken, HttpContext);
 
                 return Ok(new TokensResponseDto(tokens.AccessToken));
             }
@@ -117,7 +117,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
+                SetRefreshTokensInsideCookie(refreshTokenName, authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -142,7 +142,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
+                SetRefreshTokensInsideCookie(refreshTokenName, authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -167,7 +167,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
+                SetRefreshTokensInsideCookie(refreshTokenName, authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -191,7 +191,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetRefreshTokensInsideCookie(authResultModel.Tokens.RefreshToken, HttpContext);
+                SetRefreshTokensInsideCookie(refreshTokenName, authResultModel.Tokens.RefreshToken, HttpContext);
 
                 return Ok(CreateAuthResponse(authResultModel));
             }
@@ -206,13 +206,11 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                if(HttpContext.Request.Cookies["refresh_token"] != null)
+                if(HttpContext.Request.Cookies.TryGetValue(refreshTokenName, out string token))
                 {
-                    var token = HttpContext.Request.Cookies["refresh_token"];
+                    HttpContext.Response.Cookies.Delete(refreshTokenName);
 
                     _authService.SignOut(token);
-
-                    SetRefreshTokensInsideCookie("", HttpContext, -1);
                 }
                 else
                 {
@@ -227,11 +225,11 @@ namespace DELAY.Presentation.RestAPI.Controllers
             }
         }
 
-        private void SetRefreshTokensInsideCookie(string token, HttpContext context, int? expirationDays = null)
+        private void SetRefreshTokensInsideCookie(string tokenName, string token, HttpContext context, int? expirationDays = null)
         {
             expirationDays = expirationDays ?? (int)tokensSettings.RefreshTokenExpirationDays;
 
-            context.Response.Cookies.Append("refresh_token", token,
+            context.Response.Cookies.Append(tokenName, token,
                 new CookieOptions
                 {
                     Expires = DateTimeOffset.UtcNow.AddDays(expirationDays.Value),
@@ -250,13 +248,11 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                if (HttpContext.Request.Cookies["refresh_token"] != null)
+                if (HttpContext.Request.Cookies.TryGetValue(refreshTokenName, out string token))
                 {
-                    var token = HttpContext.Request.Cookies["refresh_token"];
+                    HttpContext.Response.Cookies.Delete(refreshTokenName);
 
                     _authService.SignOutAll(token);
-
-                    SetRefreshTokensInsideCookie("", HttpContext, -1);
                 }
                 else
                 {

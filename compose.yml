@@ -1,0 +1,31 @@
+﻿version: "3.9"
+services:
+   webapp:
+      depends_on:
+         - db
+      build:
+         context: .
+         dockerfile: src/presentation/DELAY.Presentation.RestAPI/Dockerfile
+      ports:
+         - "8081:8081"
+         - "8080:8080"
+      environment:
+         - AASPNETCORE_ENVIRONMENT=Development
+         - ASPNETCORE_URLS=https://+:8081;http://+:8080
+         - ASPNETCORE_Kestrel__Certificates__Default__Password=1111
+         - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/certificateForServerAuthorization.pfx
+      volumes:
+         - ~/.aspnet/https:/https:ro
+         - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+   db:
+      image: postgres:16.4
+      environment:
+         POSTGRES_DB: "delay_db"
+         POSTGRES_USER: "sa"
+         POSTGRES_PASSWORD: "pg1111"
+      ports:
+         - "8001:5432"
+      volumes:
+         - pgdb:/var/lib/postgresql/data
+volumes:
+   pgdb:

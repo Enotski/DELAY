@@ -27,7 +27,7 @@ namespace DELAY.Infrastructure.Persistence.Context
             : base(ModifyOptions(options))
         {
             //Database.EnsureDeleted();
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         private static DbContextOptions<DelayContext> ModifyOptions(DbContextOptions<DelayContext> options)

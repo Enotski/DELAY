@@ -3,6 +3,7 @@ using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Presentation.RestAPI.Contracts.Response;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 

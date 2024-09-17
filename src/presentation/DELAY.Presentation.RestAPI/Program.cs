@@ -1,6 +1,7 @@
 using DELAY.Core.Application;
 using DELAY.Infrastructure.DependencyInjections;
 using Microsoft.AspNetCore.CookiePolicy;
+using System.Configuration;
 
 namespace DELAY.Presentation.RestAPI
 {
@@ -9,6 +10,9 @@ namespace DELAY.Presentation.RestAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Configuration.AddKeyPerFile(directoryPath: "/run/secrets", optional: true);
+            builder.Configuration.AddUserSecrets("a2a5d057-8915-48bc-99fc-5d1869823193");
 
             builder.Services
                 .AddApplication()
@@ -43,6 +47,7 @@ namespace DELAY.Presentation.RestAPI
             });
 
             app.UseHttpsRedirection();
+            app.UseHsts();
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -461,10 +461,10 @@ function ticketInfo(row: any) {
   console.log("ticketInfo");
 }
 
-function onPositiveClick(row: any) {
+function onPositiveClick() {
   console.log("onPositiveClick");
 }
-function onNegativeClick(row: any) {
+function onNegativeClick() {
   showModal.value = false;
   console.log("onNegativeClick");
 }

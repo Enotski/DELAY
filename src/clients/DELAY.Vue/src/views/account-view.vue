@@ -62,7 +62,9 @@ import {
   GlassesOutline as visibleOnPassIco,
 } from "@vicons/ionicons5";
 
-import store from "@/store";
+import { useUserStore } from "@/stores/user-store";
+
+const authStore = useUserStore();
 
 import RequestUtils from "@/utils/request-utils";
 
@@ -80,10 +82,10 @@ onMounted(async () => {
 
 async function getInfo() {
   let id = await setInterval(async () => {
-    if (store.state.user.id !== "") {
+    if (authStore.user.id !== "") {
       clearInterval(id);
       await RequestUtils.sendRequest("users", "GET", {
-        id: store.state.user.id,
+        id: authStore.user.id,
       })
         .then((response) => {
           formValue.value = response;

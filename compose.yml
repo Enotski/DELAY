@@ -1,5 +1,4 @@
-﻿version: "3.9"
-services:
+﻿services:
    webapp:
       container_name: web_api
       depends_on:

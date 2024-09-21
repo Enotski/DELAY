@@ -1,13 +1,16 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
+import mkcert from'vite-plugin-mkcert'
+import vueJsx from '@vitejs/plugin-vue-jsx';
 import vue from '@vitejs/plugin-vue'
-import fs from "fs";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    vueJsx(),
+    mkcert()
   ],
   resolve: {
     alias: {
@@ -19,10 +22,6 @@ export default defineConfig({
     port: 8043,
     watch: {
       usePolling: true,
-    },
-    https: {
-      key: fs.readFileSync("./src/certs/localhost-key.pem"),
-      cert: fs.readFileSync("./src/certs/localhost.pem"),
     },
   },
 })

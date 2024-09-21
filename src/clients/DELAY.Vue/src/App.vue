@@ -125,7 +125,7 @@
             </div>
             <div v-if="isAuthorized">
               <n-tag size="large" type="success"
-                >{{ store.state.user.name }}
+                >{{ userStore.user.name }}
                 <template #icon>
                   <n-button
                     title="Sign Out"
@@ -174,7 +174,7 @@ import {
 } from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import router from "./router";
-import store from "./store";
+import { useUserStore } from "@/stores/user-store";
 import RequestUtils from "@/utils/request-utils";
 import {
   setTokensRefreshFailedCallBack,
@@ -204,6 +204,8 @@ import {
   ConfigResponseMode,
   type AuthError,
 } from "@vkid/sdk";
+
+const userStore = useUserStore();
 
 const tokenClaimsScheme =
   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims";
@@ -236,7 +238,7 @@ const radioSignInTypeGroupValue = ref("email");
 const radioSignModalTypeGroupValue = ref("signIn");
 
 setTokensRefreshFailedCallBack(() => {
-  store.commit("clearUser");
+  userStore.clearUser();
   isAuthorized.value = false;
   console.log("silent refresh failed");
 });
@@ -247,7 +249,7 @@ function setUserData(data: any) {
   let tokenPayload = parseJwt(data.tokens.accessToken);
   console.log(tokenPayload);
 
-  store.commit("setUser", {
+  userStore.setUser({
     role: tokenPayload[tokenPayloadNames.role],
     email: tokenPayload[tokenPayloadNames.email],
     phone: tokenPayload[tokenPayloadNames.phone],
@@ -256,7 +258,7 @@ function setUserData(data: any) {
   });
 
   setMenuOptions(data.endpoints);
-  console.log(store.state.user);
+  console.log(userStore.user);
 }
 
 function onSuccessAuth(result: any) {
@@ -388,7 +390,7 @@ function onCancelSignInClick() {
 }
 
 async function onSignOut() {
-  store.commit("clearUser");
+  userStore.clearUser();
   clearAccessToken();
   isAuthorized.value = false;
   setMenuOptions([]);
@@ -454,7 +456,7 @@ function getRouteItemIcon(path: string): Component {
   }
 }
 
-const menuOptions = ref<MenuOption[]>([
+const menuOptions = ref<MenuOption[] | any[]>([
   {
     label: () =>
       h(

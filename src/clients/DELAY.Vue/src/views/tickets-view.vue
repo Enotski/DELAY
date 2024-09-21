@@ -153,12 +153,14 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import RequestUtils from "@/utils/request-utils";
+import { type IBoardDto } from "@/interfaces/contracts/board-dto";
 import { NDataTable, NButton, NIcon, NDivider, NInput, NModal } from "naive-ui";
 import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
 import { Add as plusIco, Remove as minusIco } from "@vicons/ionicons5";
+import type { ITicketDto } from "@/interfaces/contracts/ticket-dto";
 
 const boardsData = ref([
   {
@@ -318,7 +320,7 @@ onMounted(async () => {});
 //   );
 // };
 
-const boardsColumns: TableColumn[] = [
+const boardsColumns: TableColumn<IBoardDto>[] = [
   {
     title: "Boards",
     align: "center",
@@ -368,7 +370,7 @@ const boardsColumns: TableColumn[] = [
   },
 ];
 
-const ticketsColumns: TableColumn[] = [
+const ticketsColumns: TableColumn<ITicketDto>[] = [
   {
     title: "Tickets",
     align: "center",

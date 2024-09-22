@@ -23,7 +23,7 @@ namespace DELAY.Core.Application.Contracts.Models
 
         public string? Password { get; set; }
     }
-    public class UserrPasswordUpdateRequestDto: KeyDto
+    public class UserPasswordRequestDto: KeyDto
     {
         public string Password { get; set; }
     }

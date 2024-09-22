@@ -35,7 +35,7 @@ namespace DELAY.Presentation.RestAPI
             {
                 x.AllowAnyMethod()
                 .AllowAnyHeader()
-                .WithOrigins("https://localhost", "https://localhost:443") // путь к нашему SPA клиенту
+                .WithOrigins("https://localhost", "https://localhost:443", "https://localhost:8043") // путь к нашему SPA клиенту
                 .AllowCredentials();
             });
 

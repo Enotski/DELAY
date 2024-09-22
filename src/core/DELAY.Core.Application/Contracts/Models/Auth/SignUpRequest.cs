@@ -2,7 +2,7 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Auth
 {
-    public class SignUpRequest : AuthUserAgentRequest
+    public class SignUpRequest : SignInRequest
     {
         public SignUpRequest()
         {
@@ -10,14 +10,5 @@ namespace DELAY.Core.Application.Contracts.Models.Auth
 
         [Required]
         public string Name { get; set; }
-
-        [Phone]
-        public string? Phone { get; set; }
-
-        [EmailAddress]
-        public string? Email { get; set; }
-
-        [Required]
-        public string Password { get; set; }
     }
 }

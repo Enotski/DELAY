@@ -175,13 +175,8 @@ import {
 import type { MenuOption } from "naive-ui";
 import router from "./router";
 import { useUserStore } from "@/stores/user-store";
-import RequestUtils from "@/utils/request-utils";
-import {
-  setTokensRefreshFailedCallBack,
-  setAccessToken,
-  clearAccessToken,
-  parseJwt,
-} from "@/utils/request-utils";
+import { RequestUtils } from "@/utils";
+
 import { makeId } from "@/utils/random-generator";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { googleSdkLoaded } from "vue3-google-login";
@@ -237,7 +232,7 @@ const showSignInModal = ref(false);
 const radioSignInTypeGroupValue = ref("email");
 const radioSignModalTypeGroupValue = ref("signIn");
 
-setTokensRefreshFailedCallBack(() => {
+RequestUtils.setTokensRefreshFailedCallBack(() => {
   userStore.clearUser();
   isAuthorized.value = false;
   console.log("silent refresh failed");
@@ -246,7 +241,7 @@ setTokensRefreshFailedCallBack(() => {
 function setUserData(data: any) {
   isAuthorized.value = true;
 
-  let tokenPayload = parseJwt(data.tokens.accessToken);
+  let tokenPayload = RequestUtils.parseJwt(data.tokens.accessToken);
   console.log(tokenPayload);
 
   userStore.setUser({
@@ -264,7 +259,7 @@ function setUserData(data: any) {
 function onSuccessAuth(result: any) {
   showSignInModal.value = false;
 
-  setAccessToken(result.tokens.accessToken);
+  RequestUtils.setAccessToken(result.tokens.accessToken);
   setUserData(result);
 }
 const formValue = ref({
@@ -292,9 +287,10 @@ onMounted(async () => {
   if (fingerprint === "") await setFingerprint();
 
   if (isAuthorized.value == false) {
-    await RequestUtils.sendRequest("auth/signin-transient", "GET", {
-      fingerprint: fingerprint,
-    })
+    await RequestUtils.default
+      .sendRequest("auth/signin-transient", "GET", {
+        fingerprint: fingerprint,
+      })
       .then((response) => {
         onSuccessAuth(response);
       })
@@ -317,12 +313,14 @@ const loginGoogle = () => {
 
           if (fingerprint === "") await setFingerprint();
 
-          await RequestUtils.sendRequest("auth/signin-google", "POST", {
-            code: response.code,
-            fingerprint: fingerprint,
-          }).then((response) => {
-            onSuccessAuth(response);
-          });
+          await RequestUtils.default
+            .sendRequest("auth/signin-google", "POST", {
+              code: response.code,
+              fingerprint: fingerprint,
+            })
+            .then((response) => {
+              onSuccessAuth(response);
+            });
         },
       })
       .requestCode();
@@ -348,14 +346,16 @@ const loginVk = () => {
 
       if (fingerprint === "") await setFingerprint();
 
-      await RequestUtils.sendRequest("auth/signin-vk", "POST", {
-        code: response.code,
-        deviceId: response.device_id,
-        codeVerifier: codeVerifier,
-        fingerprint: fingerprint,
-      }).then((response) => {
-        onSuccessAuth(response);
-      });
+      await RequestUtils.default
+        .sendRequest("auth/signin-vk", "POST", {
+          code: response.code,
+          deviceId: response.device_id,
+          codeVerifier: codeVerifier,
+          fingerprint: fingerprint,
+        })
+        .then((response) => {
+          onSuccessAuth(response);
+        });
     })
     .catch((e: AuthError) => {
       console.error("Ошибка Auth.login()", e);
@@ -372,17 +372,17 @@ async function onConfirmSignInClick() {
   formValue.value.fingerprint = fingerprint;
 
   if (radioSignModalTypeGroupValue.value == "signIn") {
-    await RequestUtils.sendRequest("auth/signin", "POST", formValue.value).then(
-      (response) => {
+    await RequestUtils.default
+      .sendRequest("auth/signin", "POST", formValue.value)
+      .then((response) => {
         onSuccessAuth(response);
-      }
-    );
+      });
   } else {
-    await RequestUtils.sendRequest("auth/signup", "POST", formValue.value).then(
-      (response) => {
+    await RequestUtils.default
+      .sendRequest("auth/signup", "POST", formValue.value)
+      .then((response) => {
         onSuccessAuth(response);
-      }
-    );
+      });
   }
 }
 function onCancelSignInClick() {
@@ -391,15 +391,17 @@ function onCancelSignInClick() {
 
 async function onSignOut() {
   userStore.clearUser();
-  clearAccessToken();
+  RequestUtils.clearAccessToken();
   isAuthorized.value = false;
   setMenuOptions([]);
 
   router.push("/");
 
-  await RequestUtils.sendRequest("auth/signout", "POST").catch((error) => {
-    console.log(error);
-  });
+  await RequestUtils.default
+    .sendRequest("auth/signout", "POST")
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 async function setFingerprint() {

@@ -10,7 +10,7 @@
     {
         None = 0,
         User,
-        Moder,
+        Moderator,
         Admin,
     }
     public enum RoomRoleType

@@ -19,7 +19,8 @@ export default defineConfig({
   },
   server: {
     host: true,
-    port: 8043,
+    port: 443,
+    // Для docker заккоментить
     watch: {
       usePolling: true,
     },

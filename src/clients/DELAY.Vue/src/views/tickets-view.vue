@@ -153,14 +153,13 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
 import RequestUtils from "@/utils/request-utils";
-import { type IBoardDto } from "@/interfaces/contracts/board-dto";
 import { NDataTable, NButton, NIcon, NDivider, NInput, NModal } from "naive-ui";
 import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
 import { Add as plusIco, Remove as minusIco } from "@vicons/ionicons5";
-import type { ITicketDto } from "@/interfaces/contracts/ticket-dto";
+import type { ITicketDto, IBoardDto } from "@/interfaces";
 
 const boardsData = ref([
   {

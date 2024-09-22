@@ -521,7 +521,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdatePasswordAsync([FromBody] UserrPasswordUpdateRequestDto model)
+        public async Task<IActionResult> UpdatePasswordAsync([FromBody] UserPasswordRequestDto model)
         {
             try
             {

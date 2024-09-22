@@ -53,6 +53,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
             return new AuthResponseDto(new TokensResponseDto(authResult.Tokens.AccessToken), endpoints);
         }
 
+
         [HttpGet]
         [Route("signin-transient")]
         public async Task<IActionResult> TransientSingInByRefreshTokenAsync(string fingerPrint)

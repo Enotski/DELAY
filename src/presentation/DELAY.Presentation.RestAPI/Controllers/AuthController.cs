@@ -110,7 +110,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                model.SetUserAgentData(UserAgentData, RemoteIpAddress);
+                model.SetUserAgentData(RemoteIpAddress, UserAgentData);
 
                 var authResultModel = await _authService.SignInAsync(model);
 
@@ -135,7 +135,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                model.SetUserAgentData(UserAgentData, RemoteIpAddress);
+                model.SetUserAgentData(RemoteIpAddress, UserAgentData);
 
                 var authResultModel = await _authService.SignUpAsync(model);
 
@@ -160,7 +160,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                model.SetUserAgentData(UserAgentData, RemoteIpAddress);
+                model.SetUserAgentData(RemoteIpAddress, UserAgentData);
 
                 var authResultModel = await _authService.SignInGoogleAsync(model);
 
@@ -184,7 +184,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                model.SetUserAgentData(UserAgentData, RemoteIpAddress);
+                model.SetUserAgentData(RemoteIpAddress, UserAgentData);
 
                 var authResultModel = await _authService.SignInVkAsync(model);
 

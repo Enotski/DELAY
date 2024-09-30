@@ -1,7 +1,6 @@
 using DELAY.Core.Application;
-using DELAY.Infrastructure.DependencyInjections;
+using DELAY.Infrastructure;
 using Microsoft.AspNetCore.CookiePolicy;
-using System.Configuration;
 
 namespace DELAY.Presentation.RestAPI
 {
@@ -16,7 +15,7 @@ namespace DELAY.Presentation.RestAPI
 
             builder.Services
                 .AddApplication()
-                .AddInfrastructure(builder.Configuration)
+                .AddInfrasturcture(builder.Configuration)
                 .AddPresentation(builder.Configuration);
 
             builder.ConfigureWebApplication();
@@ -35,7 +34,7 @@ namespace DELAY.Presentation.RestAPI
             {
                 x.AllowAnyMethod()
                 .AllowAnyHeader()
-                .WithOrigins("https://localhost", "https://localhost:443", "https://localhost:8043") // путь к нашему SPA клиенту
+                .WithOrigins("https://localhost", "https://localhost:443", "https://localhost:8043")
                 .AllowCredentials();
             });
 

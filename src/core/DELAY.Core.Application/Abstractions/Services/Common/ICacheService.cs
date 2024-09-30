@@ -1,6 +1,6 @@
 ﻿namespace DELAY.Core.Application.Abstractions.Services.Common
 {
-    public interface ICachingService
+    public interface ICacheService
     {
         /// <summary>
         /// Сохранение в кэш
@@ -8,21 +8,24 @@
         /// <typeparam name="TValue">Тип значения</typeparam>
         /// <param name="key">Ключ значения</param>
         /// <param name="val">Значение</param>
-        public void SetValueToCache<TValue>(object key, TValue val, DateTimeOffset absoluteExpiration) where TValue : class;
-        public void SetValueToCache<TValue>(object key, TValue val) where TValue : class;
+        bool SetData<TValue>(string key, TValue val, DateTimeOffset absoluteExpiration);
+        bool SetData<TValue>(string key, TValue val);
 
         /// <summary>
         /// Удаление значения из кэша
         /// </summary>
         /// <typeparam name="TValue">Тип значения</typeparam>
         /// <param name="key">Ключ значения</param>
-        public void RemoveValueFromCache(object key);
+        bool RemoveData(string key);
+        bool RemoveData(IEnumerable<string> keys);
 
         /// <summary>
         /// Получение значения из кэша
         /// </summary>
         /// <typeparam name="TValue">Тип значения</typeparam>
         /// <param name="key">Ключ значения</param>
-        public TValue GetValueFromCache<TValue>(object key) where TValue : class;
+        TValue? GetData<TValue>(string key);
+
+        Task ClearCacheAsync();
     }
 }

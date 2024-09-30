@@ -17,6 +17,9 @@
 	<ItemGroup>
     <ProjectReference Include="..\..\core\DELAY.Core.Application\DELAY.Core.Application.csproj" />
     <ProjectReference Include="..\..\core\DELAY.Core.Domain\DELAY.Core.Domain.csproj" />
+    <ProjectReference Include="..\DELAY.Infrastructure.Auth\DELAY.Infrastructure.Auth.csproj" />
+    <ProjectReference Include="..\DELAY.Infrastructure.Caching\DELAY.Infrastructure.Caching.csproj" />
+    <ProjectReference Include="..\DELAY.Infrastructure.Persistence\DELAY.Infrastructure.Persistence.csproj" />
   </ItemGroup>
 
 

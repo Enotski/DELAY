@@ -12,7 +12,6 @@ WORKDIR /src
 COPY ["src/presentation/DELAY.Presentation.RestAPI/DELAY.Presentation.RestAPI.csproj", "src/presentation/DELAY.Presentation.RestAPI/"]
 COPY ["src/core/DELAY.Core.Application/DELAY.Core.Application.csproj", "src/core/DELAY.Core.Application/"]
 COPY ["src/core/DELAY.Core.Domain/DELAY.Core.Domain.csproj", "src/core/DELAY.Core.Domain/"]
-COPY ["src/infrastructure/DELAY.Infrastructure.DependencyInjection/DELAY.Infrastructure.DependencyInjections.csproj", "src/infrastructure/DELAY.Infrastructure.DependencyInjection/"]
 COPY ["src/infrastructure/DELAY.Infrastructure.Auth/DELAY.Infrastructure.Auth.csproj", "src/infrastructure/DELAY.Infrastructure.Auth/"]
 COPY ["src/infrastructure/DELAY.Infrastructure/DELAY.Infrastructure.csproj", "src/infrastructure/DELAY.Infrastructure/"]
 COPY ["src/infrastructure/DELAY.Infrastructure.Caching/DELAY.Infrastructure.Caching.csproj", "src/infrastructure/DELAY.Infrastructure.Caching/"]

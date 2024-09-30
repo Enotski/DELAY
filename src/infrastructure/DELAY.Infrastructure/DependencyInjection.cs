@@ -1,7 +1,10 @@
-﻿using DELAY.Core.Application.Abstractions.Mapper;
-using DELAY.Core.Application.Abstractions.Services.Auth;
+﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Mapper;
+using DELAY.Infrastructure.Auth;
+using DELAY.Infrastructure.Caching;
 using DELAY.Infrastructure.Helpers;
+using DELAY.Infrastructure.Persistence;
 using Mapster;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,15 +15,18 @@ namespace DELAY.Infrastructure
     public static class DependencyInjection
     {
 
-        public static IServiceCollection AddInfrasturctureServices(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddInfrasturcture(this IServiceCollection services, ConfigurationManager configurationManager)
         {
-            services.AddServices(config)
-                .AddMapperService();
+            services.AddServices()
+                .AddMapperService()
+                .AddPersistenceServices(configurationManager)
+                .AddCachingServices(configurationManager)
+                .AddAuthServices();
 
             return services;
         }
 
-        private static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddSingleton<IPasswordHelper, PasswordHelper>();
 

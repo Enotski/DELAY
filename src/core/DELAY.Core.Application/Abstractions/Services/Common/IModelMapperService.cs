@@ -1,4 +1,4 @@
-﻿namespace DELAY.Core.Application.Abstractions.Mapper
+﻿namespace DELAY.Core.Application.Abstractions.Services.Common
 {
     public interface IModelMapperService
     {

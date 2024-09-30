@@ -1,4 +1,4 @@
-﻿using DELAY.Core.Application.Abstractions.Mapper;
+﻿using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Domain.Models;

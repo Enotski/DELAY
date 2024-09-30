@@ -3,6 +3,7 @@
       container_name: web_api
       depends_on:
          - db
+         - redis
       build:
          context: .
          dockerfile: src/presentation/DELAY.Presentation.RestAPI/Dockerfile
@@ -17,6 +18,7 @@
       volumes:
          - ~/.aspnet/https:/https:ro
          - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+
    db:
       container_name: pg_db
       image: postgres:16.4
@@ -28,5 +30,16 @@
          - "8001:5432"
       volumes:
          - pgdb:/var/lib/postgresql/data
+
+   redis:
+      container_name: delay-redis
+      image: redis:latest
+      environment:
+         REDIS_HOST: delay-redis
+         REDIS_PORT: 6379
+      ports:
+         - 6379:6379
+      restart: always
+
 volumes:
    pgdb:

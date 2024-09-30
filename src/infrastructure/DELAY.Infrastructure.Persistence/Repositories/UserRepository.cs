@@ -1,12 +1,12 @@
-﻿using DELAY.Core.Application.Abstractions.Mapper;
+﻿using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Enums;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
+using DELAY.Core.Application.Extensions;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
 using DELAY.Core.Domain.Models.Base;
-using DELAY.Infrastructure.Extensions;
 using DELAY.Infrastructure.Persistence.Builders;
 using DELAY.Infrastructure.Persistence.Context;
 using DELAY.Infrastructure.Persistence.Entities;
@@ -17,7 +17,7 @@ using System.Linq.Expressions;
 
 namespace DELAY.Infrastructure.Persistence.Repositories
 {
-    
+
     internal class UserRepository : NamedRepository<UserEntity, User>, IUserStorage
     {
         public UserRepository(DelayContext context, IModelMapperService mapper) : base(context, mapper)

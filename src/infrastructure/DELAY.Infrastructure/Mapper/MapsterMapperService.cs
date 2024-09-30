@@ -1,4 +1,4 @@
-﻿using DELAY.Core.Application.Abstractions.Mapper;
+﻿using DELAY.Core.Application.Abstractions.Services.Common;
 using MapsterMapper;
 
 namespace DELAY.Core.Application.Mapper

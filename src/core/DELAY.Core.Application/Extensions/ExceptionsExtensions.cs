@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace DELAY.Infrastructure.Extensions
+namespace DELAY.Core.Application.Extensions
 {
     public static class ExceptionsExtensions
     {

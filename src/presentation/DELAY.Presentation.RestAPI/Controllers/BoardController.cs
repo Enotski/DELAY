@@ -1,8 +1,8 @@
-﻿using DELAY.Core.Application.Abstractions.Mapper;
+﻿using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Abstractions.Services.Tickets;
 using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Application.Extensions;
 using DELAY.Core.Domain.Models;
-using DELAY.Infrastructure.Extensions;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
 

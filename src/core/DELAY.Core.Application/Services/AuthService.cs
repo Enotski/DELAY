@@ -5,7 +5,6 @@ using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
-using System.Reflection;
 
 namespace DELAY.Core.Application.Services
 {
@@ -17,13 +16,13 @@ namespace DELAY.Core.Application.Services
 
         private readonly IPasswordHelper _passwordHelper;
 
-        private readonly ICachingService _cacheService;
+        private readonly ICacheService _cacheService;
 
         private readonly ITokensService _tokensService;
 
         private readonly IUserStorage _userStorage;
 
-        public AuthService(IGoogleAuthService googleAuthService, IVkAuthService vkAuthService, IPasswordHelper passwordHelper, ICachingService cacheService, ITokensService tokensService, IUserStorage userStorage)
+        public AuthService(IGoogleAuthService googleAuthService, IVkAuthService vkAuthService, IPasswordHelper passwordHelper, ICacheService cacheService, ITokensService tokensService, IUserStorage userStorage)
         {
             _googleAuthService = googleAuthService;
             _vkAuthService = vkAuthService;
@@ -38,12 +37,12 @@ namespace DELAY.Core.Application.Services
             if (!_tokensService.IsValidToken(refreshToken))
                 return null;
 
-            var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
+            var cachedSession = _cacheService.GetData<SessionCache>(refreshToken);
 
             if (cachedSession == null)
                 return null;
 
-            _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
+            _cacheService.RemoveData(cachedSession.RefreshToken);
 
             if (!_tokensService.IsValidToken(cachedSession.RefreshToken))
             {
@@ -60,12 +59,12 @@ namespace DELAY.Core.Application.Services
             if (!_tokensService.IsValidToken(refreshToken))
                 return null;
 
-            var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
+            var cachedSession = _cacheService.GetData<SessionCache>(refreshToken);
 
             if (cachedSession == null)
                 return null;
 
-            _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
+            _cacheService.RemoveData(cachedSession.RefreshToken);
 
             if (!_tokensService.IsValidToken(cachedSession.RefreshToken))
             {
@@ -129,46 +128,46 @@ namespace DELAY.Core.Application.Services
 
         public void SignOut(string refreshToken)
         {
-            var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
+            var cachedSession = _cacheService.GetData<SessionCache>(refreshToken);
 
             if (cachedSession != null)
             {
-                _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
+                _cacheService.RemoveData(cachedSession.RefreshToken);
             }
 
             var root = _tokensService.GetPrincipal(refreshToken, out DateTime validTo)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
 
-            var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
+            var cachedRootSession = _cacheService.GetData<RootUserSessionCache>(root.Value);
 
             if(cachedRootSession != null)
             {
                 cachedRootSession.SessionsKeys = cachedRootSession.SessionsKeys.Where(x => x != refreshToken);
 
-                _cacheService.SetValueToCache(root.Value, cachedRootSession);
+                _cacheService.SetData(root.Value, cachedRootSession);
             }
         }
 
         public void SignOutAll(string refreshToken)
         {
-            var cachedSession = _cacheService.GetValueFromCache<SessionCache>(refreshToken);
+            var cachedSession = _cacheService.GetData<SessionCache>(refreshToken);
 
             if (cachedSession != null)
             {
-                _cacheService.RemoveValueFromCache(cachedSession.RefreshToken);
+                _cacheService.RemoveData(cachedSession.RefreshToken);
             }
 
             var root = _tokensService.GetPrincipal(refreshToken, out DateTime validTo)?.Claims?.FirstOrDefault(x => x.Type == "ueid");
 
-            var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
+            var cachedRootSession = _cacheService.GetData<RootUserSessionCache>(root.Value);
 
             if (cachedRootSession != null)
             {
                 cachedRootSession.SessionsKeys = cachedRootSession.SessionsKeys.Where(x => x != refreshToken);
 
                 foreach (var key in cachedRootSession.SessionsKeys)
-                    _cacheService.RemoveValueFromCache(key);
+                    _cacheService.RemoveData(key);
 
-                _cacheService.RemoveValueFromCache(root.Value);
+                _cacheService.RemoveData(root.Value);
             }
         }
 
@@ -206,11 +205,11 @@ namespace DELAY.Core.Application.Services
 
             var session = new SessionCache(Guid.NewGuid(), refreshToken, user.Id, authModel.Fingerprint, authModel.IpAddress, authModel.UserAgent, DateTime.UtcNow, validTo, authProvider);
 
-            _cacheService.SetValueToCache(refreshToken, session, validTo);
+            _cacheService.SetData(refreshToken, session, validTo);
 
             var root = tokenClaims?.FirstOrDefault(x => x.Type == "ueid");
 
-            var cachedRootSession = _cacheService.GetValueFromCache<RootUserSessionCache>(root.Value);
+            var cachedRootSession = _cacheService.GetData<RootUserSessionCache>(root.Value);
 
             if (cachedRootSession == null)
             {
@@ -221,7 +220,7 @@ namespace DELAY.Core.Application.Services
                 if(cachedRootSession.SessionsKeys.Count() >= 5)
                 {
                     foreach (var key in cachedRootSession.SessionsKeys)
-                        _cacheService.RemoveValueFromCache(key);
+                        _cacheService.RemoveData(key);
 
                     cachedRootSession.SessionsKeys = [refreshToken];
                 }
@@ -231,7 +230,7 @@ namespace DELAY.Core.Application.Services
                 }
             }
 
-            _cacheService.SetValueToCache(root.Value, cachedRootSession);
+            _cacheService.SetData(root.Value, cachedRootSession);
         }
 
         private async Task ValidateUserAsync(User user, bool isValidatePassword)

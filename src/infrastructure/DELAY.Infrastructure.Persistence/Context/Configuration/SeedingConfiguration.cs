@@ -10,7 +10,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             builder.Entity<TicketEntity>().HasData(GetPreconfiguredTicketEntities());
             builder.Entity<UserEntity>().HasData(GetPreconfiguredUsetEntities());
             builder.Entity<BoardEntity>().HasData(GetPreconfiguredBoardEntities());
-            builder.Entity<RoomEntity>().HasData(GetPreconfiguredRoomEntities());
+            builder.Entity<ChatRoomEntity>().HasData(GetPreconfiguredRoomEntities());
         }
 
         private static UserEntity[] GetPreconfiguredUsetEntities()
@@ -51,28 +51,24 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
                 new BoardEntity() {
                     Id = Guid.NewGuid(),
                     Name = "Default board 1",
-                    Description = "Default desctiption",
                 },
                 new BoardEntity() {
                     Id = Guid.NewGuid(),
                     Name = "Default board 2",
-                    Description = "Default desctiption",
                 },
             ];
         }
 
-        private static RoomEntity[] GetPreconfiguredRoomEntities()
+        private static ChatRoomEntity[] GetPreconfiguredRoomEntities()
         {
             return [
-                new RoomEntity() {
+                new ChatRoomEntity() {
                     Id = Guid.NewGuid(),
                     Name = "Default room 1",
-                    Description = "Default desctiption",
                 },
-                new RoomEntity() {
+                new ChatRoomEntity() {
                     Id = Guid.NewGuid(),
                     Name = "Default room 2",
-                    Description = "Default desctiption",
                 },
             ];
         }

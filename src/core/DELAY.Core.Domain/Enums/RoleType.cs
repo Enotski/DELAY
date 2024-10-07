@@ -13,7 +13,7 @@
         Moderator,
         Admin,
     }
-    public enum RoomRoleType
+    public enum ChatRoomRoleType
     {
         None = 0,
         User,

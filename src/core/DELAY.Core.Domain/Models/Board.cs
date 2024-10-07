@@ -3,28 +3,25 @@ using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Domain.Models
 {
-    public class Board : KeyNamedModel, IDescriptioin
+    public class Board : KeyNamedModel
     {
-        public Board(string name, string description, string createdBy) : base(name)
+        public Board(string name, string createdBy) : base(name)
         {
-            Description = description;
             CreateDate = DateTime.UtcNow;
             ChangeDate = CreateDate;
             CreatedBy = createdBy;
         }
 
-        public Board(Guid id, string name, string description) : base(id, name)
+        public Board(Guid id, string name) : base(id, name)
         {
-            Description = description;
         }
 
         public Board()
         {
         }
 
-        public void Update(string name, string description, string changedBy)
+        public void Update(string name, string changedBy)
         {
-            Description = description;
             ChangeDate = DateTime.UtcNow;
             ChangedBy = changedBy;
 
@@ -36,12 +33,13 @@ namespace DELAY.Core.Domain.Models
             return !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(CreatedBy);
         }
 
-        public Room Room { get; set; }
-        public string Description { get; set; }
         public string CreatedBy { get; set; }
         public string ChangedBy { get; set; }
         public DateTime ChangeDate { get; set; }
         public DateTime CreateDate { get; set; }
+
+        public IEnumerable<TicketsList> TicketsLists { get; set; }
+        public IEnumerable<ChatRoom> ChatRooms { get; set; }
         public IEnumerable<BoardUser> BoardUsers { get; set; } = new List<BoardUser>();
     }
 }

@@ -51,7 +51,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 defaultValue: "");
 
             migrationBuilder.AddColumn<Guid>(
-                name: "RoomId",
+                name: "ChatRoomId",
                 table: "Boards",
                 type: "uuid",
                 nullable: true);
@@ -59,14 +59,14 @@ namespace DELAY.Infrastructure.Persistence.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Boards_RoomId",
                 table: "Boards",
-                column: "RoomId");
+                column: "ChatRoomId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Boards_Rooms_RoomId",
                 table: "Boards",
-                column: "RoomId",
+                column: "ChatRoomId",
                 principalTable: "Rooms",
-                principalColumn: "RoomId");
+                principalColumn: "ChatRoomId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Tickets_Users_ChangedById",
@@ -108,7 +108,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 table: "Boards");
 
             migrationBuilder.DropColumn(
-                name: "RoomId",
+                name: "ChatRoomId",
                 table: "Boards");
 
             migrationBuilder.AlterColumn<Guid>(

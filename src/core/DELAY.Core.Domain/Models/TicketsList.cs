@@ -15,5 +15,10 @@ namespace DELAY.Core.Domain.Models
         public TicketsList(Guid id, string name) : base(id, name)
         {
         }
+
+        public Guid BoardId { get; set; }
+        public Board Board { get; set; }
+
+        public IEnumerable<Ticket> Tickets { get; set; }
     }
 }

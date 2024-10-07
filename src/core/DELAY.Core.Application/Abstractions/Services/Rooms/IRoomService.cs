@@ -2,27 +2,27 @@
 
 namespace DELAY.Core.Application.Abstractions.Services.Rooms
 {
-    internal interface IRoomService : INamedService<Room>
+    internal interface IRoomService : INamedService<ChatRoom>
     {
         /// <summary>
         /// Create room
         /// </summary>
-        /// <param name="room">Room model</param>
+        /// <param name="room">ChatRoom model</param>
         /// <returns></returns>
-        Task CreateAsync(Room user);
+        Task CreateAsync(ChatRoom user);
 
         /// <summary>
         /// Update room
         /// </summary>
-        /// <param name="room">Room updated model</param>
+        /// <param name="room">ChatRoom updated model</param>
         /// <returns></returns>
-        Task UpdateAsync(Room room);
+        Task UpdateAsync(ChatRoom room);
 
         /// <summary>
         /// Get boards assigned to user
         /// </summary>
         /// <param name="userId">User id</param>
         /// <returns></returns>
-        Task<IReadOnlyList<Room>> GetTicketsAssignedToUser(Guid userId);
+        Task<IReadOnlyList<ChatRoom>> GetTicketsAssignedToUser(Guid userId);
     }
 }

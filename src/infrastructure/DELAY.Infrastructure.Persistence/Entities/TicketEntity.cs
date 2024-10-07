@@ -6,15 +6,16 @@ namespace DELAY.Infrastructure.Persistence.Entities
     /// <summary>
     /// Task in tracker
     /// </summary>
-    public class TicketEntity : KeyNamedModelEntity, IDescriptioin
+    public class TicketEntity : KeyNamedEntity, IDescriptioin
     {
 
         public string Description { get; set; }
 
         public DateTime ChangedDate { get; set; }
+        public DateTime CreateDate { get; set; }
 
-        public Guid? ChangedById { get; set; }
-        public UserEntity ChangedBy { get; set; }
+        public string ChangedBy { get; set; }
+        public string CreatedBy { get; set; }
 
         public Guid TicketListId { get; set; }
         public TicketsListEntity TicketList { get; set; }

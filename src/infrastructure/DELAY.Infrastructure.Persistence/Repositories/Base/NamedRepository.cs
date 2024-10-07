@@ -12,7 +12,7 @@ using DELAY.Core.Application.Extensions;
 
 namespace DELAY.Infrastructure.Persistence.Repositories.Base
 {
-    internal abstract class NamedRepository<TEntity, TDomain> : BaseRepository<TEntity, TDomain>, INamedStorage<TDomain>
+    internal abstract class NamedRepository<TEntity, TDomain> : KeyRepository<TEntity, TDomain>, INamedStorage<TDomain>
         where TEntity : class, IKey, IName
         where TDomain : class, IKey, IName
     {

@@ -38,9 +38,9 @@ namespace DELAY.Core.Application.Services
 
             var triggered = await ValidatePermissionToOperation(Domain.Enums.RoleType.User, triggeredBy);
 
-            var board = new Board(model.Name, model.Description, triggered.Name);
+            var board = new Board(model.Name, triggered.Name);
 
-            board.BoardUsers = new List<BoardUser>() { new BoardUser(board, new KeyNamedModel(triggered.Id, triggered.Name), Domain.Enums.RoleType.Admin) };
+            board.BoardUsers = new List<BoardUser>() { new BoardUser(board, new KeyNamedModel(triggered.Id, triggered.Name), Domain.Enums.BoardRoleType.Admin) };
 
             if (!board.IsValid())
                 throw new ArgumentException("Invalid board data");

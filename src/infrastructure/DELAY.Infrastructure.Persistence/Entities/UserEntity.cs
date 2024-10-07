@@ -4,7 +4,7 @@ using DELAY.Infrastructure.Persistence.Entities.Base;
 
 namespace DELAY.Infrastructure.Persistence.Entities
 {
-    public class UserEntity : KeyModelEntity, IName
+    public class UserEntity : KeyEntity, IName
     {
         public string? Name { get; set; }
 
@@ -22,14 +22,12 @@ namespace DELAY.Infrastructure.Persistence.Entities
 
         public RoleType Role { get; set; }
 
-        public ICollection<TicketEntity> ChangedTickets { get; set; }
-
         public ICollection<SessionLogEntity> Sessions { get; set; }
 
         public ICollection<TicketUserEntity> AssignedTickets { get; set; } = new List<TicketUserEntity>();
 
         public ICollection<BoardUserEntity> BoardUsers { get; set; } = new List<BoardUserEntity>();
 
-        public ICollection<RoomUserEntity> RoomUsers { get; set; } = new List<RoomUserEntity>();
+        public ICollection<ChatRoomUserEntity> ChatRoomUsers { get; set; } = new List<ChatRoomUserEntity>();
     }
 }

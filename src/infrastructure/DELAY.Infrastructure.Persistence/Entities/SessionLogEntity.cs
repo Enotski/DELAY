@@ -3,7 +3,7 @@ using DELAY.Infrastructure.Persistence.Entities.Base;
 
 namespace DELAY.Infrastructure.Persistence.Entities
 {
-    public class SessionLogEntity : KeyModelEntity
+    public class SessionLogEntity : KeyEntity
     {
         public SessionLogEntity()
         {

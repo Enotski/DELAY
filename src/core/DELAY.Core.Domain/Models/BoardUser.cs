@@ -3,13 +3,13 @@ using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Domain.Models
 {
-    public class BoardUser : KeyModel
+    public class BoardUser
     {
         public BoardUser()
         {
         }
 
-        public BoardUser(Board board, KeyNamedModel user, RoleType userRole)
+        public BoardUser(Board board, KeyNamedModel user, BoardRoleType userRole)
         {
             Board = board;
             User = user;
@@ -18,6 +18,6 @@ namespace DELAY.Core.Domain.Models
 
         public KeyNamedModel Board { get; set; }
         public KeyNamedModel User { get; set; }
-        public RoleType UserRole { get; set; }
+        public BoardRoleType UserRole { get; set; }
     }
 }

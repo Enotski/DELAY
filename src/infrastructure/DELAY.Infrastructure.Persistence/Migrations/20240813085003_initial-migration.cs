@@ -94,7 +94,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RoomUsers",
+                name: "ChatRoomUsers",
                 columns: table => new
                 {
                     RoomUserId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -109,7 +109,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         name: "FK_RoomUsers_Rooms_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Rooms",
-                        principalColumn: "RoomId",
+                        principalColumn: "ChatRoomId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RoomUsers_Users_UserId",
@@ -184,12 +184,12 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoomUsers_RoomId",
-                table: "RoomUsers",
-                column: "RoomId");
+                table: "ChatRoomUsers",
+                column: "ChatRoomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoomUsers_UserId",
-                table: "RoomUsers",
+                table: "ChatRoomUsers",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -220,7 +220,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 name: "BoardUsers");
 
             migrationBuilder.DropTable(
-                name: "RoomUsers");
+                name: "ChatRoomUsers");
 
             migrationBuilder.DropTable(
                 name: "TicketUsers");

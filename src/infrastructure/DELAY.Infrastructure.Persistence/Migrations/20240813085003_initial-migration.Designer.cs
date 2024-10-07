@@ -70,12 +70,12 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.ToTable("BoardUsers", (string)null);
                 });
 
-            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.RoomEntity", b =>
+            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.ChatRoomEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("RoomId");
+                        .HasColumnName("ChatRoomId");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -90,14 +90,14 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.ToTable("Rooms", (string)null);
                 });
 
-            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.RoomUserEntity", b =>
+            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.ChatRoomUserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("RoomUserId");
 
-                    b.Property<Guid>("RoomId")
+                    b.Property<Guid>("ChatRoomId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
@@ -108,11 +108,11 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("ChatRoomId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RoomUsers", (string)null);
+                    b.ToTable("ChatRoomUsers", (string)null);
                 });
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.TicketEntity", b =>
@@ -246,21 +246,21 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.RoomUserEntity", b =>
+            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.ChatRoomUserEntity", b =>
                 {
-                    b.HasOne("DELAY.Infrastructure.Persistence.Entities.Base.RoomEntity", "Room")
-                        .WithMany("RoomUsers")
-                        .HasForeignKey("RoomId")
+                    b.HasOne("DELAY.Infrastructure.Persistence.Entities.Base.ChatRoomEntity", "ChatRoom")
+                        .WithMany("ChatRoomUsers")
+                        .HasForeignKey("ChatRoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DELAY.Infrastructure.Persistence.Entities.Base.UserEntity", "User")
-                        .WithMany("RoomUsers")
+                        .WithMany("ChatRoomUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Room");
+                    b.Navigation("ChatRoom");
 
                     b.Navigation("User");
                 });
@@ -308,9 +308,9 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Navigation("BoardUsers");
                 });
 
-            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.RoomEntity", b =>
+            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.ChatRoomEntity", b =>
                 {
-                    b.Navigation("RoomUsers");
+                    b.Navigation("ChatRoomUsers");
                 });
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.Base.TicketEntity", b =>
@@ -331,7 +331,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
                     b.Navigation("ChangedTickets");
 
-                    b.Navigation("RoomUsers");
+                    b.Navigation("ChatRoomUsers");
                 });
 #pragma warning restore 612, 618
         }

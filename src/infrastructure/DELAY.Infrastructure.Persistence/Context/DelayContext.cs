@@ -15,9 +15,9 @@ namespace DELAY.Infrastructure.Persistence.Context
 
         public DbSet<BoardUserEntity> BoardUsers { get; set; }
 
-        public DbSet<RoomEntity> Rooms { get; set; }
+        public DbSet<ChatRoomEntity> Rooms { get; set; }
 
-        public DbSet<RoomUserEntity> RoomUsers { get; set; }
+        public DbSet<ChatRoomUserEntity> RoomUsers { get; set; }
 
         public DbSet<UserEntity> Users { get; set; }
 

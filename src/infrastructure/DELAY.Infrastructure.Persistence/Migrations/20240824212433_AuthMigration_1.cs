@@ -65,9 +65,9 @@ namespace DELAY.Infrastructure.Persistence.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_Boards_Rooms_RoomId",
                 table: "Boards",
-                column: "RoomId",
+                column: "ChatRoomId",
                 principalTable: "Rooms",
-                principalColumn: "RoomId",
+                principalColumn: "ChatRoomId",
                 onDelete: ReferentialAction.SetNull);
 
             migrationBuilder.AddForeignKey(
@@ -114,9 +114,9 @@ namespace DELAY.Infrastructure.Persistence.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_Boards_Rooms_RoomId",
                 table: "Boards",
-                column: "RoomId",
+                column: "ChatRoomId",
                 principalTable: "Rooms",
-                principalColumn: "RoomId");
+                principalColumn: "ChatRoomId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Tickets_Users_ChangedById",

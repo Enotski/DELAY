@@ -5,7 +5,7 @@ using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Application.Abstractions.Storages.Base
 {
-    public interface INamedStorage<T> : IBaseStorage<T> where T : class, IKey, IName
+    public interface INamedStorage<T> : IKeyStorage<T> where T : class, IKey, IName
     {
         /// <summary>
         /// Get name by key

@@ -2,7 +2,7 @@
 
 namespace DELAY.Infrastructure.Persistence.Entities.Base
 {
-    public abstract class KeyModelEntity : IKey
+    public abstract class KeyEntity : IKey
     {
         public Guid Id { get; set; }
     }

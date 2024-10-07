@@ -1,6 +1,6 @@
 ﻿namespace DELAY.Infrastructure.Persistence.Repositories
 {
-    //internal class RoomRepository : NamedRepository<Room>, IRoomStorage
+    //internal class RoomRepository : NamedRepository<ChatRoom>, IRoomStorage
     //{
     //    public RoomRepository(DelayContext context) : base(context)
     //    {
@@ -11,7 +11,7 @@
     //        throw new NotImplementedException();
     //    }
 
-    //    public Task<IReadOnlyList<Room>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default)
+    //    public Task<IReadOnlyList<ChatRoom>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default)
     //    {
     //        throw new NotImplementedException();
     //    }

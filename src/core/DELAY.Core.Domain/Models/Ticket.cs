@@ -23,8 +23,12 @@ namespace DELAY.Core.Domain.Models
         public string Description { get; set; }
 
         public DateTime ChangedDate { get; set; }
+        public DateTime CreateDate { get; set; }
 
         public string ChangedBy { get; set; }
+        public string CreatedBy { get; set; }
+
+        public DateTime DeadLineDate { get; set; }
 
         public IEnumerable<User> AssignedUsers { get; set; } = new List<User>();
 

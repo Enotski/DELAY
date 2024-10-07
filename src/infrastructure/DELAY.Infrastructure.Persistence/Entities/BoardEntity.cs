@@ -3,16 +3,15 @@ using DELAY.Infrastructure.Persistence.Entities.Base;
 
 namespace DELAY.Infrastructure.Persistence.Entities
 {
-    public class BoardEntity : KeyNamedModelEntity, IDescriptioin
+    public class BoardEntity : KeyNamedEntity
     {
-        public string Description { get; set; }
         public string CreatedBy { get; set; }
         public string ChangedBy { get; set; }
         public DateTime ChangeDate { get; set; }
         public DateTime CreateDate { get; set; }
 
-        public Guid? RoomId { get; set; }
-        public RoomEntity Room { get; set; }
+        public ICollection<BoardChatRoomEntity> BoardChatRooms { get; set; } = new List<BoardChatRoomEntity>();
         public ICollection<BoardUserEntity> BoardUsers { get; set; } = new List<BoardUserEntity>();
+        public ICollection<TicketsListEntity> TicketsLists { get; set; } = new List<TicketsListEntity>();
     }
 }

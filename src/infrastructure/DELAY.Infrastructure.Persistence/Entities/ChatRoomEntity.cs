@@ -6,8 +6,8 @@ namespace DELAY.Infrastructure.Persistence.Entities
 {
     public class ChatRoomEntity : KeyNamedEntity
     {
-        public ICollection<ChatRoomUserEntity> RoomUsers { get; set; } = new List<ChatRoomUserEntity>();
-        public ICollection<BoardChatRoomEntity> Boards { get; set; } = new List<BoardChatRoomEntity>();
+        public ICollection<ChatRoomUserEntity> ChatRoomUsers { get; set; } = new List<ChatRoomUserEntity>();
+        public ICollection<BoardChatRoomEntity> BoardChatRooms { get; set; } = new List<BoardChatRoomEntity>();
 
         public ChatType ChatType { get; set; }
     }

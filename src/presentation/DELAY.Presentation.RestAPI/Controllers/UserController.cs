@@ -1,4 +1,5 @@
-﻿using DELAY.Core.Application.Abstractions.Services.Common;
+﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Domain.Models;
@@ -28,7 +29,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         private readonly IModelMapperService mapper;
 
-        public UserController(IUserService userService, IModelMapperService mapper, ILogger<UserController> logger)
+        public UserController(IUserService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<UserController> logger) : base(tokensService)
         {
             this.logger = logger;
 

@@ -24,7 +24,7 @@ namespace DELAY.Infrastructure.Persistence
             return services;
         }
         private static IServiceCollection AddStorages(this IServiceCollection services)
-        {
+        { 
             services.AddScoped<IUserStorage, UserRepository>();
             services.AddScoped<IBoardStorage, BoardRepository>();
 

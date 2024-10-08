@@ -1,14 +1,15 @@
 ﻿using DELAY.Core.Domain.Enums;
-using DELAY.Core.Domain.Interfaces;
-using DELAY.Infrastructure.Persistence.Entities.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace DELAY.Infrastructure.Persistence.Entities
 {
-    public class ChatRoomUserEntity : KeyEntity, IKey
+    public class ChatRoomUserEntity
     {
+        [Key]
         public Guid ChatRoomId { get; set; }
         public ChatRoomEntity ChatRoom { get; set; }
 
+        [Key]
         public Guid UserId { get; set; }
         public UserEntity User { get; set; }
 

@@ -8,7 +8,6 @@ namespace DELAY.Infrastructure.Persistence.Entities
     /// </summary>
     public class TicketEntity : KeyNamedEntity, IDescriptioin
     {
-
         public string Description { get; set; }
 
         public DateTime ChangedDate { get; set; }

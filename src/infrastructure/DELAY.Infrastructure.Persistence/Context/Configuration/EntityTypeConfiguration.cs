@@ -19,6 +19,11 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
                 builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
             }
         }
+        private static string GetTableName(string modelName)
+        {
+            return modelName + "s";
+        }
+
         internal abstract class DbKeyModelEntityConfiguration<TEntity>
             : IEntityTypeConfiguration<TEntity>
             where TEntity : class, IKey
@@ -28,7 +33,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
 
             protected void IntiTableAndPrimaryKeyNames(string modelName)
             {
-                TableName = modelName + "s";
+                TableName = GetTableName(modelName);
                 PrimaryKeyPropertyName = modelName + "Id";
             }
 
@@ -51,9 +56,6 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
 
                 builder.HasOne(p => p.TicketList).WithMany(p => p.Tickets)
                     .HasForeignKey(p => p.TicketListId).OnDelete(DeleteBehavior.SetNull);
-
-                builder.HasMany(p => p.AssignedUsers).WithOne(p => p.Ticket)
-                    .HasForeignKey(p => p.TicketId).OnDelete(DeleteBehavior.Cascade);
             }
         }
 
@@ -63,9 +65,6 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             public override void Configure(EntityTypeBuilder<TicketsListEntity> builder)
             {
                 base.Configure(builder);
-
-                builder.HasMany(p => p.Tickets).WithOne(p => p.TicketList)
-                    .HasForeignKey(p => p.TicketListId).OnDelete(DeleteBehavior.Cascade);
             }
         }
 
@@ -75,18 +74,6 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             public override void Configure(EntityTypeBuilder<UserEntity> builder)
             {
                 base.Configure(builder);
-
-                builder.HasMany(p => p.AssignedTickets).WithOne(p => p.User)
-                    .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
-
-                builder.HasMany(p => p.BoardUsers).WithOne(p => p.User)
-                    .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
-
-                builder.HasMany(p => p.ChatRoomUsers).WithOne(p => p.User)
-                    .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
-
-                builder.HasMany(p => p.Sessions).WithOne(p => p.User)
-                    .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
             }
         }
 
@@ -96,12 +83,6 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             public override void Configure(EntityTypeBuilder<BoardEntity> builder)
             {
                 base.Configure(builder);
-
-                builder.HasMany(p => p.BoardUsers).WithOne(p => p.Board)
-                    .HasForeignKey(p => p.BoardId).OnDelete(DeleteBehavior.Cascade);
-
-                builder.HasMany(p => p.BoardChatRooms).WithOne(p => p.Board)
-                    .HasForeignKey(p => p.BoardId).OnDelete(DeleteBehavior.SetNull);
 
                 builder.HasMany(p => p.TicketsLists).WithOne(p => p.Board)
                     .HasForeignKey(p => p.BoardId).OnDelete(DeleteBehavior.SetNull);
@@ -114,32 +95,10 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             public override void Configure(EntityTypeBuilder<ChatRoomEntity> builder)
             {
                 base.Configure(builder);
-
-                builder.HasMany(p => p.RoomUsers).WithOne(p => p.ChatRoom)
-                    .HasForeignKey(p => p.ChatRoomId).OnDelete(DeleteBehavior.Cascade);
-
-
-                builder.HasMany(p => p.Boards).WithOne(p => p.ChatRoom)
-                    .HasForeignKey(p => p.ChatRoomId).OnDelete(DeleteBehavior.SetNull);
             }
         }
 
-        internal sealed class DbTicketUserEntityConfiguration
-            : DbKeyModelEntityConfiguration<TicketUserEntity>
-        {
-            public override void Configure(EntityTypeBuilder<TicketUserEntity> builder)
-            {
-                base.Configure(builder);
-
-                builder.HasOne(p => p.User).WithMany(p => p.AssignedTickets)
-                    .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
-
-                builder.HasOne(p => p.Ticket).WithMany(p => p.AssignedUsers)
-                    .HasForeignKey(p => p.TicketId).OnDelete(DeleteBehavior.Cascade);
-            }
-        }
-
-        internal sealed class DbTicketUserSessionEntityConfiguration
+        internal sealed class DbSessionLogEntityConfiguration
             : DbKeyModelEntityConfiguration<SessionLogEntity>
         {
             public override void Configure(EntityTypeBuilder<SessionLogEntity> builder)
@@ -151,33 +110,67 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbRoomUserEntityConfiguration
-            : DbKeyModelEntityConfiguration<ChatRoomUserEntity>
-        {
-            public override void Configure(EntityTypeBuilder<ChatRoomUserEntity> builder)
-            {
-                base.Configure(builder);
-
-                builder.HasOne(p => p.User).WithMany(p => p.ChatRoomUsers)
-                    .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
-
-                builder.HasOne(p => p.ChatRoom).WithMany(p => p.RoomUsers)
-                    .HasForeignKey(p => p.ChatRoomId).OnDelete(DeleteBehavior.Cascade);
-            }
-        }
-
         internal sealed class DbBoardUserEntityConfiguration
-            : DbKeyModelEntityConfiguration<BoardUserEntity>
+            : IEntityTypeConfiguration<BoardUserEntity>
         {
-            public override void Configure(EntityTypeBuilder<BoardUserEntity> builder)
+            public void Configure(EntityTypeBuilder<BoardUserEntity> builder)
             {
-                base.Configure(builder);
+                builder.ToTable(GetTableName(typeof(BoardUserEntity).Name.Replace("Entity", "")))
+                                    .HasKey(p => new { p.BoardId, p.UserId });
 
                 builder.HasOne(p => p.User).WithMany(p => p.BoardUsers)
                     .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
 
                 builder.HasOne(p => p.Board).WithMany(p => p.BoardUsers)
                     .HasForeignKey(p => p.BoardId).OnDelete(DeleteBehavior.Cascade);
+            }
+        }
+
+        internal sealed class DbChatRoomUserEntityConfiguration
+            : IEntityTypeConfiguration<ChatRoomUserEntity>
+        {
+            public void Configure(EntityTypeBuilder<ChatRoomUserEntity> builder)
+            {
+                builder.ToTable(GetTableName(typeof(ChatRoomUserEntity).Name.Replace("Entity", "")))
+                    .HasKey(p => new { p.ChatRoomId, p.UserId });
+
+                builder.HasOne(p => p.User).WithMany(p => p.ChatRoomUsers)
+                    .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(p => p.ChatRoom).WithMany(p => p.ChatRoomUsers)
+                    .HasForeignKey(p => p.ChatRoomId).OnDelete(DeleteBehavior.Cascade);
+            }
+        }
+
+        internal sealed class DbBoardChatRoomEntityConfiguration
+            : IEntityTypeConfiguration<BoardChatRoomEntity>
+        {
+            public void Configure(EntityTypeBuilder<BoardChatRoomEntity> builder)
+            {
+                builder.ToTable(GetTableName(typeof(BoardChatRoomEntity).Name.Replace("Entity", "")))
+                    .HasKey(p => new { p.BoardId, p.ChatRoomId });
+
+                builder.HasOne(p => p.Board).WithMany(p => p.BoardChatRooms)
+                    .HasForeignKey(p => p.BoardId).OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(p => p.ChatRoom).WithMany(p => p.BoardChatRooms)
+                    .HasForeignKey(p => p.ChatRoomId).OnDelete(DeleteBehavior.Cascade);
+            }
+        }
+
+        internal sealed class DbTicketUserEntityConfiguration
+    : IEntityTypeConfiguration<TicketUserEntity>
+        {
+            public void Configure(EntityTypeBuilder<TicketUserEntity> builder)
+            {
+                builder.ToTable(GetTableName(typeof(TicketUserEntity).Name.Replace("Entity", "")))
+                    .HasKey(p => new { p.TicketId, p.UserId });
+
+                builder.HasOne(p => p.User).WithMany(p => p.AssignedTickets)
+                    .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
+
+                builder.HasOne(p => p.Ticket).WithMany(p => p.AssignedUsers)
+                    .HasForeignKey(p => p.TicketId).OnDelete(DeleteBehavior.Cascade);
             }
         }
     }

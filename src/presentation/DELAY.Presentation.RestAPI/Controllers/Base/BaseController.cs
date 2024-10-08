@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DELAY.Core.Application.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace DELAY.Presentation.RestAPI.Controllers.Base
@@ -40,6 +41,25 @@ namespace DELAY.Presentation.RestAPI.Controllers.Base
                 }
                 return HttpContext.Request.Headers["User-Agent"].ToString();
             }
+        }
+
+        /// <summary>
+        /// Обработка исключения и запись в лог
+        /// </summary>
+        /// <param name="logger">Логгер</param>
+        /// <param name="ex">Объект исключения, будет записан в лог</param>
+        /// <param name="logMessage">Сообщение</param>
+        /// <param name="logParams">Параметры лога помимо объекта исключения</param>
+        /// <returns></returns>
+        protected IActionResult HandleError(ILogger logger, Exception ex, string logMessage, int code = StatusCodes.Status500InternalServerError, params object[] logParams)
+        {
+            logger.LogError(logMessage + ": {ex}", ex, logParams);
+
+#if DEBUG
+            return Problem(ex.Format(), statusCode: code);
+#else
+            return Problem(ex.Message, statusCode: code);
+#endif
         }
     }
 }

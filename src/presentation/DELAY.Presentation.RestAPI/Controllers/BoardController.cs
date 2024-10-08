@@ -1,4 +1,5 @@
-﻿using DELAY.Core.Application.Abstractions.Services.Common;
+﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Abstractions.Services.Tickets;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Extensions;
@@ -9,11 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace DELAY.Core.Application.Abstractions.Services
 {
     [ApiController]
-    [Route("boards")]
+    [Route("api/boards")]
     public class BoardController : AuthorizedController
     {
         /// <summary>
-        /// <inheritdoc cref="IUserService"/>
+        /// <inheritdoc cref="IBoardService"/>
         /// </summary>
         private readonly IBoardService boardService;
 
@@ -27,13 +28,40 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         private readonly IModelMapperService mapper;
 
-        public BoardController(IBoardService userService, IModelMapperService mapper, ILogger<UserController> logger)
+        public BoardController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<UserController> logger) : base(tokensService)
         {
             this.logger = logger;
 
             this.boardService = userService ?? throw new ArgumentNullException(nameof(IBoardService));
 
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(IModelMapperService));
+        }
+
+        
+        [HttpGet]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAsync()
+        {
+            try
+            {
+                if(TryGetUser(out OperationUserInfo user))
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+            }
+            catch (Exception exp)
+            {
+                logger.LogError("Ошибка получения объекта активности по ключу {id}: {exp}", exp);
+
+                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -61,39 +89,39 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <response code="200">OK</response>
         /// <response code="404">Не удалось найти по ключу</response>
         /// <response code="500">Ошибка сервера</response>
-        [HttpGet]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAsync(Guid id)
-        {
-            try
-            {
-                var user = await boardService.GetAsync(id);
+        //[HttpGet]
+        //[Produces("application/json")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //public async Task<IActionResult> GetAsync(Guid id)
+        //{
+        //    try
+        //    {
+        //        var user = await boardService.GetAsync(id);
 
-                if (user == null)
-                {
-                    string message = "Не удалось определить объект активности по ключу";
+        //        if (user == null)
+        //        {
+        //            string message = "Не удалось определить объект активности по ключу";
 
-                    logger.LogInformation(message + " {id}", id);
+        //            logger.LogInformation(message + " {id}", id);
 
-                    return Problem(message, statusCode: StatusCodes.Status404NotFound);
-                }
+        //            return Problem(message, statusCode: StatusCodes.Status404NotFound);
+        //        }
 
-                var result = mapper.Map<UserDto>(user);
+        //        var result = mapper.Map<UserDto>(user);
 
-                logger.LogInformation("Получение объекта активности по ключу {id}: {result}", result, id);
+        //        logger.LogInformation("Получение объекта активности по ключу {id}: {result}", result, id);
 
-                return Ok(result);
-            }
-            catch (Exception exp)
-            {
-                logger.LogError("Ошибка получения объекта активности по ключу {id}: {exp}", id, exp);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception exp)
+        //    {
+        //        logger.LogError("Ошибка получения объекта активности по ключу {id}: {exp}", id, exp);
 
-                return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
-            }
-        }
+        //        return Problem(exp.Format(), statusCode: StatusCodes.Status500InternalServerError);
+        //    }
+        //}
 
         /// <summary>
         /// Add user

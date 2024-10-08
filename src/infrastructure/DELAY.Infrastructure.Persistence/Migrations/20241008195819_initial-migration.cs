@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -15,7 +16,10 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     BoardId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
+                    ChangedBy = table.Column<string>(type: "text", nullable: false),
+                    ChangeDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -24,28 +28,16 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rooms",
+                name: "ChatRooms",
                 columns: table => new
                 {
-                    RoomId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
+                    ChatRoomId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ChatType = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rooms", x => x.RoomId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TicketsLists",
-                columns: table => new
-                {
-                    TicketsListId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TicketsLists", x => x.TicketsListId);
+                    table.PrimaryKey("PK_ChatRooms", x => x.ChatRoomId);
                 });
 
             migrationBuilder.CreateTable(
@@ -53,14 +45,14 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    Password = table.Column<string>(type: "text", nullable: true),
                     ChangedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ChangedBy = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    ChangedBy = table.Column<string>(type: "text", nullable: true),
+                    Role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,17 +60,59 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TicketsLists",
+                columns: table => new
+                {
+                    TicketsListId = table.Column<Guid>(type: "uuid", nullable: false),
+                    BoardId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TicketsLists", x => x.TicketsListId);
+                    table.ForeignKey(
+                        name: "FK_TicketsLists_Boards_BoardId",
+                        column: x => x.BoardId,
+                        principalTable: "Boards",
+                        principalColumn: "BoardId",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BoardChatRooms",
+                columns: table => new
+                {
+                    BoardId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ChatRoomId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BoardChatRooms", x => new { x.BoardId, x.ChatRoomId });
+                    table.ForeignKey(
+                        name: "FK_BoardChatRooms_Boards_BoardId",
+                        column: x => x.BoardId,
+                        principalTable: "Boards",
+                        principalColumn: "BoardId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BoardChatRooms_ChatRooms_ChatRoomId",
+                        column: x => x.ChatRoomId,
+                        principalTable: "ChatRooms",
+                        principalColumn: "ChatRoomId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BoardUsers",
                 columns: table => new
                 {
-                    BoardUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     BoardId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserRole = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BoardUsers", x => x.BoardUserId);
+                    table.PrimaryKey("PK_BoardUsers", x => new { x.BoardId, x.UserId });
                     table.ForeignKey(
                         name: "FK_BoardUsers_Boards_BoardId",
                         column: x => x.BoardId,
@@ -97,26 +131,46 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 name: "ChatRoomUsers",
                 columns: table => new
                 {
-                    RoomUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RoomId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ChatRoomId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserRole = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RoomUsers", x => x.RoomUserId);
+                    table.PrimaryKey("PK_ChatRoomUsers", x => new { x.ChatRoomId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_RoomUsers_Rooms_RoomId",
-                        column: x => x.RoomId,
-                        principalTable: "Rooms",
+                        name: "FK_ChatRoomUsers_ChatRooms_ChatRoomId",
+                        column: x => x.ChatRoomId,
+                        principalTable: "ChatRooms",
                         principalColumn: "ChatRoomId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RoomUsers_Users_UserId",
+                        name: "FK_ChatRoomUsers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SessionLogs",
+                columns: table => new
+                {
+                    SessionLogId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AuthProvider = table.Column<int>(type: "integer", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IpAddress = table.Column<string>(type: "text", nullable: false),
+                    UserAgent = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SessionLogs", x => x.SessionLogId);
+                    table.ForeignKey(
+                        name: "FK_SessionLogs_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -126,7 +180,9 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     TicketId = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     ChangedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ChangedById = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ChangedBy = table.Column<string>(type: "text", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
                     TicketListId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
@@ -138,26 +194,19 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         column: x => x.TicketListId,
                         principalTable: "TicketsLists",
                         principalColumn: "TicketsListId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Tickets_Users_ChangedById",
-                        column: x => x.ChangedById,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
                 name: "TicketUsers",
                 columns: table => new
                 {
-                    TicketUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     TicketId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TicketUsers", x => x.TicketUserId);
+                    table.PrimaryKey("PK_TicketUsers", x => new { x.TicketId, x.UserId });
                     table.ForeignKey(
                         name: "FK_TicketUsers_Tickets_TicketId",
                         column: x => x.TicketId,
@@ -173,9 +222,9 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BoardUsers_BoardId",
-                table: "BoardUsers",
-                column: "BoardId");
+                name: "IX_BoardChatRooms_ChatRoomId",
+                table: "BoardChatRooms",
+                column: "ChatRoomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BoardUsers_UserId",
@@ -183,19 +232,14 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoomUsers_RoomId",
-                table: "ChatRoomUsers",
-                column: "ChatRoomId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RoomUsers_UserId",
+                name: "IX_ChatRoomUsers_UserId",
                 table: "ChatRoomUsers",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tickets_ChangedById",
-                table: "Tickets",
-                column: "ChangedById");
+                name: "IX_SessionLogs_UserId",
+                table: "SessionLogs",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_TicketListId",
@@ -203,9 +247,9 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 column: "TicketListId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TicketUsers_TicketId",
-                table: "TicketUsers",
-                column: "TicketId");
+                name: "IX_TicketsLists_BoardId",
+                table: "TicketsLists",
+                column: "BoardId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TicketUsers_UserId",
@@ -217,28 +261,34 @@ namespace DELAY.Infrastructure.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "BoardChatRooms");
+
+            migrationBuilder.DropTable(
                 name: "BoardUsers");
 
             migrationBuilder.DropTable(
                 name: "ChatRoomUsers");
 
             migrationBuilder.DropTable(
+                name: "SessionLogs");
+
+            migrationBuilder.DropTable(
                 name: "TicketUsers");
 
             migrationBuilder.DropTable(
-                name: "Boards");
-
-            migrationBuilder.DropTable(
-                name: "Rooms");
+                name: "ChatRooms");
 
             migrationBuilder.DropTable(
                 name: "Tickets");
 
             migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
                 name: "TicketsLists");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Boards");
         }
     }
 }

@@ -440,7 +440,10 @@ const ticketsColumns: TableColumn<ITicketDto>[] = [
 
 const showModal = ref(false);
 
-function addBoard(row: any) {
+async function addBoard(row: any) {
+  await RequestUtils.sendRequest("boards", "GET").then(async () => {
+    console.log("good");
+  });
   console.log("addBoard");
 }
 

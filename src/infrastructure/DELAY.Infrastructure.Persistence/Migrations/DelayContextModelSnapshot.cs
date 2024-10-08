@@ -22,6 +22,21 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.BoardChatRoomEntity", b =>
+                {
+                    b.Property<Guid>("BoardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ChatRoomId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("BoardId", "ChatRoomId");
+
+                    b.HasIndex("ChatRoomId");
+
+                    b.ToTable("BoardChatRooms", (string)null);
+                });
+
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.BoardEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -43,32 +58,17 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("ChatRoomId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ChatRoomId");
 
                     b.ToTable("Boards", (string)null);
                 });
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.BoardUserEntity", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("BoardUserId");
-
                     b.Property<Guid>("BoardId")
                         .HasColumnType("uuid");
 
@@ -78,9 +78,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Property<int>("UserRole")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("BoardId");
+                    b.HasKey("BoardId", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -94,10 +92,8 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("ChatRoomId");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)");
+                    b.Property<int>("ChatType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -105,16 +101,11 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Rooms", (string)null);
+                    b.ToTable("ChatRooms", (string)null);
                 });
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.ChatRoomUserEntity", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("RoomUserId");
-
                     b.Property<Guid>("ChatRoomId")
                         .HasColumnType("uuid");
 
@@ -124,9 +115,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Property<int>("UserRole")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChatRoomId");
+                    b.HasKey("ChatRoomId", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -171,11 +160,19 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("TicketId");
 
-                    b.Property<Guid?>("ChangedById")
-                        .HasColumnType("uuid");
+                    b.Property<string>("ChangedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("ChangedDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -190,8 +187,6 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChangedById");
-
                     b.HasIndex("TicketListId");
 
                     b.ToTable("Tickets", (string)null);
@@ -199,20 +194,13 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.TicketUserEntity", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("TicketUserId");
-
                     b.Property<Guid>("TicketId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("TicketId");
+                    b.HasKey("TicketId", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -226,11 +214,16 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("TicketsListId");
 
+                    b.Property<Guid>("BoardId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
 
                     b.ToTable("TicketsLists", (string)null);
                 });
@@ -271,12 +264,21 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.BoardEntity", b =>
+            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.BoardChatRoomEntity", b =>
                 {
+                    b.HasOne("DELAY.Infrastructure.Persistence.Entities.BoardEntity", "Board")
+                        .WithMany("BoardChatRooms")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DELAY.Infrastructure.Persistence.Entities.ChatRoomEntity", "ChatRoom")
-                        .WithMany("Boards")
+                        .WithMany("BoardChatRooms")
                         .HasForeignKey("ChatRoomId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Board");
 
                     b.Navigation("ChatRoom");
                 });
@@ -324,7 +326,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.HasOne("DELAY.Infrastructure.Persistence.Entities.UserEntity", "User")
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -332,18 +334,11 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.TicketEntity", b =>
                 {
-                    b.HasOne("DELAY.Infrastructure.Persistence.Entities.UserEntity", "ChangedBy")
-                        .WithMany("ChangedTickets")
-                        .HasForeignKey("ChangedById")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("DELAY.Infrastructure.Persistence.Entities.TicketsListEntity", "TicketList")
                         .WithMany("Tickets")
                         .HasForeignKey("TicketListId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
-
-                    b.Navigation("ChangedBy");
 
                     b.Navigation("TicketList");
                 });
@@ -367,14 +362,29 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.TicketsListEntity", b =>
+                {
+                    b.HasOne("DELAY.Infrastructure.Persistence.Entities.BoardEntity", "Board")
+                        .WithMany("TicketsLists")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("Board");
+                });
+
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.BoardEntity", b =>
                 {
+                    b.Navigation("BoardChatRooms");
+
                     b.Navigation("BoardUsers");
+
+                    b.Navigation("TicketsLists");
                 });
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.ChatRoomEntity", b =>
                 {
-                    b.Navigation("Boards");
+                    b.Navigation("BoardChatRooms");
 
                     b.Navigation("ChatRoomUsers");
                 });
@@ -394,8 +404,6 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Navigation("AssignedTickets");
 
                     b.Navigation("BoardUsers");
-
-                    b.Navigation("ChangedTickets");
 
                     b.Navigation("ChatRoomUsers");
 

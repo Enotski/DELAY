@@ -1,5 +1,5 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
-using DELAY.Core.Application.Abstractions.Services.Tickets;
+using DELAY.Core.Application.Abstractions.Services.Boards;
 using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Services;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,6 @@
 ﻿using DELAY.Core.Domain.Interfaces;
 
-namespace DELAY.Core.Application.Contracts.Models.Base
+namespace DELAY.Core.Application.Contracts.Models.Dtos.Base
 {
     public class KeyNameDto : KeyDto, IName
     {

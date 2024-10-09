@@ -1,8 +1,8 @@
-﻿using DELAY.Core.Application.Contracts.Models.Base;
+﻿using DELAY.Core.Application.Contracts.Models.Dtos.Base;
 
-namespace DELAY.Core.Application.Contracts.Models
+namespace DELAY.Core.Application.Contracts.Models.Dtos
 {
-    public class UserDto : KeyDto
+    public class UserDto : KeyNameDto
     {
         public UserDto()
         {
@@ -23,11 +23,8 @@ namespace DELAY.Core.Application.Contracts.Models
 
         public string? Password { get; set; }
     }
-    public class UserPasswordRequestDto: KeyDto
-    {
-        public string Password { get; set; }
-    }
-    public class UserCreateRequestDto
+
+    public class EditCreateRequestDto
     {
         public string Name { get; set; }
 
@@ -37,5 +34,10 @@ namespace DELAY.Core.Application.Contracts.Models
 
         public string Password { get; set; }
 
+    }
+
+    public class UserPasswordRequestDto : KeyDto
+    {
+        public string Password { get; set; }
     }
 }

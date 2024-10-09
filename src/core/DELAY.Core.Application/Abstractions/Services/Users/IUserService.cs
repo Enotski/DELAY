@@ -1,35 +1,39 @@
 ﻿using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Application.Contracts.Models.Dtos;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Models;
 
 namespace DELAY.Core.Application.Abstractions.Services.Users
 {
-    public interface IUserService : INamedService<User>
+    public interface IUserService : INamedService<UserDto>
     {
         /// <summary>
         /// Create user
         /// </summary>
         /// <param name="user">User model</param>
         /// <returns></returns>
-        Task<Guid?> AddAsync(User user, string triggeredBy);
+        Task<Guid?> AddAsync(EditCreateRequestDto model, OperationUserInfo triggeredBy);
 
         /// <summary>
         /// Update user
         /// </summary>
         /// <param name="user">User updated model</param>
         /// <returns></returns>
-        Task<int> UpdateAsync(User user, string triggeredBy);
-        Task<int> UpdatePasswordAsync(Guid id, string password, string triggeredBy);
+        Task<int> UpdateAsync(EditCreateRequestDto model, OperationUserInfo triggeredBy);
 
-        Task<IEnumerable<User>> GetUsersByTicketAsync(Guid ticketId);
+        Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy);
 
-        Task<IEnumerable<User>> GetBoardUsersAsync(Guid boardId);
+        Task<IEnumerable<UserDto>> GetByTicketAsync(Guid ticketId);
+
+        Task<IEnumerable<UserDto>> GetByBoardAsync(Guid boardId);
+
+        Task<IEnumerable<UserDto>> GetByChatRoomAsync(Guid boardId);
 
         /// <summary>
         /// Get records by search options
         /// </summary>
         /// <param name="options">Search options</param>
         /// <returns></returns>
-        Task<PagedData<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination);
+        Task<PagedData<UserDto>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination);
     }
 }

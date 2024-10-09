@@ -1,4 +1,4 @@
-﻿namespace DELAY.Core.Application.Contracts.Models
+﻿namespace DELAY.Core.Application.Contracts.Models.Dtos.Response
 {
     public class PagedDataDto<T>
     {

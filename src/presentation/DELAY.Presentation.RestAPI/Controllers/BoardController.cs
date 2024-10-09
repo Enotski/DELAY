@@ -1,7 +1,9 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Abstractions.Services.Boards;
 using DELAY.Core.Application.Abstractions.Services.Common;
-using DELAY.Core.Application.Abstractions.Services.Tickets;
 using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Application.Contracts.Models.Dtos.Boards;
+using DELAY.Core.Application.Contracts.Models.Dtos.Users;
 using DELAY.Core.Application.Extensions;
 using DELAY.Core.Domain.Models;
 using DELAY.Presentation.RestAPI.Controllers.Base;
@@ -37,6 +39,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(IModelMapperService));
         }
 
+        
         
         [HttpGet]
         [Produces("application/json")]

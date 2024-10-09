@@ -1,9 +1,8 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Contracts.Models.Auth;
-using DELAY.Presentation.RestAPI.Contracts.Response;
+using DELAY.Presentation.RestAPI.Contracts;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -29,24 +28,24 @@ namespace DELAY.Presentation.RestAPI.Controllers
 
         private AuthResponseDto CreateAuthResponse(AuthResult authResult)
         {
-            var endpoints = new List<ApiEndpoint>();
+            var endpoints = new List<ApiEndpointDto>();
 
             if (authResult.Role == Core.Domain.Enums.RoleType.User)
             {
                 endpoints.AddRange([
-                    new ApiEndpoint("tickets", "Tickets"),
-                    new ApiEndpoint("rooms", "Rooms"),
-                    new ApiEndpoint("account", "Account"),
-                    new ApiEndpoint("users", "Users")
+                    new ApiEndpointDto("tickets", "Tickets"),
+                    new ApiEndpointDto("rooms", "Rooms"),
+                    new ApiEndpointDto("account", "Account"),
+                    new ApiEndpointDto("users", "Users")
                 ]);
             }
             else if (authResult.Role == Core.Domain.Enums.RoleType.Admin)
             {
                 endpoints.AddRange([
-                    new ApiEndpoint("tickets", "Tickets"),
-                    new ApiEndpoint("rooms", "Rooms"),
-                    new ApiEndpoint("account", "Account"),
-                    new ApiEndpoint("users", "Users"),
+                    new ApiEndpointDto("tickets", "Tickets"),
+                    new ApiEndpointDto("rooms", "Rooms"),
+                    new ApiEndpointDto("account", "Account"),
+                    new ApiEndpointDto("users", "Users"),
                 ]);
             }
 
@@ -94,7 +93,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
                     return Unauthorized();
                 }
 
-                SetRefreshTokensInsideCookie(refreshTokenName,tokens.RefreshToken, HttpContext);
+                SetRefreshTokensInsideCookie(refreshTokenName, tokens.RefreshToken, HttpContext);
 
                 return Ok(new TokensResponseDto(tokens.AccessToken));
             }
@@ -208,7 +207,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
         {
             try
             {
-                if(HttpContext.Request.Cookies.TryGetValue(refreshTokenName, out string token))
+                if (HttpContext.Request.Cookies.TryGetValue(refreshTokenName, out string token))
                 {
                     HttpContext.Response.Cookies.Delete(refreshTokenName);
 

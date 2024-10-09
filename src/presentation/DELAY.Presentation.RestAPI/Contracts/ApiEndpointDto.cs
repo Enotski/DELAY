@@ -1,12 +1,12 @@
-﻿namespace DELAY.Presentation.RestAPI.Contracts.Response
+﻿namespace DELAY.Presentation.RestAPI.Contracts
 {
-    public class ApiEndpoint
+    public class ApiEndpointDto
     {
-        public ApiEndpoint()
+        public ApiEndpointDto()
         {
         }
 
-        public ApiEndpoint(string path, string title)
+        public ApiEndpointDto(string path, string title)
         {
             Path = path;
             Title = title;

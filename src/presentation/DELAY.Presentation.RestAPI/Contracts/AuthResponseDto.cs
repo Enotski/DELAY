@@ -1,6 +1,4 @@
-﻿using DELAY.Core.Application.Contracts.Models.Base;
-
-namespace DELAY.Presentation.RestAPI.Contracts.Response
+﻿namespace DELAY.Presentation.RestAPI.Contracts
 {
     public class AuthResponseDto
     {
@@ -8,12 +6,12 @@ namespace DELAY.Presentation.RestAPI.Contracts.Response
         {
         }
 
-        public AuthResponseDto(TokensResponseDto tokens, IEnumerable<ApiEndpoint> endpoints)
+        public AuthResponseDto(TokensResponseDto tokens, IEnumerable<ApiEndpointDto> endpoints)
         {
             Endpoints = endpoints;
             Tokens = tokens;
         }
-        public IEnumerable<ApiEndpoint> Endpoints { get; set; }
+        public IEnumerable<ApiEndpointDto> Endpoints { get; set; }
         public TokensResponseDto Tokens { get; set; }
     }
 

@@ -220,7 +220,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
             if (id != null)
                 filter = filter.And(x => x.Id != id);
 
-            return !await BuildQuery(filter).AnyAsync(cancellationToken);
+            return !await Set.AnyAsync(filter, cancellationToken);
         }
         public async Task<bool> IsUniqueEmail(string email, Guid? id = null, CancellationToken cancellationToken = default)
         {
@@ -231,7 +231,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
             if (id != null)
                 filter = filter.And(x => x.Id != id);
 
-            return !await BuildQuery(filter).AnyAsync(cancellationToken);
+            return !await Set.AnyAsync(filter, cancellationToken);
         }
         public async Task<bool> IsUniquePhone(string phoneNumber, Guid? id = null, CancellationToken cancellationToken = default)
         {
@@ -242,20 +242,14 @@ namespace DELAY.Infrastructure.Persistence.Repositories
             if (id != null)
                 filter = filter.And(x => x.Id != id);
 
-            return !await BuildQuery(filter).AnyAsync(cancellationToken);
+            return !await Set.AnyAsync(filter, cancellationToken);
         }
 
-        public async Task<KeyNamedModel> PermissionToPerformOperationAsync(RoleType role, string triggeredBy, CancellationToken cancellationToken = default)
+        public async Task<bool> IsAllowToPerformOperationAsync(RoleType role, Guid triggeredById, CancellationToken cancellationToken = default)
         {
-            triggeredBy = triggeredBy.ToUpperTrim();
+            var filter = PredicateBuilder.Create<UserEntity>(x => x.Id == triggeredById && x.Role >= role);
 
-            var filter = PredicateBuilder.Create<UserEntity>(x => x.Name.Trim().ToUpper() == triggeredBy && x.Role >= role);
-            var selector = KeyNamedSelectorSpecification();
-
-            var result = await BuildQuery(filter).Select(selector).FirstOrDefaultAsync(cancellationToken);
-
-            return new KeyNamedModel(Guid.NewGuid(), "admin");
-            return result;
+            return await Set.AnyAsync(filter, cancellationToken);
         }
     }
 }

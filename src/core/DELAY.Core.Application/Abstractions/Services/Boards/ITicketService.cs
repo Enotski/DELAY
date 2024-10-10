@@ -2,6 +2,7 @@
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Domain.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos.Base;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
 
 namespace DELAY.Core.Application.Abstractions.Services.Boards
 {

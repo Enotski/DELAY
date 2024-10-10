@@ -1,7 +1,11 @@
-﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+﻿using DELAY.Core.Application.Abstractions.Services;
+using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Application.Contracts.Models.Dtos;
+using DELAY.Core.Application.Contracts.Models.Dtos.Base;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
@@ -174,6 +178,66 @@ namespace DELAY.Core.Application.Services
         public async Task<IEnumerable<User>> GetBoardUsersAsync(Guid boardId)
         {
             return await userStorage.GetBoardUsersAsync(boardId);
+        }
+
+        public Task<Guid?> AddAsync(EditCreateUserRequestDto model, OperationUserInfo triggeredBy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> UpdateAsync(EditCreateUserRequestDto model, OperationUserInfo triggeredBy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<UserDto>> GetByTicketAsync(Guid ticketId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<UserDto>> GetByBoardAsync(Guid boardId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<UserDto>> GetByChatRoomAsync(Guid boardId)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<PagedData<UserDto>> IUserService.GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Guid?> CreateAsync(NameDto model, OperationUserInfo triggeredBy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> DeleteAsync(Guid id, OperationUserInfo triggeredBy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> DeleteAsync(IEnumerable<Guid> ids, OperationUserInfo triggeredBy)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<UserDto> INamedService<UserDto>.GetAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IReadOnlyList<UserDto>> INamedService<UserDto>.GetRecordsAsync(IEnumerable<Guid> ids)
+        {
+            throw new NotImplementedException();
         }
     }
 }

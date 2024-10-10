@@ -116,6 +116,20 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
 
             return entity.Id;
         }
+        public async Task<Guid> AddAsync(TDomain model, Action<Guid, DbContext> relationEntitiesInsertDelegate, CancellationToken cancellationToken = default)
+        {
+            var entity = _mapper.Map<TEntity>(model);
+
+            entity.Id = Guid.NewGuid();
+
+            context.Set<TEntity>().Add(entity);
+
+            relationEntitiesInsertDelegate(entity.Id, context);
+
+            await context.SaveChangesAsync(cancellationToken);
+
+            return entity.Id;
+        }
 
         public async Task<int> AddAsync(IEnumerable<TDomain> models, CancellationToken cancellationToken = default)
         {

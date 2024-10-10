@@ -1,6 +1,7 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System.Security.Claims;
 
@@ -13,6 +14,7 @@ namespace DELAY.Presentation.RestAPI.Controllers.Base
 
         public AuthorizedController(ITokensService tokensService)
         {
+            ArgumentNullException.ThrowIfNull(tokensService, nameof(ITokensService));
             _tokensService = tokensService;
         }
 

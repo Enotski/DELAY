@@ -25,6 +25,6 @@ namespace DELAY.Core.Application.Abstractions.Storages
 
         Task<User> GetByPhoneAsync(string phone, CancellationToken cancellationToken = default);
 
-        Task<KeyNamedModel> PermissionToPerformOperationAsync(RoleType role, string triggeredBy, CancellationToken cancellationToken = default);
+        Task<bool> IsAllowToPerformOperationAsync(RoleType role, Guid triggeredById, CancellationToken cancellationToken = default);
     }
 }

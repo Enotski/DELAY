@@ -20,8 +20,9 @@ namespace DELAY.Core.Domain.Models
         {
         }
 
-        public void Update(string name, string changedBy)
+        public void Update(string name, string description, string changedBy)
         {
+            Description = description;
             ChangeDate = DateTime.UtcNow;
             ChangedBy = changedBy;
 
@@ -32,6 +33,8 @@ namespace DELAY.Core.Domain.Models
         {
             return !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(CreatedBy);
         }
+
+        public string Description { get; set; }
 
         public string CreatedBy { get; set; }
         public string ChangedBy { get; set; }

@@ -7,6 +7,7 @@ namespace DELAY.Infrastructure.Persistence.Entities
     {
         public string CreatedBy { get; set; }
         public string ChangedBy { get; set; }
+        public string Description { get; set; }
         public DateTime ChangeDate { get; set; }
         public DateTime CreateDate { get; set; }
 

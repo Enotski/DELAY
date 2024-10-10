@@ -12,14 +12,14 @@ namespace DELAY.Core.Application.Abstractions.Services.Users
         /// </summary>
         /// <param name="user">User model</param>
         /// <returns></returns>
-        Task<Guid?> AddAsync(EditCreateRequestDto model, OperationUserInfo triggeredBy);
+        Task<Guid?> AddAsync(EditCreateUserRequestDto model, OperationUserInfo triggeredBy);
 
         /// <summary>
         /// Update user
         /// </summary>
         /// <param name="user">User updated model</param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EditCreateRequestDto model, OperationUserInfo triggeredBy);
+        Task<int> UpdateAsync(EditCreateUserRequestDto model, OperationUserInfo triggeredBy);
 
         Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy);
 

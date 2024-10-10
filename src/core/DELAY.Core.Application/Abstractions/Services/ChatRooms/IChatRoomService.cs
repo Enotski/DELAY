@@ -1,6 +1,7 @@
 ﻿using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos;
 using DELAY.Core.Application.Contracts.Models.Dtos.Base;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
 using DELAY.Core.Domain.Models;
 
 namespace DELAY.Core.Application.Abstractions.Services.Rooms

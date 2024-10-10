@@ -1,4 +1,5 @@
 ﻿using DELAY.Core.Application.Contracts.Models.Dtos.Base;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos
 {
@@ -8,9 +9,8 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
         {
         }
 
-        public UserDto(Guid id, string? name, string? email, string? phoneNumber, string? password) : base(id)
+        public UserDto(Guid id, string? name, string? email, string? phoneNumber, string? password) : base(id, name)
         {
-            Name = name;
             Email = email;
             PhoneNumber = phoneNumber;
             Password = password;
@@ -24,7 +24,7 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
         public string? Password { get; set; }
     }
 
-    public class EditCreateRequestDto
+    public class EditCreateUserRequestDto
     {
         public string Name { get; set; }
 

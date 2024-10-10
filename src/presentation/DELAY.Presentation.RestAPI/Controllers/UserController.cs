@@ -4,11 +4,8 @@ using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos;
 using DELAY.Core.Application.Contracts.Models.Dtos.Response;
-using DELAY.Core.Application.Contracts.Models.Dtos.Users;
-using DELAY.Core.Domain.Models;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {
@@ -136,7 +133,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                var user = await userService.GetBoardUsersAsync(id);
+                var user = await userService.GetByBoardAsync(id);
 
                 if (user == null)
                 {
@@ -196,7 +193,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                var user = await userService.GetUsersByTicketAsync(id);
+                var user = await userService.GetByTicketAsync(id);
 
                 if (user == null)
                 {
@@ -432,11 +429,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddAsync([FromBody] UserCreateRequestDto model)
+        public async Task<IActionResult> AddAsync([FromBody] EditCreateUserRequestDto model)
         {
             try
             {
-                var result = await userService.AddAsync(mapper.Map<User>(model), UserIdentityName);
+                TryGetUser(out var user);
+
+                var result = await userService.AddAsync(model, user);
 
                 logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
 
@@ -478,11 +477,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateAsync([FromBody] UserDto model)
+        public async Task<IActionResult> UpdateAsync([FromBody] EditCreateUserRequestDto model)
         {
             try
             {
-                var result = await userService.UpdateAsync(mapper.Map<User>(model), UserIdentityName);
+                TryGetUser(out var user);
+
+                var result = await userService.UpdateAsync(model, user);
 
                 logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
 
@@ -529,7 +530,9 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                var result = await userService.UpdatePasswordAsync(model.Id, model.Password, UserIdentityName);
+                TryGetUser(out var user);
+
+                var result = await userService.UpdatePasswordAsync(model, user);
 
                 logger.LogInformation("Создание объекта активности по параметрам и получение ключа {result} новой записи", result);
 
@@ -570,7 +573,9 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                var deletedCount = await userService.DeleteAsync(id, UserIdentityName);
+                TryGetUser(out var user);
+
+                var deletedCount = await userService.DeleteAsync(id, user);
 
                 logger.LogInformation("Удалено {deletedCount} активностей по параметрам фильтра {filter}", deletedCount, id);
 
@@ -611,7 +616,9 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                var deletedCount = await userService.DeleteAsync(ids, UserIdentityName);
+                TryGetUser(out var user);
+
+                var deletedCount = await userService.DeleteAsync(ids, user);
 
                 logger.LogInformation("Удалено {deletedCount} активностей по параметрам фильтра {filter}", deletedCount, ids);
 

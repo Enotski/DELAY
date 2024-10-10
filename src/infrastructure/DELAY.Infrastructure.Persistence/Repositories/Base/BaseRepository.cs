@@ -2,6 +2,8 @@
 using DELAY.Core.Application.Abstractions.Storages.Base;
 using DELAY.Core.Domain.Interfaces;
 using DELAY.Infrastructure.Persistence.Context;
+using DELAY.Infrastructure.Persistence.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DELAY.Infrastructure.Persistence.Repositories.Base
 {
@@ -15,5 +17,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
         {
             this.context = context;
         }
+
+        protected DbSet<TEntity> Set { get => context.Set<TEntity>(); } 
     }
 }

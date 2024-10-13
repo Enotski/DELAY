@@ -25,7 +25,7 @@ namespace DELAY.Core.Domain.Models
         public string? ChangedBy { get; set; }
         public RoleType Role { get; set; }
 
-        public IEnumerable<Ticket> AssignedTickets { get; set; }
+        public IEnumerable<KeyNamedModel> AssignedTickets { get; set; }
         public IEnumerable<ChatRoomUser> ChatRooms { get; set; }
         public IEnumerable<BoardUser> Boards { get; set; }
 

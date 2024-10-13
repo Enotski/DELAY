@@ -1,24 +1,86 @@
-﻿namespace DELAY.Infrastructure.Persistence.Repositories
+﻿using DELAY.Core.Application.Abstractions.Services.Common;
+using DELAY.Core.Application.Abstractions.Storages;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors;
+using DELAY.Core.Domain.Models;
+using DELAY.Infrastructure.Persistence.Context;
+using DELAY.Infrastructure.Persistence.Entities;
+using DELAY.Infrastructure.Persistence.Repositories.Base;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+
+namespace DELAY.Infrastructure.Persistence.Repositories
 {
-    //internal class TicketRepository : NamedRepository<Ticket>, ITicketStorage
-    //{
-    //    public TicketRepository(DelayContext context) : base(context)
-    //    {
-    //    }
+    internal class TicketRepository : NamedRepository<TicketEntity, Ticket>, ITicketStorage
+    {
+        public TicketRepository(DelayContext context, IModelMapperService mapper) : base(context, mapper)
+        {
+        }
 
-    //    public Task<int> CountAsync(IEnumerable<SearchOptions> options, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+        public async Task<Guid> CreateTicketAsync(Ticket ticket, CancellationToken cancellationToken = default)
+        {
+            return await AddAsync(ticket, (id, dbContext) => {
+                if (ticket.Users.Any())
+                {
+                    var entities = ticket.Users.Select(x => new TicketUserEntity(ticket.Id, x.Id));
 
-    //    public Task<IReadOnlyList<Ticket>> GetAssignedToUserAsync(Guid userId, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+                    dbContext.Set<TicketUserEntity>().AddRange(entities);
+                }
+            }, cancellationToken);
+        }
 
-    //    public Task<IReadOnlyList<Ticket>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
+        public async Task<int> UpdateTicketAsync(Ticket ticket, CancellationToken cancellationToken = default)
+        {
+            return await UpdateAsync(ticket, (id, dbContext) => {
+                var toRemove = dbContext.Set<TicketUserEntity>().Where(x => x.TicketId == ticket.Id);
+                dbContext.Set<TicketUserEntity>().RemoveRange(toRemove);
+
+                if (ticket.Users.Any())
+                {
+                    var entities = ticket.Users.Select(x => new TicketUserEntity(ticket.Id, x.Id));
+
+                    dbContext.Set<TicketUserEntity>().AddRange(entities);
+                }
+            }, cancellationToken);
+        }
+
+        public async Task<IEnumerable<KeyNameSelector>> GetRecordsByListAsync(Guid listId, CancellationToken cancellationToken = default)
+        {
+            Expression<Func<TicketEntity, KeyNameSelector>> selector = x
+                => new KeyNameSelector(x.Id, x.Name);
+
+            Expression<Func<TicketEntity, bool>> filter = x
+                => x.TicketListId == listId;
+
+            return await BuildQuery(filter)
+                .Select(selector)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<TicketSelector> GetRecordAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            Expression<Func<TicketEntity, TicketSelector>> selector = x
+                => new TicketSelector(x.Id, x.Name, x.IsDone, x.Description, x.ChangedDate, x.CreateDate, x.ChangedBy, x.CreatedBy, x.DeadlineDate,
+                x.Users.Select(xx => new KeyNameSelector(xx.UserId, xx.User.Name)));
+
+            var filter = ByKeySearchSpecification(id);
+
+            return await BuildQuery(filter)
+                .Select(selector)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<KeyNameSelector>> GetRecordsByUserAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            Expression<Func<TicketEntity, KeyNameSelector>> selector = x
+                => new KeyNameSelector(x.Id, x.Name);
+
+            Expression<Func<TicketEntity, bool>> filter = x
+                => x.Users.Any(xx => xx.UserId == userId);
+
+            return await BuildQuery(filter)
+                .Select(selector)
+                .ToListAsync(cancellationToken);
+        }
+    }
 }

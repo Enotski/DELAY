@@ -48,7 +48,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetAsync(id, user);
+                var model = await boardService.GetBoardAsync(id, user);
 
                 if (model == null)
                 {
@@ -74,7 +74,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetByUserAsync(user.Id);
+                var model = await boardService.GetBoardByUserAsync(user.Id);
 
                 if (model == null)
                 {
@@ -117,13 +117,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateBoard([FromBody] NameDto model)
+        public async Task<IActionResult> CreateBoard([FromBody] BoardDto model)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.CreateAsync(model, user);
+                var result = await boardService.CreateBoardAsync(model, user);
 
                 return Created(result.ToString(), result);
             }
@@ -137,13 +137,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateBoard([FromBody] EditBoardRequestDto model)
+        public async Task<IActionResult> UpdateBoard([FromBody] BoardDto model)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.UpdateAsync(model, user);
+                var result = await boardService.UpdateBoardAsync(model, user);
 
                 return Ok();
             }

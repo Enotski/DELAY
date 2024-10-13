@@ -1,16 +1,13 @@
-﻿using DELAY.Core.Application.Abstractions.Services;
-using DELAY.Core.Application.Abstractions.Services.Auth;
+﻿using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos;
 using DELAY.Core.Application.Contracts.Models.Dtos.Base;
-using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
 using DELAY.Core.Domain.Models.Base;
-using System.Reflection;
 
 namespace DELAY.Core.Application.Services
 {
@@ -29,14 +26,15 @@ namespace DELAY.Core.Application.Services
 
         private async Task<KeyNamedModel> ValidatePermissionToOperation(RoleType roleType, string triggeredByName)
         {
-            var result = await userStorage.PermissionToPerformOperationAsync(roleType, triggeredByName);
+            throw new NotImplementedException();
+            //var result = await userStorage.PermissionToPerformOperationAsync(roleType, triggeredByName);
 
-            if (result == null)
-            {
-                throw new Exception("No permission for operation");
-            }
+            //if (result == null)
+            //{
+            //    throw new Exception("No permission for operation");
+            //}
 
-            return result;
+            //return result;
         }
         private async Task ValidateUserAsync(User user)
         {
@@ -230,12 +228,7 @@ namespace DELAY.Core.Application.Services
             throw new NotImplementedException();
         }
 
-        Task<UserDto> INamedService<UserDto>.GetAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<IReadOnlyList<UserDto>> INamedService<UserDto>.GetRecordsAsync(IEnumerable<Guid> ids)
+        Task<UserDto> IUserService.GetAsync(Guid id)
         {
             throw new NotImplementedException();
         }

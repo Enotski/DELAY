@@ -20,16 +20,6 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         {
         }
 
-        public Task<int> CountAsync(Guid userId, IEnumerable<SearchOptions> options, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IReadOnlyList<Board>> GetRecordsAsync(Guid userId, IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Guid> CreateBoardAsync(Board board, CancellationToken cancellationToken = default)
         {
             return await AddAsync(board, (id, dbContext) => {
@@ -42,11 +32,25 @@ namespace DELAY.Infrastructure.Persistence.Repositories
             }, cancellationToken);
         }
 
-        public async Task<BoardSelector> GetBoardAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<int> UpdateBoardAsync(Board board, CancellationToken cancellationToken = default)
+        {
+            return await UpdateAsync(board, (id, dbContext) => {
+                var toRemove = dbContext.Set<BoardUserEntity>().Where(x => x.BoardId == board.Id);
+                dbContext.Set<BoardUserEntity>().RemoveRange(toRemove);
+
+                if (board.BoardUsers.Any())
+                {
+                    var toAdd = board.BoardUsers.Select(x => new BoardUserEntity(id, x.User.Id, x.UserRole));
+                    dbContext.Set<BoardUserEntity>().AddRange(toAdd);
+                }
+            }, cancellationToken);
+        }
+
+        public async Task<BoardSelector> GetRecordAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Expression<Func<BoardEntity, BoardSelector>> selector = x
-                => new BoardSelector(x.Id, x.Name, x.Description, 
-                x.BoardUsers.Select(xx => new BoardUserSelector(new KeyNameSelector(xx.BoardId, xx.Board.Name), new KeyNameSelector(xx.UserId, xx.User.Name), xx.UserRole)));
+                => new BoardSelector(x.Id, x.Name, x.Description, x.IsPublic, 
+                x.BoardUsers.Select(xx => new BoardUserSelector(new KeyNameSelector(xx.UserId, xx.User.Name), xx.UserRole)));
 
             var filter = ByKeySearchSpecification(id);
 
@@ -55,13 +59,26 @@ namespace DELAY.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<KeyNameSelector>> GetByUserAsync(Guid userId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<KeyNameSelector>> GetRecordsByUserAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             Expression<Func<BoardEntity, KeyNameSelector>> selector = x
                 => new KeyNameSelector(x.Id, x.Name);
 
             Expression<Func<BoardEntity, bool>> filter = x 
-                => x.BoardUsers.Any(xx => xx.UserId == userId);
+                => x.IsPublic || x.BoardUsers.Any(xx => xx.UserId == userId);
+
+            return await BuildQuery(filter)
+                .Select(selector)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<KeyNameSelector>> GetKeyNameRecordsByChatAsync(Guid chatId, CancellationToken cancellationToken = default)
+        {
+            Expression<Func<BoardEntity, KeyNameSelector>> selector = x
+                => new KeyNameSelector(x.Id, x.Name);
+
+            Expression<Func<BoardEntity, bool>> filter = x
+                => x.BoardChatRooms.Any(xx => xx.ChatRoomId == chatId);
 
             return await BuildQuery(filter)
                 .Select(selector)

@@ -169,7 +169,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
                 builder.HasOne(p => p.User).WithMany(p => p.AssignedTickets)
                     .HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
 
-                builder.HasOne(p => p.Ticket).WithMany(p => p.AssignedUsers)
+                builder.HasOne(p => p.Ticket).WithMany(p => p.Users)
                     .HasForeignKey(p => p.TicketId).OnDelete(DeleteBehavior.Cascade);
             }
         }

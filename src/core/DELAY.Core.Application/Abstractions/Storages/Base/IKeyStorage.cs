@@ -8,6 +8,8 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
     /// <typeparam name="T"></typeparam>
     public interface IKeyStorage<T> : IBaseStorage<T> where T : class, IKey
     {
+        Task<bool> IsExistById(Guid id, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Get record by key
         /// </summary>

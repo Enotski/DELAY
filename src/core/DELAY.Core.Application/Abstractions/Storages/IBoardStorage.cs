@@ -9,16 +9,14 @@ namespace DELAY.Core.Application.Abstractions.Storages
 {
     public interface IBoardStorage : INamedStorage<Board>
     {
-        Task<int> CountAsync(Guid userId, IEnumerable<SearchOptions> options, CancellationToken cancellationToken = default);
-
-        Task<IReadOnlyList<Board>> GetRecordsAsync(Guid userId, IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default);
-
         Task<bool> IsAllowToPerformOperationAsync(BoardRoleType role, Guid triggeredById, Guid boardId, CancellationToken cancellationToken = default);
 
         Task<Guid> CreateBoardAsync(Board board, CancellationToken cancellationToken = default);
+        Task<int> UpdateBoardAsync(Board board, CancellationToken cancellationToken = default);
 
-        Task<BoardSelector> GetBoardAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<BoardSelector> GetRecordAsync(Guid id, CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<KeyNameSelector>> GetByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<KeyNameSelector>> GetRecordsByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<KeyNameSelector>> GetKeyNameRecordsByChatAsync(Guid chatId, CancellationToken cancellationToken = default);
     }
 }

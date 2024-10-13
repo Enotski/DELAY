@@ -15,6 +15,11 @@ namespace DELAY.Core.Domain.Models.Base
         {
             Name = name;
         }
+        public KeyNamedModel(KeyNamedModel model) : base()
+        {
+            Id = model.Id;
+            Name = model.Name;
+        }
 
         public string Name
         {
@@ -27,6 +32,12 @@ namespace DELAY.Core.Domain.Models.Base
             }
         }
         private string name;
+
+
+        public bool IsValidName()
+        {
+            return !string.IsNullOrWhiteSpace(Name);
+        }
 
         public void Update(string name)
         {

@@ -4,6 +4,7 @@ using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Interfaces;
 using DELAY.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Z.EntityFramework.Plus;
 
@@ -82,6 +83,9 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
             return query;
         }
 
+        public async Task<bool> IsExistById(Guid id, CancellationToken cancellationToken = default) => await Set.AnyAsync(x => x.Id == id, cancellationToken);
+
+
         /// <summary>
         /// Получение кол-ва сущностей
         /// </summary>
@@ -116,7 +120,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
 
             return entity.Id;
         }
-        public async Task<Guid> AddAsync(TDomain model, Action<Guid, DbContext> relationEntitiesInsertDelegate, CancellationToken cancellationToken = default)
+        public async Task<Guid> AddAsync(TDomain model, Action<Guid, DbContext> beforeSaveDelegate, CancellationToken cancellationToken = default)
         {
             var entity = _mapper.Map<TEntity>(model);
 
@@ -124,7 +128,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
 
             context.Set<TEntity>().Add(entity);
 
-            relationEntitiesInsertDelegate(entity.Id, context);
+            beforeSaveDelegate(entity.Id, context);
 
             await context.SaveChangesAsync(cancellationToken);
 
@@ -231,6 +235,19 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
             var entity = _mapper.Map<TEntity>(model);
 
             context.Entry(entity).State = EntityState.Modified;
+
+            return await context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<int> UpdateAsync(TDomain model, Action<Guid, DbContext> beforeSaveDelegate, CancellationToken cancellationToken = default)
+        {
+            var entity = _mapper.Map<TEntity>(model);
+
+            entity.Id = Guid.NewGuid();
+
+            context.Set<TEntity>().Add(entity);
+
+            beforeSaveDelegate(entity.Id, context);
 
             return await context.SaveChangesAsync(cancellationToken);
         }

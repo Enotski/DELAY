@@ -306,40 +306,40 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <response code="200">OK</response>
         /// <response code="404">Не удалось найти по ключу</response>
         /// <response code="500">Internal server error</response>
-        [HttpGet]
-        [Route("get-list")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAsync([FromBody] IEnumerable<Guid> ids)
-        {
-            try
-            {
-                var user = await userService.GetRecordsAsync(ids);
+        //[HttpGet]
+        //[Route("get-list")]
+        //[Produces("application/json")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //public async Task<IActionResult> GetAsync([FromBody] IEnumerable<Guid> ids)
+        //{
+        //    try
+        //    {
+        //        var user = await userService.GetRecordsAsync(ids);
 
-                if (user == null)
-                {
-                    string message = "Не удалось определить объект активности по ключу";
+        //        if (user == null)
+        //        {
+        //            string message = "Не удалось определить объект активности по ключу";
 
-                    logger.LogInformation(message + " {ids}", ids);
+        //            logger.LogInformation(message + " {ids}", ids);
 
-                    return Problem(message, statusCode: StatusCodes.Status404NotFound);
-                }
+        //            return Problem(message, statusCode: StatusCodes.Status404NotFound);
+        //        }
 
-                var result = mapper.Map<UserDto>(user);
+        //        var result = mapper.Map<UserDto>(user);
 
-                logger.LogInformation("Получение объекта активности по ключу {ids}: {result}", result, ids);
+        //        logger.LogInformation("Получение объекта активности по ключу {ids}: {result}", result, ids);
 
-                return Ok(result);
-            }
-            catch (Exception exp)
-            {
-                logger.LogError("Ошибка получения объекта активности по ключу {ids}: {exp}", ids, exp);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception exp)
+        //    {
+        //        logger.LogError("Ошибка получения объекта активности по ключу {ids}: {exp}", ids, exp);
 
-                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
-            }
-        }
+        //        return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
+        //    }
+        //}
 
         /// <summary>
         /// Получение активности по ключу
@@ -366,40 +366,40 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <response code="200">OK</response>
         /// <response code="404">Не удалось найти по ключу</response>
         /// <response code="500">Internal server error</response>
-        [HttpGet]
-        [Route("get-key-name-list")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetKeyNamesAsync([FromBody] IEnumerable<Guid> ids)
-        {
-            try
-            {
-                var user = await userService.GetKeyNameRecordsAsync(ids);
+        //[HttpGet]
+        //[Route("get-key-name-list")]
+        //[Produces("application/json")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //public async Task<IActionResult> GetKeyNamesAsync([FromBody] IEnumerable<Guid> ids)
+        //{
+        //    try
+        //    {
+        //        var user = await userService.GetKeyNameRecordsAsync(ids);
 
-                if (user == null)
-                {
-                    string message = "Не удалось определить объект активности по ключу";
+        //        if (user == null)
+        //        {
+        //            string message = "Не удалось определить объект активности по ключу";
 
-                    logger.LogInformation(message + " {ids}", ids);
+        //            logger.LogInformation(message + " {ids}", ids);
 
-                    return Problem(message, statusCode: StatusCodes.Status404NotFound);
-                }
+        //            return Problem(message, statusCode: StatusCodes.Status404NotFound);
+        //        }
 
-                var result = mapper.Map<UserDto>(user);
+        //        var result = mapper.Map<UserDto>(user);
 
-                logger.LogInformation("Получение объекта активности по ключу {ids}: {result}", result, ids);
+        //        logger.LogInformation("Получение объекта активности по ключу {ids}: {result}", result, ids);
 
-                return Ok(result);
-            }
-            catch (Exception exp)
-            {
-                logger.LogError("Ошибка получения объекта активности по ключу {ids}: {exp}", ids, exp);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception exp)
+        //    {
+        //        logger.LogError("Ошибка получения объекта активности по ключу {ids}: {exp}", ids, exp);
 
-                return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
-            }
-        }
+        //        return Problem(exp.Message, statusCode: StatusCodes.Status500InternalServerError);
+        //    }
+        //}
 
         /// <summary>
         /// Add user

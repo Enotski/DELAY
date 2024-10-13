@@ -1,64 +1,45 @@
-﻿namespace DELAY.Infrastructure.Persistence.Repositories
+﻿using DELAY.Core.Application.Abstractions.Services.Common;
+using DELAY.Core.Application.Abstractions.Storages;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
+using DELAY.Core.Domain.Models;
+using DELAY.Infrastructure.Persistence.Context;
+using DELAY.Infrastructure.Persistence.Entities;
+using DELAY.Infrastructure.Persistence.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+
+namespace DELAY.Infrastructure.Persistence.Repositories
 {
-    //internal class TicketListRepository : BaseRepository<TicketsList>, ITicketsListStorage
-    //{
-    //    protected TicketListRepository(DelayContext context) : base(context)
-    //    {
-    //    }
+    internal class TicketsListRepository : NamedRepository<TicketsListEntity, TicketsList>, ITicketsListStorage
+    {
+        public TicketsListRepository(DelayContext context, IModelMapperService mapper) : base(context, mapper)
+        {
+        }
 
-    //    public Task<int> CountAsync(IEnumerable<SearchOptions> options, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+        public async Task<TicketsListSelector> GetRecordAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            Expression<Func<TicketsListEntity, TicketsListSelector>> selector = x
+                => new TicketsListSelector(x.Id, x.Name, x.Tickets.Select(xx => new KeyNameSelector(xx.Id, xx.Name)));
 
-    //    public Task<Guid> GetKeyByNameAsync(string name, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+            var filter = ByKeySearchSpecification(id);
 
-    //    public Task<KeyNamedModel> GetKeyNameByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+            return await BuildQuery(filter)
+                .Select(selector)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
 
-    //    public Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<SearchOptions> searchOptions, SortOptions sortOption, PaginationOptions pagination, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+        public async Task<IEnumerable<TicketsListSelector>> GetRecordsByBoardAsync(Guid boardId, CancellationToken cancellationToken = default)
+        {
+            Expression<Func<TicketsListEntity, TicketsListSelector>> selector = x
+                => new TicketsListSelector(x.Id, x.Name, x.Tickets.Select(xx => new KeyNameSelector(xx.Id, xx.Name)));
 
-    //    public Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+            Expression<Func<TicketsListEntity, bool>> filter = x
+                => x.BoardId == boardId;
 
-    //    public Task<PagedData<KeyNamedModel>> GetKeyNameRecordsAsync(string term, PaginationOptions pagination, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task<IReadOnlyList<KeyNamedModel>> GetKeyNamesByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task<string> GetNameByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task<IReadOnlyList<string>> GetNamesByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task<IReadOnlyList<TicketsList>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions paginationOption, CancellationToken cancellationToken = default)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    Task<Guid?> INamedStorage<TicketsList>.GetKeyByNameAsync(string name, CancellationToken cancellationToken)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
+            return await BuildQuery(filter)
+                .Select(selector)
+                .ToListAsync(cancellationToken);
+        }
+    }
 }

@@ -1,5 +1,4 @@
-﻿using DELAY.Core.Domain.Interfaces;
-using DELAY.Infrastructure.Persistence.Entities.Base;
+﻿using DELAY.Infrastructure.Persistence.Entities.Base;
 
 namespace DELAY.Infrastructure.Persistence.Entities
 {
@@ -10,6 +9,7 @@ namespace DELAY.Infrastructure.Persistence.Entities
         public string Description { get; set; }
         public DateTime ChangeDate { get; set; }
         public DateTime CreateDate { get; set; }
+        public bool IsPublic { get; set; }
 
         public ICollection<BoardChatRoomEntity> BoardChatRooms { get; set; } = new List<BoardChatRoomEntity>();
         public ICollection<BoardUserEntity> BoardUsers { get; set; } = new List<BoardUserEntity>();

@@ -6,7 +6,7 @@ using DELAY.Core.Domain.Models;
 
 namespace DELAY.Core.Application.Abstractions.Services.Rooms
 {
-    internal interface IChatRoomService : INamedService<ChatRoom>
+    internal interface IChatRoomService : INamedService
     {
         /// <summary>
         /// Create room

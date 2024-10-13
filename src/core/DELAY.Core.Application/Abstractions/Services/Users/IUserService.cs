@@ -5,7 +5,7 @@ using DELAY.Core.Domain.Models;
 
 namespace DELAY.Core.Application.Abstractions.Services.Users
 {
-    public interface IUserService : INamedService<UserDto>
+    public interface IUserService : INamedService
     {
         /// <summary>
         /// Create user
@@ -23,12 +23,13 @@ namespace DELAY.Core.Application.Abstractions.Services.Users
 
         Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy);
 
+        Task<UserDto> GetAsync(Guid id);
         Task<IEnumerable<UserDto>> GetByTicketAsync(Guid ticketId);
 
         Task<IEnumerable<UserDto>> GetByBoardAsync(Guid boardId);
 
         Task<IEnumerable<UserDto>> GetByChatRoomAsync(Guid boardId);
-
+        Task<int> DeleteAsync(IEnumerable<Guid> id, OperationUserInfo triggeredBy);
         /// <summary>
         /// Get records by search options
         /// </summary>

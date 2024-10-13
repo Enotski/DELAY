@@ -12,14 +12,16 @@ namespace DELAY.Core.Domain.Models
         {
         }
 
-        public Ticket(string name, string description, string changedBy, IEnumerable<User> assignedUsers) : base(name)
+        public Ticket(KeyNamedModel ticketsList, string name, string description, string changedBy, IEnumerable<KeyNamedModel> assignedUsers) : base(name)
         {
+            TicketsList = ticketsList;
             Description = description;
             ChangedDate = DateTime.UtcNow;
-            AssignedUsers = assignedUsers;
+            Users = assignedUsers;
             ChangedBy = changedBy;
         }
 
+        public bool IsDone { get; set; }
         public string Description { get; set; }
 
         public DateTime ChangedDate { get; set; }
@@ -30,14 +32,20 @@ namespace DELAY.Core.Domain.Models
 
         public DateTime DeadLineDate { get; set; }
 
-        public IEnumerable<User> AssignedUsers { get; set; } = new List<User>();
+        public KeyNamedModel TicketsList { get; set; }
+        public IEnumerable<KeyNamedModel> Users { get; set; } = new List<KeyNamedModel>();
 
-        public void Update(string name, string description, IEnumerable<User> assignedUsers, string changedBy)
+        public bool IsValid()
+            => base.IsValidName() && !string.IsNullOrEmpty(CreatedBy) && CreateDate != DateTime.MaxValue && CreateDate != DateTime.MaxValue && TicketsList != null && TicketsList.Id != Guid.Empty;
+
+
+        public void Update(string name, string description, bool isDone, IEnumerable<KeyNamedModel> assignedUsers, string changedBy)
         {
+            IsDone = isDone;
             Description = description;
             ChangedDate = DateTime.UtcNow;
             ChangedBy = changedBy;
-            AssignedUsers = assignedUsers;
+            Users = assignedUsers;
             this.Update(name);
         }
     }

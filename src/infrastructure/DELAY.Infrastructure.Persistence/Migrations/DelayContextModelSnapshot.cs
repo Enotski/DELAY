@@ -346,7 +346,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.TicketUserEntity", b =>
                 {
                     b.HasOne("DELAY.Infrastructure.Persistence.Entities.TicketEntity", "Ticket")
-                        .WithMany("AssignedUsers")
+                        .WithMany("Users")
                         .HasForeignKey("TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -391,7 +391,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.TicketEntity", b =>
                 {
-                    b.Navigation("AssignedUsers");
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("DELAY.Infrastructure.Persistence.Entities.TicketsListEntity", b =>

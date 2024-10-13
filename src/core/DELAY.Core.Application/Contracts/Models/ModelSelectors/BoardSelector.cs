@@ -6,27 +6,27 @@ namespace DELAY.Core.Application.Contracts.Models.ModelSelectors
 {
     public class BoardSelector : KeyNameDto
     {
-        public BoardSelector(Guid id, string name, string description, IEnumerable<BoardUserSelector> users) : base(id, name)
+        public BoardSelector(Guid id, string name, string description, bool isPublic, IEnumerable<BoardUserSelector> users) : base(id, name)
         {
             Description = description;
             Users = users;
+            IsPublic = isPublic;
         }
 
         public string Description { get; set; }
+        public bool IsPublic { get; set; }
 
         public IEnumerable<BoardUserSelector> Users { get; set; }
     }
 
     public class BoardUserSelector
     {
-        public BoardUserSelector(KeyNameSelector board, KeyNameSelector user, BoardRoleType userRole)
+        public BoardUserSelector(KeyNameSelector user, BoardRoleType userRole)
         {
-            Board = board;
             User = user;
             UserRole = userRole;
         }
 
-        public KeyNameSelector Board { get; set; }
         public KeyNameSelector User { get; set; }
         public BoardRoleType UserRole { get; set; }
     }

@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace DELAY.Core.Application.Abstractions.Services
 {
     [ApiController]
-    [Route("api/boards")]
-    public class BoardController : AuthorizedController
+    [Route("api/tickets-list")]
+    public class TicketsListController : AuthorizedController
     {
         /// <summary>
         /// <inheritdoc cref="IBoardService"/>
@@ -20,14 +20,14 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <summary>
         /// <inheritdoc cref="ILogger"/>
         /// </summary>
-        private readonly ILogger<BoardController> logger;
+        private readonly ILogger<TicketsListController> logger;
 
         /// <summary>
         /// <inheritdoc cref="IModelMapperService"/>
         /// </summary>
         private readonly IModelMapperService mapper;
 
-        public BoardController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<BoardController> logger) : base(tokensService)
+        public TicketsListController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<TicketsListController> logger) : base(tokensService)
         {
             this.logger = logger;
 
@@ -41,13 +41,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAsync(Guid id)
+        public async Task<IActionResult> GetAsync([FromQuery] Guid id, [FromQuery] Guid boardId)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetBoardAsync(id, user);
+                var model = await boardService.GetTicketsListAsync(new TicketsListRequestDto() { TicketsListId = id, BoardId = boardId }, user);
 
                 if (model == null)
                 {
@@ -62,18 +62,18 @@ namespace DELAY.Core.Application.Abstractions.Services
             }
         }
 
-        [HttpGet, Route("/by-chat/{id}")]
+        [HttpGet, Route("by-board")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByChatAsync(Guid id)
+        public async Task<IActionResult> GetByBoardAsync([FromQuery] Guid boardId)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetBoardByChatAsync(id, user);
+                var model = await boardService.GetTicketsListByBoardAsync(boardId, user);
 
                 if (model == null)
                 {
@@ -85,32 +85,6 @@ namespace DELAY.Core.Application.Abstractions.Services
             catch (Exception exp)
             {
                 return HandleError(logger, exp, "Get board by key error", code: StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet, Route("by-user")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByUserAsync()
-        {
-            try
-            {
-                TryGetUser(out OperationUserInfo user);
-
-                var model = await boardService.GetBoardByUserAsync(user.Id);
-
-                if (model == null)
-                {
-                    return Problem("Not found by user", statusCode: StatusCodes.Status404NotFound);
-                }
-
-                return Ok(model);
-            }
-            catch (Exception exp)
-            {
-                return HandleError(logger, exp, "Create board by user error", code: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -142,13 +116,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateBoard([FromBody] BoardDto model)
+        public async Task<IActionResult> CreateAsync([FromBody] TicketsListDto model)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.CreateBoardAsync(model, user);
+                var result = await boardService.CreateTicketsListAsync(model, user);
 
                 return Created(result.ToString(), result);
             }
@@ -162,19 +136,19 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateBoard([FromBody] BoardDto model)
+        public async Task<IActionResult> UpdateAsync([FromBody] TicketsListDto model)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.UpdateBoardAsync(model, user);
+                var result = await boardService.UpdateTicketsListAsync(model, user);
 
                 return Ok();
             }
             catch (Exception exp)
             {
-                return HandleError(logger, exp, "Create board error", code: StatusCodes.Status500InternalServerError);
+                return HandleError(logger, exp, "Update list error", code: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -182,19 +156,19 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteBoard([FromBody] Guid id)
+        public async Task<IActionResult> DeleteAsync([FromBody] Guid id)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.DeleteAsync(id, user);
+                var result = await boardService.DeleteTicketsListAsync(id, user);
 
                 return Ok();
             }
             catch (Exception exp)
             {
-                return HandleError(logger, exp, "Create board error", code: StatusCodes.Status500InternalServerError);
+                return HandleError(logger, exp, "Delete list error", code: StatusCodes.Status500InternalServerError);
             }
         }
     }

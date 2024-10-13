@@ -10,7 +10,7 @@ namespace DELAY.Core.Application.Abstractions.Services
 {
     [ApiController]
     [Route("api/boards")]
-    public class BoardController : AuthorizedController
+    public class TicketController : AuthorizedController
     {
         /// <summary>
         /// <inheritdoc cref="IBoardService"/>
@@ -20,14 +20,14 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// <summary>
         /// <inheritdoc cref="ILogger"/>
         /// </summary>
-        private readonly ILogger<BoardController> logger;
+        private readonly ILogger<TicketController> logger;
 
         /// <summary>
         /// <inheritdoc cref="IModelMapperService"/>
         /// </summary>
         private readonly IModelMapperService mapper;
 
-        public BoardController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<BoardController> logger) : base(tokensService)
+        public TicketController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<TicketController> logger) : base(tokensService)
         {
             this.logger = logger;
 
@@ -41,13 +41,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAsync(Guid id)
+        public async Task<IActionResult> GetAsync([FromQuery] Guid id, [FromQuery] Guid boardId)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetBoardAsync(id, user);
+                var model = await boardService.GetTicketAsync(new TicketRequestDto() { Id = id, BoardId = boardId}, user);
 
                 if (model == null)
                 {
@@ -62,18 +62,18 @@ namespace DELAY.Core.Application.Abstractions.Services
             }
         }
 
-        [HttpGet, Route("/by-chat/{id}")]
+        [HttpGet, Route("/by-list")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByChatAsync(Guid id)
+        public async Task<IActionResult> GetByChatAsync([FromQuery] Guid listId, [FromQuery] Guid boardId)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetBoardByChatAsync(id, user);
+                var model = await boardService.GetTicketsByListAsync(new TicketsByListRequestDto() { ListId = listId, BoardId = boardId}, user);
 
                 if (model == null)
                 {
@@ -99,7 +99,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetBoardByUserAsync(user.Id);
+                var model = await boardService.GetTicketsByUserAsync(user);
 
                 if (model == null)
                 {
@@ -142,13 +142,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateBoard([FromBody] BoardDto model)
+        public async Task<IActionResult> CreateBoard([FromBody] EditTicketRequestDto model)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.CreateBoardAsync(model, user);
+                var result = await boardService.CreateTicketAsync(model, user);
 
                 return Created(result.ToString(), result);
             }
@@ -162,13 +162,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateBoard([FromBody] BoardDto model)
+        public async Task<IActionResult> UpdateAsync([FromBody] EditTicketRequestDto model)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.UpdateBoardAsync(model, user);
+                var result = await boardService.UpdateTicketAsync(model, user);
 
                 return Ok();
             }
@@ -182,13 +182,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteBoard([FromBody] Guid id)
+        public async Task<IActionResult> DeleteAsync([FromBody] Guid id)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.DeleteAsync(id, user);
+                var result = await boardService.DeleteTicketAsync(id, user);
 
                 return Ok();
             }

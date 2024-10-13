@@ -96,9 +96,9 @@ namespace DELAY.Core.Application.Services
             return mapperService.Map<IReadOnlyList<KeyNameDto>>(entities);
         }
 
-        public async Task<IReadOnlyList<KeyNameDto>> GetBoardByChatAsync(Guid chatId, Guid userId)
+        public async Task<IReadOnlyList<KeyNameDto>> GetBoardByChatAsync(Guid chatId, OperationUserInfo triggeredBy)
         {
-            await IsGlobalAllowToPerformOperationAsync(RoleType.User, userId);
+            await IsGlobalAllowToPerformOperationAsync(RoleType.User, triggeredBy.Id);
 
             var entities = await boardStorage.GetKeyNameRecordsByChatAsync(chatId);
 
@@ -224,7 +224,7 @@ namespace DELAY.Core.Application.Services
             return mapperService.Map<TicketDto>(entity);
         }
 
-        public async Task<IEnumerable<KeyNameDto>> GetTicketsListByBoardAsync(TicketsByListRequestDto model, OperationUserInfo triggeredBy)
+        public async Task<IEnumerable<KeyNameDto>> GetTicketsByListAsync(TicketsByListRequestDto model, OperationUserInfo triggeredBy)
         {
             await IsAllowToPerformOperationAsync(BoardRoleType.User, triggeredBy.Id, model.BoardId);
 
@@ -235,7 +235,7 @@ namespace DELAY.Core.Application.Services
             return mapperService.Map<IEnumerable<KeyNameDto>>(entities);
         }
 
-        public async Task<IEnumerable<TicketsListDto>> GetTicketsListByUserAsync(OperationUserInfo triggeredBy)
+        public async Task<IEnumerable<TicketsListDto>> GetTicketsByUserAsync(OperationUserInfo triggeredBy)
         {
             await IsGlobalAllowToPerformOperationAsync(RoleType.User, triggeredBy.Id);
 

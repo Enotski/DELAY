@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DELAY.Core.Application.Abstractions.Services
 {
     [ApiController]
-    [Route("api/boards")]
+    [Route("api/tickets")]
     public class TicketController : AuthorizedController
     {
         /// <summary>
@@ -62,7 +62,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             }
         }
 
-        [HttpGet, Route("/by-list")]
+        [HttpGet, Route("by-list")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -114,35 +114,11 @@ namespace DELAY.Core.Application.Abstractions.Services
             }
         }
 
-        /// <summary>
-        /// Add user
-        /// </summary>
-        /// <param name="model"><inheritdoc cref="UserDto"/></param>
-        /// <returns>User's key</returns>
-        /// <remarks>
-        /// Request:
-        ///
-        ///     POST /api/users
-        ///     {
-        ///       "name": "string",
-        ///       "email": "string",
-        ///       "phoneNumber": "string",
-        ///       "description": "string",
-        ///       "password": "string"
-        ///     }
-        ///
-        /// Response:
-        /// 
-        ///     "00000000-0000-0000-0000-000000000000"
-        /// 
-        /// </remarks>
-        /// <response code="201">User added</response>
-        /// <response code="500">Server error</response>
         [HttpPost]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateBoard([FromBody] EditTicketRequestDto model)
+        public async Task<IActionResult> CreateTicketAsync([FromBody] EditTicketRequestDto model)
         {
             try
             {

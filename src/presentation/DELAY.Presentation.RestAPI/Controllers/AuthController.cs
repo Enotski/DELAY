@@ -33,7 +33,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
             if (authResult.Role == Core.Domain.Enums.RoleType.User)
             {
                 endpoints.AddRange([
-                    new ApiEndpointDto("tickets", "Tickets"),
+                    new ApiEndpointDto("boards", "Boards"),
                     new ApiEndpointDto("rooms", "Rooms"),
                     new ApiEndpointDto("account", "Account"),
                     new ApiEndpointDto("users", "Users")
@@ -42,7 +42,7 @@ namespace DELAY.Presentation.RestAPI.Controllers
             else if (authResult.Role == Core.Domain.Enums.RoleType.Admin)
             {
                 endpoints.AddRange([
-                    new ApiEndpointDto("tickets", "Tickets"),
+                    new ApiEndpointDto("boards", "Boards"),
                     new ApiEndpointDto("rooms", "Rooms"),
                     new ApiEndpointDto("account", "Account"),
                     new ApiEndpointDto("users", "Users"),

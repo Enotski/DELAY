@@ -3,13 +3,14 @@ using DELAY.Core.Application.Abstractions.Services.Boards;
 using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos;
+using DELAY.Core.Application.Contracts.Models.Dtos.Base;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {
     [ApiController]
-    [Route("api/tickets-list")]
+    [Route("api/tickets-lists")]
     public class TicketsListController : AuthorizedController
     {
         /// <summary>
@@ -69,6 +70,32 @@ namespace DELAY.Core.Application.Abstractions.Services
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByBoardAsync([FromQuery] Guid boardId)
         {
+            return Ok(new List<TicketsListDto>()
+            {
+                new TicketsListDto(new List<KeyNameDto>()
+                {
+                    new KeyNameDto(Guid.NewGuid(), "Make one"),
+                    new KeyNameDto(Guid.NewGuid(), "Make two"),
+                    new KeyNameDto(Guid.NewGuid(), "Make three"),
+                }, boardId),
+                new TicketsListDto(new List<KeyNameDto>()
+                {
+                    new KeyNameDto(Guid.NewGuid(), "Make one"),
+                    new KeyNameDto(Guid.NewGuid(), "Make two"),
+                }, boardId),
+                new TicketsListDto(new List<KeyNameDto>()
+                {
+                    new KeyNameDto(Guid.NewGuid(), "Make one"),
+                    new KeyNameDto(Guid.NewGuid(), "Make two"),
+                    new KeyNameDto(Guid.NewGuid(), "Make three"),
+                    new KeyNameDto(Guid.NewGuid(), "Make one"),
+                    new KeyNameDto(Guid.NewGuid(), "Make two"),
+                    new KeyNameDto(Guid.NewGuid(), "Make three"),
+                    new KeyNameDto(Guid.NewGuid(), "Make one"),
+                    new KeyNameDto(Guid.NewGuid(), "Make two"),
+                    new KeyNameDto(Guid.NewGuid(), "Make three"),
+                }, boardId),
+            });
             try
             {
                 TryGetUser(out OperationUserInfo user);
@@ -88,30 +115,6 @@ namespace DELAY.Core.Application.Abstractions.Services
             }
         }
 
-        /// <summary>
-        /// Add user
-        /// </summary>
-        /// <param name="model"><inheritdoc cref="UserDto"/></param>
-        /// <returns>User's key</returns>
-        /// <remarks>
-        /// Request:
-        ///
-        ///     POST /api/users
-        ///     {
-        ///       "name": "string",
-        ///       "email": "string",
-        ///       "phoneNumber": "string",
-        ///       "description": "string",
-        ///       "password": "string"
-        ///     }
-        ///
-        /// Response:
-        /// 
-        ///     "00000000-0000-0000-0000-000000000000"
-        /// 
-        /// </remarks>
-        /// <response code="201">User added</response>
-        /// <response code="500">Server error</response>
         [HttpPost]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]

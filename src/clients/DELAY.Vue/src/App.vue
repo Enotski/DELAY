@@ -445,7 +445,7 @@ function setMenuOptions(endpoints: []) {
 
 function getRouteItemIcon(path: string): Component {
   switch (path) {
-    case "tickets":
+    case "boards":
       return boardIco;
     case "rooms":
       return messageIco;

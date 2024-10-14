@@ -27,6 +27,7 @@
         :row-key="rowKey"
         :pagination="pagination"
         :remote="true"
+        :checked-row-keys="checkedBoardsKeys"
         @update:checked-row-keys="handleCheck"
       />
       <n-button type="success" class="mt-3" ghost @click="addBoard">
@@ -45,105 +46,31 @@
         </div>
       </div>
       <div class="d-flex p-0 flex-stretch">
-        <div
-          class="card-border mb-3 me-4 flex-card-content"
-          style="width: inherit; height: max-content"
-        >
-          <n-data-table
-            :style="{
-              height: '100%',
-            }"
-            style="min-width: 400px"
-            :max-height="550"
-            :bordered="true"
-            :single-line="false"
-            :columns="ticketsColumns"
-            :data="ticketsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
-          <n-button type="success" class="mt-3" ghost @click="addTicket">
-            <template #icon>
-              <n-icon><plus-ico /></n-icon>
-            </template>
-          </n-button>
-        </div>
-        <div
-          class="card-border mb-3 me-4 flex-card-content"
-          style="width: inherit; height: max-content"
-        >
-          <n-data-table
-            :style="{
-              height: '100%',
-            }"
-            style="min-width: 400px"
-            :max-height="550"
-            :bordered="true"
-            :single-line="false"
-            :columns="ticketsColumns"
-            :data="ticketsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
-          <n-button type="success" class="mt-3" ghost @click="addTicket">
-            <template #icon>
-              <n-icon><plus-ico /></n-icon>
-            </template>
-          </n-button>
-        </div>
-        <div
-          class="card-border mb-3 me-4 flex-card-content"
-          style="width: inherit; height: max-content"
-        >
-          <n-data-table
-            :style="{
-              height: '100%',
-            }"
-            style="min-width: 400px"
-            :max-height="550"
-            :bordered="true"
-            :single-line="false"
-            :columns="ticketsColumns"
-            :data="ticketsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
-          <n-button type="success" class="mt-3" ghost @click="addTicket">
-            <template #icon>
-              <n-icon><plus-ico /></n-icon>
-            </template>
-          </n-button>
-        </div>
-        <div
-          class="card-border mb-3 me-4 flex-card-content"
-          style="width: inherit; height: max-content"
-        >
-          <n-data-table
-            :style="{
-              height: '100%',
-            }"
-            style="min-width: 400px"
-            :max-height="550"
-            :bordered="true"
-            :single-line="false"
-            :columns="ticketsColumns"
-            :data="ticketsData"
-            :row-key="rowKey"
-            :pagination="pagination"
-            :remote="true"
-            @update:checked-row-keys="handleCheck"
-          />
-          <n-button type="success" class="mt-3" ghost @click="addTicket">
-            <template #icon>
-              <n-icon><plus-ico /></n-icon>
-            </template>
-          </n-button>
+        <div v-for="(item, index) in ticketListsData" :key="index">
+          <div
+            class="card-border mb-3 me-4 flex-card-content"
+            style="width: inherit; height: max-content"
+          >
+            <n-data-table
+              :style="{
+                height: '100%',
+              }"
+              style="min-width: 400px"
+              :max-height="550"
+              :bordered="true"
+              :single-line="false"
+              :columns="ticketsColumns"
+              :data="item.tickets"
+              :row-key="rowKey"
+              :pagination="pagination"
+              :remote="true"
+            />
+            <n-button type="success" class="mt-3" ghost @click="addTicket">
+              <template #icon>
+                <n-icon><plus-ico /></n-icon>
+              </template>
+            </n-button>
+          </div>
         </div>
       </div>
     </div>
@@ -152,121 +79,24 @@
 
 <script setup lang="ts">
 import { ref, h, onMounted } from "vue";
-import RequestUtils from "@/utils/request-utils";
+import { RequestUtils } from "@/utils";
 import { NDataTable, NButton, NIcon, NDivider, NInput, NModal } from "naive-ui";
 import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
 import { Add as plusIco, Remove as minusIco } from "@vicons/ionicons5";
-import type { ITicketDto, IBoardDto } from "@/interfaces";
+import type { ITicketDto, IBoardDto, IBaseDto } from "@/interfaces";
+import type { ITicketsListDto } from "@/interfaces/api/contracts/board/tickets-list-dto";
 
-const boardsData = ref([
-  {
-    id: 0,
-    name: "John Brown",
-  },
-  {
-    id: 1,
-    name: "Jim Green",
-  },
-  {
-    id: 2,
-    name: "Joe Black",
-  },
-  {
-    id: 11,
-    name: "John Brown",
-  },
-  {
-    id: 22,
-    name: "Jim Green",
-  },
-  {
-    id: 33,
-    name: "Joe Black",
-  },
-  {
-    id: 12,
-    name: "John Brown",
-  },
-  {
-    id: 31,
-    name: "Jim Green",
-  },
-  {
-    id: 21,
-    name: "Joe Black",
-  },
-  {
-    id: 10,
-    name: "John Brown",
-  },
-  {
-    id: 41,
-    name: "Jim Green",
-  },
-  {
-    id: 92,
-    name: "Joe Black",
-  },
-]);
-const ticketsData = ref([
-  {
-    id: 0,
-    name: "John Brown",
-  },
-  {
-    id: 1,
-    name: "Jim Green",
-  },
-  {
-    id: 2,
-    name: "Joe Black",
-  },
-  {
-    id: 11,
-    name: "John Brown",
-  },
-  {
-    id: 22,
-    name: "Jim Green",
-  },
-  {
-    id: 33,
-    name: "Joe Black",
-  },
-  {
-    id: 12,
-    name: "John Brown",
-  },
-  {
-    id: 31,
-    name: "Jim Green",
-  },
-  {
-    id: 21,
-    name: "Joe Black",
-  },
-  {
-    id: 10,
-    name: "John Brown",
-  },
-  {
-    id: 41,
-    name: "Jim Green",
-  },
-  {
-    id: 92,
-    name: "Joe Black",
-  },
-]);
+const boardsData = ref<IBoardDto[]>([]);
+const ticketListsData = ref<ITicketsListDto[]>([]);
 
-const rowKey = (row: any) => row.id;
-const checkedRowKeysRef = ref([]);
+const rowKey = (row: IBaseDto) => row.id;
+const checkedBoardsKeys = ref<string[]>([]);
 
 const handleCheck = (rowKeys: any) => {
-  checkedRowKeysRef.value = rowKeys;
+  checkedBoardsKeys.value = rowKeys;
 };
 
 const pagination = {
@@ -292,8 +122,34 @@ const defaultRequestOptions = {
   },
 };
 
-onMounted(async () => {});
+onMounted(async () => {
+  await RequestUtils.default
+    .sendRequest("boards/by-user", "GET")
+    .then(async (response: IBoardDto[]) => {
+      if (response != null) {
+        boardsData.value = response;
 
+        checkedBoardsKeys.value.push(boardsData.value[0].id);
+        if (boardsData.value.length > 0) {
+          await RequestUtils.default
+            .sendRequest("tickets-lists/by-board", "GET", {
+              boardId: boardsData.value[0].id,
+            })
+            .then((res: ITicketsListDto[]) => {
+              if (res != null) {
+                ticketListsData.value = res;
+              }
+            })
+            .finally(() => {
+              console.log("get tickets list by board");
+            });
+        }
+      }
+    })
+    .finally(() => {
+      console.log("get boards by user");
+    });
+});
 // const handleAddClick = async () => {
 //   await sendRequest("users", "POST", formValue.value.form).then(() => {
 //     sendRequest("users/search", "POST", defaultRequestOptions).then((value) => {
@@ -374,13 +230,9 @@ const ticketsColumns: TableColumn<ITicketDto>[] = [
     title: "Tickets",
     align: "center",
     key: "name",
-    render(row, index) {
+    render(row) {
       return h(NInput, {
         value: row.name,
-        onUpdateValue(v) {
-          ticketsData.value[index].name = v;
-          console.log(ticketsData.value[index].name);
-        },
       });
     },
   },
@@ -441,9 +293,9 @@ const ticketsColumns: TableColumn<ITicketDto>[] = [
 const showModal = ref(false);
 
 async function addBoard(row: any) {
-  await RequestUtils.sendRequest("boards", "GET").then(async () => {
-    console.log("good");
-  });
+  // await RequestUtils.sendRequest("boards", "GET").then(async () => {
+  //   console.log("good");
+  // });
   console.log("addBoard");
 }
 

@@ -3,6 +3,7 @@ using DELAY.Core.Application.Abstractions.Services.Boards;
 using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos;
+using DELAY.Core.Application.Contracts.Models.Dtos.Base;
 using DELAY.Presentation.RestAPI.Controllers.Base;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,18 +63,18 @@ namespace DELAY.Core.Application.Abstractions.Services
             }
         }
 
-        [HttpGet, Route("/by-chat/{id}")]
+        [HttpGet, Route("by-chat")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetByChatAsync(Guid id)
+        public async Task<IActionResult> GetByChatAsync(Guid chatId)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetBoardByChatAsync(id, user);
+                var model = await boardService.GetBoardByChatAsync(chatId, user);
 
                 if (model == null)
                 {
@@ -97,6 +98,8 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
+                return Ok(new List<KeyNameDto>() { new KeyNameDto(Guid.NewGuid(), "Board primary"), new KeyNameDto(Guid.NewGuid(), "Board lower"), new KeyNameDto(Guid.NewGuid(), "Board middle") });
+
                 TryGetUser(out OperationUserInfo user);
 
                 var model = await boardService.GetBoardByUserAsync(user.Id);
@@ -114,35 +117,11 @@ namespace DELAY.Core.Application.Abstractions.Services
             }
         }
 
-        /// <summary>
-        /// Add user
-        /// </summary>
-        /// <param name="model"><inheritdoc cref="UserDto"/></param>
-        /// <returns>User's key</returns>
-        /// <remarks>
-        /// Request:
-        ///
-        ///     POST /api/users
-        ///     {
-        ///       "name": "string",
-        ///       "email": "string",
-        ///       "phoneNumber": "string",
-        ///       "description": "string",
-        ///       "password": "string"
-        ///     }
-        ///
-        /// Response:
-        /// 
-        ///     "00000000-0000-0000-0000-000000000000"
-        /// 
-        /// </remarks>
-        /// <response code="201">User added</response>
-        /// <response code="500">Server error</response>
         [HttpPost]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateBoard([FromBody] BoardDto model)
+        public async Task<IActionResult> CreateBoardAsync([FromBody] BoardDto model)
         {
             try
             {
@@ -162,7 +141,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateBoard([FromBody] BoardDto model)
+        public async Task<IActionResult> UpdateBoardAsync([FromBody] BoardDto model)
         {
             try
             {
@@ -182,7 +161,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteBoard([FromBody] Guid id)
+        public async Task<IActionResult> DeleteBoardAsync([FromBody] Guid id)
         {
             try
             {

@@ -1,5 +1,72 @@
 <template>
   <n-modal
+    v-model:show="showBoardModal"
+    class="w-100"
+    preset="dialog"
+    title="Edit board"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onSaveBoardModal"
+    @negative-click="onCloseBoardModal"
+  >
+    <n-form ref="boardFormRef" inline :model="boardFormValue" class="row">
+      <n-form-item label="Name">
+        <n-input v-model:value="boardFormValue.name" placeholder="Input Name" />
+      </n-form-item>
+      <n-form-item label="Description">
+        <n-input
+          v-model:value="boardFormValue.description"
+          placeholder="Input description"
+        />
+      </n-form-item>
+      <n-form-item>
+        <n-switch
+          v-model:value="boardFormValue.isPublic"
+          :rail-style="railStyle"
+        >
+          <template #checked> Public </template>
+          <template #unchecked> Private </template>
+        </n-switch>
+      </n-form-item>
+      <div class="d-flex">
+        <n-form-item label="Users">
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            :max-height="630"
+            style="min-width: 350px"
+            :bordered="true"
+            :single-line="false"
+            :columns="boardUsersColumns"
+            :data="boardUsersData"
+            :row-key="rowBoardUserKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-form-item>
+        <n-form-item label="All Users">
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            :max-height="630"
+            style="min-width: 350px"
+            :bordered="true"
+            :single-line="false"
+            :columns="allUsersColumns"
+            :data="allUsersData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+            @update:checked-row-keys="handleCheck"
+          />
+        </n-form-item>
+      </div>
+    </n-form>
+  </n-modal>
+  <n-modal
     v-model:show="showModal"
     preset="dialog"
     title="Dialog"
@@ -78,21 +145,68 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, onMounted } from "vue";
+import { ref, h, onMounted, type CSSProperties } from "vue";
 import { RequestUtils } from "@/utils";
-import { NDataTable, NButton, NIcon, NDivider, NInput, NModal } from "naive-ui";
+import {
+  NDataTable,
+  NButton,
+  NIcon,
+  NSwitch,
+  NInput,
+  NModal,
+  NForm,
+  NFormItem,
+  NSelect,
+} from "naive-ui";
 import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
 import { Add as plusIco, Remove as minusIco } from "@vicons/ionicons5";
-import type { ITicketDto, IBoardDto, IBaseDto } from "@/interfaces";
+import {
+  type ITicketDto,
+  type IBoardDto,
+  type IBaseDto,
+  type IBoardUserDto,
+  BoardRoleType,
+} from "@/interfaces";
 import type { ITicketsListDto } from "@/interfaces/api/contracts/board/tickets-list-dto";
+import { options } from "node_modules/axios/index.cjs";
 
 const boardsData = ref<IBoardDto[]>([]);
 const ticketListsData = ref<ITicketsListDto[]>([]);
+const boardFormValue = ref<IBoardDto>({
+  id: "",
+  name: "",
+  description: "",
+  isPublic: true,
+  users: [],
+});
+
+const railStyle = ({
+  focused,
+  checked,
+}: {
+  focused: boolean;
+  checked: boolean;
+}) => {
+  const style: CSSProperties = {};
+  if (checked) {
+    style.background = "#f5770a";
+    if (focused) {
+      style.boxShadow = "0 0 0 2px #f5770a";
+    }
+  } else {
+    style.background = "#2080f0";
+    if (focused) {
+      style.boxShadow = "0 0 0 2px #2080f040";
+    }
+  }
+  return style;
+};
 
 const rowKey = (row: IBaseDto) => row.id;
+const rowBoardUserKey = (row: IBoardUserDto) => row.user.id;
 const checkedBoardsKeys = ref<string[]>([]);
 
 const handleCheck = (rowKeys: any) => {
@@ -101,25 +215,6 @@ const handleCheck = (rowKeys: any) => {
 
 const pagination = {
   pageSize: 10,
-};
-
-const defaultRequestOptions = {
-  searchOptions: [
-    {
-      column: "",
-      value: "",
-    },
-  ],
-  sortOptions: [
-    {
-      column: "",
-      order: 0,
-    },
-  ],
-  paginatedOption: {
-    skip: 0,
-    take: 0,
-  },
 };
 
 onMounted(async () => {
@@ -150,30 +245,6 @@ onMounted(async () => {
       console.log("get boards by user");
     });
 });
-// const handleAddClick = async () => {
-//   await sendRequest("users", "POST", formValue.value.form).then(() => {
-//     sendRequest("users/search", "POST", defaultRequestOptions).then((value) => {
-//       data.value = value.records;
-//     });
-//     formValue.value.form = {
-//       name: "",
-//       login: "",
-//       password: "",
-//     };
-//   });
-// };
-
-// const handleRemoveClick = async () => {
-//   await sendRequest("users", "DELETE", checkedRowKeysRef.value).then(
-//     async () => {
-//       await sendRequest("users/search", "POST", defaultRequestOptions).then(
-//         (value) => {
-//           data.value = value.records;
-//         }
-//       );
-//     }
-//   );
-// };
 
 const boardsColumns: TableColumn<IBoardDto>[] = [
   {
@@ -290,13 +361,223 @@ const ticketsColumns: TableColumn<ITicketDto>[] = [
   },
 ];
 
+const userBoardRoleOpetions = [
+  {
+    label: "User",
+    value: "1",
+  },
+  {
+    label: "Moder",
+    value: "2",
+  },
+  {
+    label: "Admin",
+    value: "3",
+  },
+];
+
+const boardUsersColumns: TableColumn<IBoardUserDto>[] = [
+  {
+    type: "selection",
+  },
+  {
+    title: "Name",
+    key: "user.name",
+  },
+  {
+    title: "Role",
+    key: "userRole",
+    render(row, index) {
+      return h(NSelect, {
+        options: userBoardRoleOpetions,
+        value: row.userRole,
+        onUpdateValue(v) {
+          boardUsersData.value[index].userRole = v;
+        },
+      });
+    },
+  },
+  {
+    width: 80,
+    key: "delete",
+    render(row) {
+      return h(
+        NButton,
+        {
+          ghost: true,
+          type: "error",
+          strong: true,
+          size: "small",
+          onClick: () => deleteUserFromBoard(row),
+        },
+        { default: () => "Delete" }
+      );
+    },
+  },
+];
+const allUsersColumns: TableColumn[] = [
+  {
+    type: "selection",
+  },
+  {
+    title: "Name",
+    key: "name",
+  },
+  {
+    title: "",
+    key: "success",
+    width: 68,
+    render(row) {
+      return h(
+        NButton,
+        {
+          ghost: true,
+          type: "success",
+          strong: true,
+          size: "small",
+          onClick: () => addUserToBoard(row),
+        },
+        { default: () => "Add" }
+      );
+    },
+  },
+];
+const boardUsersData = ref<IBoardUserDto[]>([
+  {
+    user: {
+      id: "110",
+      name: "John Brown",
+    },
+    userRole: "1",
+  },
+  {
+    user: {
+      id: "111",
+      name: "Jim Green111",
+    },
+    userRole: "2",
+  },
+  {
+    user: {
+      id: "112",
+      name: "Jim Green11213",
+    },
+    userRole: "1",
+  },
+  {
+    user: {
+      id: "113",
+      name: "Jim Green3333",
+    },
+    userRole: "2",
+  },
+]);
+
+const allUsersData = ref([
+  {
+    id: 110,
+    name: "John Brown",
+  },
+  {
+    id: 111,
+    name: "Jim Green",
+  },
+  {
+    id: 112,
+    name: "Joe Black",
+  },
+  {
+    id: 111,
+    name: "John Brown",
+  },
+  {
+    id: 212,
+    name: "Jim Green",
+  },
+  {
+    id: 313,
+    name: "Joe Black",
+  },
+  {
+    id: 112,
+    name: "John Brown",
+  },
+  {
+    id: 131,
+    name: "Jim Green",
+  },
+  {
+    id: 0,
+    name: "John Brown",
+  },
+  {
+    id: 1,
+    name: "Jim Green",
+  },
+  {
+    id: 2,
+    name: "Joe Black",
+  },
+  {
+    id: 11,
+    name: "John Brown",
+  },
+  {
+    id: 22,
+    name: "Jim Green",
+  },
+  {
+    id: 33,
+    name: "Joe Black",
+  },
+  {
+    id: 12,
+    name: "John Brown",
+  },
+  {
+    id: 31,
+    name: "Jim Green",
+  },
+  {
+    id: 21,
+    name: "Joe Black",
+  },
+  {
+    id: 10,
+    name: "John Brown",
+  },
+  {
+    id: 41,
+    name: "Jim Green",
+  },
+  {
+    id: 92,
+    name: "Joe Black",
+  },
+]);
+const showBoardModal = ref(false);
 const showModal = ref(false);
 
 async function addBoard(row: any) {
   // await RequestUtils.sendRequest("boards", "GET").then(async () => {
   //   console.log("good");
   // });
+  showBoardModal.value = true;
   console.log("addBoard");
+}
+
+async function addUserToBoard(row: any) {
+  console.log("addUserToBoard");
+}
+async function deleteUserFromBoard(row: any) {
+  console.log("addUserToBoard");
+}
+
+function onSaveBoardModal() {
+  console.log("addTicketsList");
+}
+function onCloseBoardModal() {
+  console.log("addTicketsList");
 }
 
 function addTicketsList(row: any) {
@@ -308,7 +589,7 @@ function addTicket(row: any) {
 }
 
 function boardInfo(row: any) {
-  showModal.value = true;
+  showBoardModal.value = true;
   console.log("boardInfo");
 }
 

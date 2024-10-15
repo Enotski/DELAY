@@ -44,6 +44,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
+            return Ok(new BoardDto()
+            {
+                Id = Guid.NewGuid(),
+                IsPublic = true,
+                Name = "Board 1",
+                Description = "Description 1"
+            });
             try
             {
                 TryGetUser(out OperationUserInfo user);

@@ -77,12 +77,12 @@ namespace DELAY.Core.Application.Abstractions.Services
                     new KeyNameDto(Guid.NewGuid(), "Make one"),
                     new KeyNameDto(Guid.NewGuid(), "Make two"),
                     new KeyNameDto(Guid.NewGuid(), "Make three"),
-                }, boardId),
+                }, boardId){Name = "Ticket list simple"},
                 new TicketsListDto(new List<KeyNameDto>()
                 {
                     new KeyNameDto(Guid.NewGuid(), "Make one"),
                     new KeyNameDto(Guid.NewGuid(), "Make two"),
-                }, boardId),
+                }, boardId){Name = "Ticket list super"},
                 new TicketsListDto(new List<KeyNameDto>()
                 {
                     new KeyNameDto(Guid.NewGuid(), "Make one"),
@@ -94,7 +94,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                     new KeyNameDto(Guid.NewGuid(), "Make one"),
                     new KeyNameDto(Guid.NewGuid(), "Make two"),
                     new KeyNameDto(Guid.NewGuid(), "Make three"),
-                }, boardId),
+                }, boardId){Name = "Ticket list ultra"},
             });
             try
             {

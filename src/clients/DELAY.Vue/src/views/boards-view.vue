@@ -13,12 +13,6 @@
       <n-form-item label="Name">
         <n-input v-model:value="boardFormValue.name" placeholder="Input Name" />
       </n-form-item>
-      <n-form-item label="Description">
-        <n-input
-          v-model:value="boardFormValue.description"
-          placeholder="Input description"
-        />
-      </n-form-item>
       <n-form-item>
         <n-switch
           v-model:value="boardFormValue.isPublic"
@@ -28,6 +22,16 @@
           <template #unchecked> Private </template>
         </n-switch>
       </n-form-item>
+      <div>
+        <n-form-item label="Description">
+          <n-input
+            class="w-100"
+            v-model:value="boardFormValue.description"
+            placeholder="Input description"
+            type="textarea"
+          />
+        </n-form-item>
+      </div>
       <div class="d-flex">
         <n-form-item label="Users">
           <n-data-table
@@ -39,11 +43,10 @@
             :bordered="true"
             :single-line="false"
             :columns="boardUsersColumns"
-            :data="boardUsersData"
+            :data="boardFormValue.users"
             :row-key="rowBoardUserKey"
             :pagination="pagination"
             :remote="true"
-            @update:checked-row-keys="handleCheck"
           />
         </n-form-item>
         <n-form-item label="All Users">
@@ -60,7 +63,6 @@
             :row-key="rowKey"
             :pagination="pagination"
             :remote="true"
-            @update:checked-row-keys="handleCheck"
           />
         </n-form-item>
       </div>
@@ -116,22 +118,59 @@
         <div v-for="(item, index) in ticketListsData" :key="index">
           <div
             class="card-border mb-3 me-4 flex-card-content"
-            style="width: inherit; height: max-content"
+            style="
+              width: inherit;
+              height: max-content;
+              max-height: 550px;
+              min-width: 400px;
+            "
           >
-            <n-data-table
-              :style="{
-                height: '100%',
-              }"
-              style="min-width: 400px"
-              :max-height="550"
-              :bordered="true"
-              :single-line="false"
-              :columns="ticketsColumns"
-              :data="item.tickets"
-              :row-key="rowKey"
-              :pagination="pagination"
-              :remote="true"
-            />
+            <n-list bordered>
+              <template #header
+                ><div class="d-flex justify-content-between">
+                  {{ item.name }}
+                  <n-button
+                    ghost
+                    type="error"
+                    strong
+                    size="small"
+                    @click="deleteTicketsList(item.id)"
+                    >Delete</n-button
+                  >
+                </div>
+              </template>
+              <n-scrollbar style="max-height: 400px">
+                <div v-for="(ticket, index) in item.tickets" :key="index">
+                  <n-list-item>
+                    <template #suffix>
+                      <n-space
+                        horizontal
+                        inline
+                        class="ticket-row-buttons-space"
+                      >
+                        <n-button
+                          ghost
+                          type="info"
+                          strong
+                          size="small"
+                          @click="ticketInfo(ticket.id)"
+                          >Info</n-button
+                        >
+                        <n-button
+                          ghost
+                          type="error"
+                          strong
+                          size="small"
+                          @click="deleteTicket(ticket.id)"
+                          >Delete</n-button
+                        >
+                      </n-space>
+                    </template>
+                    <n-thing :description="ticket.name"> </n-thing>
+                  </n-list-item>
+                </div>
+              </n-scrollbar>
+            </n-list>
             <n-button type="success" class="mt-3" ghost @click="addTicket">
               <template #icon>
                 <n-icon><plus-ico /></n-icon>
@@ -148,6 +187,11 @@
 import { ref, h, onMounted, type CSSProperties } from "vue";
 import { RequestUtils } from "@/utils";
 import {
+  NSpace,
+  NScrollbar,
+  NThing,
+  NList,
+  NListItem,
   NDataTable,
   NButton,
   NIcon,
@@ -157,6 +201,7 @@ import {
   NForm,
   NFormItem,
   NSelect,
+  NText,
 } from "naive-ui";
 import type {
   RowData,
@@ -169,9 +214,9 @@ import {
   type IBaseDto,
   type IBoardUserDto,
   BoardRoleType,
+  type INameDto,
 } from "@/interfaces";
 import type { ITicketsListDto } from "@/interfaces/api/contracts/board/tickets-list-dto";
-import { options } from "node_modules/axios/index.cjs";
 
 const boardsData = ref<IBoardDto[]>([]);
 const ticketListsData = ref<ITicketsListDto[]>([]);
@@ -251,15 +296,6 @@ const boardsColumns: TableColumn<IBoardDto>[] = [
     title: "Boards",
     align: "center",
     key: "name",
-    render(row, index) {
-      return h(NInput, {
-        value: row.name,
-        onUpdateValue(v) {
-          boardsData.value[index].name = v;
-          console.log(boardsData.value[index].name);
-        },
-      });
-    },
   },
   {
     title: "",
@@ -272,7 +308,7 @@ const boardsColumns: TableColumn<IBoardDto>[] = [
           strong: true,
           type: "info",
           size: "small",
-          onClick: () => boardInfo(row),
+          onClick: () => boardInfo(row.id),
         },
         { default: () => "Info" }
       );
@@ -288,7 +324,7 @@ const boardsColumns: TableColumn<IBoardDto>[] = [
           type: "error",
           strong: true,
           size: "small",
-          onClick: () => deleteBoard(row),
+          onClick: () => deleteBoard(row.id),
         },
         { default: () => "Delete" }
       );
@@ -298,28 +334,25 @@ const boardsColumns: TableColumn<IBoardDto>[] = [
 
 const ticketsColumns: TableColumn<ITicketDto>[] = [
   {
-    title: "Tickets",
+    // title(column: any) {
+    //   return h(NText, {}, { default: () => "Ticket list" });
+    // },
     align: "center",
     key: "name",
-    render(row) {
-      return h(NInput, {
-        value: row.name,
-      });
-    },
   },
   {
-    title(column: any) {
-      return h(
-        NButton,
-        {
-          type: "error",
-          strong: true,
-          size: "small",
-          onClick: () => deleteTicketsList(column),
-        },
-        { default: () => "Delete list" }
-      );
-    },
+    // title(column: any) {
+    //   return h(
+    //     NButton,
+    //     {
+    //       type: "error",
+    //       strong: true,
+    //       size: "small",
+    //       onClick: () => deleteTicketsList(column),
+    //     },
+    //     { default: () => "Delete list" }
+    //   );
+    // },
     align: "center",
     key: "editButtons",
     children: [
@@ -334,7 +367,7 @@ const ticketsColumns: TableColumn<ITicketDto>[] = [
               type: "info",
               strong: true,
               size: "small",
-              onClick: () => ticketInfo(row),
+              onClick: () => ticketInfo(row.id),
             },
             { default: () => "Info" }
           );
@@ -351,7 +384,7 @@ const ticketsColumns: TableColumn<ITicketDto>[] = [
               type: "error",
               strong: true,
               size: "small",
-              onClick: () => deleteTicket(row),
+              onClick: () => deleteTicket(row.id),
             },
             { default: () => "Delete" }
           );
@@ -378,9 +411,6 @@ const userBoardRoleOpetions = [
 
 const boardUsersColumns: TableColumn<IBoardUserDto>[] = [
   {
-    type: "selection",
-  },
-  {
     title: "Name",
     key: "user.name",
   },
@@ -392,7 +422,7 @@ const boardUsersColumns: TableColumn<IBoardUserDto>[] = [
         options: userBoardRoleOpetions,
         value: row.userRole,
         onUpdateValue(v) {
-          boardUsersData.value[index].userRole = v;
+          boardFormValue.value.users[index].userRole = v;
         },
       });
     },
@@ -415,10 +445,7 @@ const boardUsersColumns: TableColumn<IBoardUserDto>[] = [
     },
   },
 ];
-const allUsersColumns: TableColumn[] = [
-  {
-    type: "selection",
-  },
+const allUsersColumns: TableColumn<INameDto>[] = [
   {
     title: "Name",
     key: "name",
@@ -442,116 +469,86 @@ const allUsersColumns: TableColumn[] = [
     },
   },
 ];
-const boardUsersData = ref<IBoardUserDto[]>([
-  {
-    user: {
-      id: "110",
-      name: "John Brown",
-    },
-    userRole: "1",
-  },
-  {
-    user: {
-      id: "111",
-      name: "Jim Green111",
-    },
-    userRole: "2",
-  },
-  {
-    user: {
-      id: "112",
-      name: "Jim Green11213",
-    },
-    userRole: "1",
-  },
-  {
-    user: {
-      id: "113",
-      name: "Jim Green3333",
-    },
-    userRole: "2",
-  },
-]);
 
-const allUsersData = ref([
+const allUsersData = ref<INameDto[]>([
   {
-    id: 110,
+    id: "110",
     name: "John Brown",
   },
   {
-    id: 111,
+    id: "111",
     name: "Jim Green",
   },
   {
-    id: 112,
+    id: "112",
     name: "Joe Black",
   },
   {
-    id: 111,
+    id: "111",
     name: "John Brown",
   },
   {
-    id: 212,
+    id: "212",
     name: "Jim Green",
   },
   {
-    id: 313,
+    id: "313",
     name: "Joe Black",
   },
   {
-    id: 112,
+    id: "112",
     name: "John Brown",
   },
   {
-    id: 131,
+    id: "131",
     name: "Jim Green",
   },
   {
-    id: 0,
+    id: "0",
     name: "John Brown",
   },
   {
-    id: 1,
+    id: "1",
     name: "Jim Green",
   },
   {
-    id: 2,
+    id: "2",
     name: "Joe Black",
   },
   {
-    id: 11,
+    id: "11",
     name: "John Brown",
   },
   {
-    id: 22,
+    id: "22",
     name: "Jim Green",
   },
   {
-    id: 33,
+    id: "33",
     name: "Joe Black",
   },
   {
-    id: 12,
+    id: "12",
     name: "John Brown",
   },
   {
-    id: 31,
+    id: "31",
     name: "Jim Green",
   },
   {
-    id: 21,
+    id: "21",
     name: "Joe Black",
   },
   {
-    id: 10,
+    id: "10",
     name: "John Brown",
   },
   {
-    id: 41,
+    id: "41",
     name: "Jim Green",
   },
   {
-    id: 92,
+    id: "92",
     name: "Joe Black",
   },
 ]);
@@ -559,18 +556,27 @@ const showBoardModal = ref(false);
 const showModal = ref(false);
 
 async function addBoard(row: any) {
-  // await RequestUtils.sendRequest("boards", "GET").then(async () => {
-  //   console.log("good");
-  // });
   showBoardModal.value = true;
   console.log("addBoard");
 }
 
-async function addUserToBoard(row: any) {
+async function addUserToBoard(row: INameDto) {
+  allUsersData.value = allUsersData.value.filter((x) => {
+    return x.id != row.id;
+  });
+
+  boardFormValue.value.users.push({ user: row, userRole: "1" });
+
   console.log("addUserToBoard");
 }
-async function deleteUserFromBoard(row: any) {
-  console.log("addUserToBoard");
+async function deleteUserFromBoard(row: IBoardUserDto) {
+  boardFormValue.value.users = boardFormValue.value.users.filter((x) => {
+    return x.user.id != row.user.id;
+  });
+
+  allUsersData.value.push(row.user);
+
+  console.log("deleteUserFromBoard");
 }
 
 function onSaveBoardModal() {
@@ -588,12 +594,12 @@ function addTicket(row: any) {
   console.log("addTicket");
 }
 
-function boardInfo(row: any) {
+function boardInfo(id: string) {
   showBoardModal.value = true;
   console.log("boardInfo");
 }
 
-function ticketInfo(row: any) {
+function ticketInfo(id: string) {
   showModal.value = true;
   console.log("ticketInfo");
 }
@@ -606,18 +612,24 @@ function onNegativeClick() {
   console.log("onNegativeClick");
 }
 
-function deleteBoard(row: any) {
+function deleteBoard(id: string) {
   showModal.value = true;
   console.log("deleteBoard");
 }
 
-function deleteTicketsList(row: any) {
+function deleteTicketsList(id: string) {
   showModal.value = true;
   console.log("deleteTicketsList");
 }
 
-function deleteTicket(row: any) {
+function deleteTicket(id: string) {
   showModal.value = true;
   console.log("deleteTicket");
 }
 </script>
+
+<style scoped>
+.ticket-row-buttons-space {
+  flex-flow: nowrap !important;
+}
+</style>

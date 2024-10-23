@@ -5,6 +5,10 @@ namespace DELAY.Infrastructure.Persistence.Entities
 {
     public class BoardUserEntity
     {
+        public BoardUserEntity()
+        {
+        }
+
         public BoardUserEntity(Guid boardId, Guid userId, BoardRoleType userRole)
         {
             BoardId = boardId;

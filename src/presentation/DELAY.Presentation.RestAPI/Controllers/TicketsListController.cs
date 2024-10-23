@@ -70,32 +70,32 @@ namespace DELAY.Core.Application.Abstractions.Services
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByBoardAsync([FromQuery] Guid boardId)
         {
-            return Ok(new List<TicketsListDto>()
-            {
-                new TicketsListDto(new List<KeyNameDto>()
-                {
-                    new KeyNameDto(Guid.NewGuid(), "Make one"),
-                    new KeyNameDto(Guid.NewGuid(), "Make two"),
-                    new KeyNameDto(Guid.NewGuid(), "Make three"),
-                }, boardId){Name = "Ticket list simple"},
-                new TicketsListDto(new List<KeyNameDto>()
-                {
-                    new KeyNameDto(Guid.NewGuid(), "Make one"),
-                    new KeyNameDto(Guid.NewGuid(), "Make two"),
-                }, boardId){Name = "Ticket list super"},
-                new TicketsListDto(new List<KeyNameDto>()
-                {
-                    new KeyNameDto(Guid.NewGuid(), "Make one"),
-                    new KeyNameDto(Guid.NewGuid(), "Make two"),
-                    new KeyNameDto(Guid.NewGuid(), "Make three"),
-                    new KeyNameDto(Guid.NewGuid(), "Make one"),
-                    new KeyNameDto(Guid.NewGuid(), "Make two"),
-                    new KeyNameDto(Guid.NewGuid(), "Make three"),
-                    new KeyNameDto(Guid.NewGuid(), "Make one"),
-                    new KeyNameDto(Guid.NewGuid(), "Make two"),
-                    new KeyNameDto(Guid.NewGuid(), "Make three"),
-                }, boardId){Name = "Ticket list ultra"},
-            });
+            //return Ok(new List<TicketsListDto>()
+            //{
+            //    new TicketsListDto(new List<KeyNameDto>()
+            //    {
+            //        new KeyNameDto(Guid.NewGuid(), "Make one"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make two"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make three"),
+            //    }, boardId){Name = "Ticket list simple"},
+            //    new TicketsListDto(new List<KeyNameDto>()
+            //    {
+            //        new KeyNameDto(Guid.NewGuid(), "Make one"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make two"),
+            //    }, boardId){Name = "Ticket list super"},
+            //    new TicketsListDto(new List<KeyNameDto>()
+            //    {
+            //        new KeyNameDto(Guid.NewGuid(), "Make one"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make two"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make three"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make one"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make two"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make three"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make one"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make two"),
+            //        new KeyNameDto(Guid.NewGuid(), "Make three"),
+            //    }, boardId){Name = "Ticket list ultra"},
+            //});
             try
             {
                 TryGetUser(out OperationUserInfo user);

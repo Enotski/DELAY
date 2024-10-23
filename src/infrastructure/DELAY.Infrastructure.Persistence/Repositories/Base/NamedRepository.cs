@@ -68,6 +68,14 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
                 .Select(selector)
                 .ToListAsync(cancellationToken);
         }
+        public async Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(CancellationToken cancellationToken = default)
+        {
+            var selector = KeyNamedSelectorSpecification();
+
+            return await BuildQueryOrderedByName()
+                .Select(selector)
+                .ToListAsync(cancellationToken);
+        }
 
         public async Task<string> GetNameByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {

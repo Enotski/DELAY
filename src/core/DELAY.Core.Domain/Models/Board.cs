@@ -10,6 +10,7 @@ namespace DELAY.Core.Domain.Models
             CreateDate = DateTime.UtcNow;
             ChangeDate = CreateDate;
             CreatedBy = createdBy;
+            ChangedBy = CreatedBy;
             IsPublic = isPublic;
             Description = description;
         }
@@ -40,7 +41,7 @@ namespace DELAY.Core.Domain.Models
 
         public bool IsValid()
         {
-            return base.IsValidName() && !string.IsNullOrWhiteSpace(CreatedBy) && (!IsPublic && (BoardUsers?.Any() ?? false));
+            return base.IsValidName() && !string.IsNullOrWhiteSpace(CreatedBy) && (IsPublic || (BoardUsers?.Any() ?? false));
         }
 
         public bool IsPublic { get; set; }

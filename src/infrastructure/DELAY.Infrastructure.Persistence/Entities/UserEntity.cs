@@ -6,6 +6,10 @@ namespace DELAY.Infrastructure.Persistence.Entities
 {
     public class UserEntity : KeyEntity, IName
     {
+        public UserEntity()
+        {
+        }
+
         public string? Name { get; set; }
 
         public string? Email { get; set; }

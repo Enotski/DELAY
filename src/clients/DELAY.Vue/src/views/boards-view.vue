@@ -33,13 +33,12 @@
         </n-form-item>
       </div>
       <div class="d-flex">
-        <n-form-item label="Users">
+        <n-form-item label="Board users">
           <n-data-table
             :style="{
               height: '100%',
             }"
-            :max-height="630"
-            style="min-width: 350px"
+            :max-height="300"
             :bordered="true"
             :single-line="false"
             :columns="boardUsersColumns"
@@ -49,13 +48,12 @@
             :remote="true"
           />
         </n-form-item>
-        <n-form-item label="All Users">
+        <n-form-item label="All users">
           <n-data-table
             :style="{
               height: '100%',
             }"
-            :max-height="630"
-            style="min-width: 350px"
+            :max-height="300"
             :bordered="true"
             :single-line="false"
             :columns="allUsersColumns"
@@ -69,36 +67,100 @@
     </n-form>
   </n-modal>
   <n-modal
-    v-model:show="showModal"
+    v-model:show="showConfirmModal"
     preset="dialog"
-    title="Dialog"
+    :title="confirmModalTitle"
     content="Are you sure?"
     positive-text="Confirm"
     negative-text="Cancel"
     @positive-click="onPositiveClick"
     @negative-click="onNegativeClick"
   />
+  <n-modal
+    v-model:show="showTicketsListModal"
+    class="w-100"
+    preset="dialog"
+    title="Edit tickets list"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onSaveTicketsListModal"
+    @negative-click="onCloseTicketsListModal"
+  >
+    <n-form
+      ref="ticketsListFormRef"
+      inline
+      :model="ticketsListFormValue"
+      class="row"
+    >
+      <n-form-item label="Name">
+        <n-input
+          v-model:value="ticketsListFormValue.name"
+          placeholder="Input Name"
+        />
+      </n-form-item>
+    </n-form>
+  </n-modal>
+  <n-modal
+    v-model:show="showTicketModal"
+    class="w-100"
+    preset="dialog"
+    title="Edit ticket"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onSaveTicketModal"
+    @negative-click="onCloseTicketModal"
+  >
+    <n-form
+      ref="ticketsListFormRef"
+      inline
+      :model="ticketFormValue"
+      class="row"
+    >
+      <n-form-item label="Name">
+        <n-input
+          v-model:value="ticketFormValue.name"
+          placeholder="Input Name"
+        />
+      </n-form-item>
+    </n-form>
+  </n-modal>
   <div class="d-flex" size="large">
     <div
       class="card-border mb-3 me-5 flex-card-content"
       style="width: inherit; height: max-content"
     >
-      <n-data-table
-        :style="{
-          height: '100%',
-        }"
-        style="min-width: 400px"
-        :max-height="660"
-        :bordered="true"
-        :single-line="false"
-        :columns="boardsColumns"
-        :data="boardsData"
-        :row-key="rowKey"
-        :pagination="pagination"
-        :remote="true"
-        :checked-row-keys="checkedBoardsKeys"
-        @update:checked-row-keys="handleCheck"
-      />
+      <n-list bordered clickable hoverable>
+        <template #header
+          ><span class="fw-bold"> {{ currentBoard.name }}</span></template
+        >
+        <n-scrollbar style="max-height: 400px; min-width: 350px">
+          <div v-for="(row, index) in boardsData" :key="index">
+            <n-list-item @click="boardSelected(row)">
+              <template #suffix>
+                <n-space horizontal inline class="ticket-row-buttons-space">
+                  <n-button
+                    ghost
+                    type="info"
+                    strong
+                    size="small"
+                    @click="boardInfo(row.id)"
+                    >Info</n-button
+                  >
+                  <n-button
+                    ghost
+                    type="error"
+                    strong
+                    size="small"
+                    @click="deleteBoard(row.id)"
+                    >Delete</n-button
+                  >
+                </n-space>
+              </template>
+              <n-thing :description="row.name"> </n-thing>
+            </n-list-item>
+          </div>
+        </n-scrollbar>
+      </n-list>
       <n-button type="success" class="mt-3" ghost @click="addBoard">
         <template #icon>
           <n-icon><plus-ico /></n-icon>
@@ -125,18 +187,28 @@
               min-width: 400px;
             "
           >
-            <n-list bordered>
+            <n-list bordered clickable hoverable>
               <template #header
                 ><div class="d-flex justify-content-between">
                   {{ item.name }}
-                  <n-button
-                    ghost
-                    type="error"
-                    strong
-                    size="small"
-                    @click="deleteTicketsList(item.id)"
-                    >Delete</n-button
-                  >
+                  <n-space horizontal inline class="ticket-row-buttons-space">
+                    <n-button
+                      ghost
+                      type="info"
+                      strong
+                      size="small"
+                      @click="ticketsListInfo(item.id)"
+                      >Info</n-button
+                    >
+                    <n-button
+                      ghost
+                      type="error"
+                      strong
+                      size="small"
+                      @click="deleteTicketsList(item.id)"
+                      >Delete</n-button
+                    >
+                  </n-space>
                 </div>
               </template>
               <n-scrollbar style="max-height: 400px">
@@ -201,24 +273,25 @@ import {
   NForm,
   NFormItem,
   NSelect,
-  NText,
 } from "naive-ui";
-import type {
-  RowData,
-  TableColumn,
-} from "naive-ui/es/data-table/src/interface";
-import { Add as plusIco, Remove as minusIco } from "@vicons/ionicons5";
+import type { TableColumn } from "naive-ui/es/data-table/src/interface";
+import { Add as plusIco } from "@vicons/ionicons5";
 import {
   type ITicketDto,
   type IBoardDto,
   type IBaseDto,
   type IBoardUserDto,
-  BoardRoleType,
   type INameDto,
 } from "@/interfaces";
 import type { ITicketsListDto } from "@/interfaces/api/contracts/board/tickets-list-dto";
 
-const boardsData = ref<IBoardDto[]>([]);
+const currentBoard = ref<INameDto>({
+  id: "",
+  name: "",
+});
+
+const confirmModalTitle = ref<string>("");
+const boardsData = ref<INameDto[]>([]);
 const ticketListsData = ref<ITicketsListDto[]>([]);
 const boardFormValue = ref<IBoardDto>({
   id: "",
@@ -226,6 +299,24 @@ const boardFormValue = ref<IBoardDto>({
   description: "",
   isPublic: true,
   users: [],
+});
+const ticketsListFormValue = ref<ITicketsListDto>({
+  id: "",
+  name: "",
+  boardId: "",
+  tickets: [],
+});
+const ticketFormValue = ref<ITicketDto>({
+  id: "",
+  name: "",
+  description: "",
+  changedBy: "",
+  createdBy: "",
+  dateChange: "",
+  createDate: "",
+  deadLineDate: "",
+  ticketListId: "",
+  AssignedUsers: [],
 });
 
 const railStyle = ({
@@ -252,11 +343,6 @@ const railStyle = ({
 
 const rowKey = (row: IBaseDto) => row.id;
 const rowBoardUserKey = (row: IBoardUserDto) => row.user.id;
-const checkedBoardsKeys = ref<string[]>([]);
-
-const handleCheck = (rowKeys: any) => {
-  checkedBoardsKeys.value = rowKeys;
-};
 
 const pagination = {
   pageSize: 10,
@@ -268,131 +354,12 @@ onMounted(async () => {
     .then(async (response: IBoardDto[]) => {
       if (response != null) {
         boardsData.value = response;
-
-        checkedBoardsKeys.value.push(boardsData.value[0].id);
-        if (boardsData.value.length > 0) {
-          await RequestUtils.default
-            .sendRequest("tickets-lists/by-board", "GET", {
-              boardId: boardsData.value[0].id,
-            })
-            .then((res: ITicketsListDto[]) => {
-              if (res != null) {
-                ticketListsData.value = res;
-              }
-            })
-            .finally(() => {
-              console.log("get tickets list by board");
-            });
-        }
       }
     })
     .finally(() => {
       console.log("get boards by user");
     });
 });
-
-const boardsColumns: TableColumn<IBoardDto>[] = [
-  {
-    title: "Boards",
-    align: "center",
-    key: "name",
-  },
-  {
-    title: "",
-    key: "info",
-    width: 68,
-    render(row) {
-      return h(
-        NButton,
-        {
-          strong: true,
-          type: "info",
-          size: "small",
-          onClick: () => boardInfo(row.id),
-        },
-        { default: () => "Info" }
-      );
-    },
-  },
-  {
-    width: 80,
-    key: "delete",
-    render(row) {
-      return h(
-        NButton,
-        {
-          type: "error",
-          strong: true,
-          size: "small",
-          onClick: () => deleteBoard(row.id),
-        },
-        { default: () => "Delete" }
-      );
-    },
-  },
-];
-
-const ticketsColumns: TableColumn<ITicketDto>[] = [
-  {
-    // title(column: any) {
-    //   return h(NText, {}, { default: () => "Ticket list" });
-    // },
-    align: "center",
-    key: "name",
-  },
-  {
-    // title(column: any) {
-    //   return h(
-    //     NButton,
-    //     {
-    //       type: "error",
-    //       strong: true,
-    //       size: "small",
-    //       onClick: () => deleteTicketsList(column),
-    //     },
-    //     { default: () => "Delete list" }
-    //   );
-    // },
-    align: "center",
-    key: "editButtons",
-    children: [
-      {
-        key: "info",
-        width: 68,
-        render(row) {
-          return h(
-            NButton,
-            {
-              ghost: true,
-              type: "info",
-              strong: true,
-              size: "small",
-              onClick: () => ticketInfo(row.id),
-            },
-            { default: () => "Info" }
-          );
-        },
-      },
-      {
-        width: 80,
-        key: "delete",
-        render(row) {
-          return h(
-            NButton,
-            {
-              ghost: true,
-              type: "error",
-              strong: true,
-              size: "small",
-              onClick: () => deleteTicket(row.id),
-            },
-            { default: () => "Delete" }
-          );
-        },
-      },
-    ],
-  },
-];
 
 const userBoardRoleOpetions = [
   {
@@ -470,97 +437,28 @@ const allUsersColumns: TableColumn<INameDto>[] = [
   },
 ];
 
-const allUsersData = ref<INameDto[]>([
-  {
-    id: "110",
-    name: "John Brown",
-  },
-  {
-    id: "111",
-    name: "Jim Green",
-  },
-  {
-    id: "112",
-    name: "Joe Black",
-  },
-  {
-    id: "111",
-    name: "John Brown",
-  },
-  {
-    id: "212",
-    name: "Jim Green",
-  },
-  {
-    id: "313",
-    name: "Joe Black",
-  },
-  {
-    id: "112",
-    name: "John Brown",
-  },
-  {
-    id: "131",
-    name: "Jim Green",
-  },
-  {
-    id: "0",
-    name: "John Brown",
-  },
-  {
-    id: "1",
-    name: "Jim Green",
-  },
-  {
-    id: "2",
-    name: "Joe Black",
-  },
-  {
-    id: "11",
-    name: "John Brown",
-  },
-  {
-    id: "22",
-    name: "Jim Green",
-  },
-  {
-    id: "33",
-    name: "Joe Black",
-  },
-  {
-    id: "12",
-    name: "John Brown",
-  },
-  {
-    id: "31",
-    name: "Jim Green",
-  },
-  {
-    id: "21",
-    name: "Joe Black",
-  },
-  {
-    id: "10",
-    name: "John Brown",
-  },
-  {
-    id: "41",
-    name: "Jim Green",
-  },
-  {
-    id: "92",
-    name: "Joe Black",
-  },
-]);
+const allUsersData = ref<INameDto[]>([]);
 const showBoardModal = ref(false);
-const showModal = ref(false);
+const showTicketsListModal = ref(false);
+const showTicketModal = ref(false);
+const showConfirmModal = ref(false);
 
 async function addBoard(row: any) {
   showBoardModal.value = true;
+  await RequestUtils.default
+    .sendRequest("users/get-key-name-list", "GET")
+    .then(async (response: INameDto[]) => {
+      if (response != null) {
+        allUsersData.value = response;
+      }
+    })
+    .finally(() => {
+      console.log("get all user");
+    });
   console.log("addBoard");
 }
 
-async function addUserToBoard(row: INameDto) {
+function addUserToBoard(row: INameDto) {
   allUsersData.value = allUsersData.value.filter((x) => {
     return x.id != row.id;
   });
@@ -569,7 +467,7 @@ async function addUserToBoard(row: INameDto) {
 
   console.log("addUserToBoard");
 }
-async function deleteUserFromBoard(row: IBoardUserDto) {
+function deleteUserFromBoard(row: IBoardUserDto) {
   boardFormValue.value.users = boardFormValue.value.users.filter((x) => {
     return x.user.id != row.user.id;
   });
@@ -579,52 +477,114 @@ async function deleteUserFromBoard(row: IBoardUserDto) {
   console.log("deleteUserFromBoard");
 }
 
-function onSaveBoardModal() {
-  console.log("addTicketsList");
+async function onSaveBoardModal() {
+  await RequestUtils.default
+    .sendRequest<IBoardDto>("boards", "POST", boardFormValue.value)
+    .then(async (response: INameDto[]) => {
+      if (response != null) {
+        showBoardModal.value = false;
+      }
+    })
+    .finally(() => {
+      console.log("save board");
+    });
 }
 function onCloseBoardModal() {
+  showBoardModal.value = false;
   console.log("addTicketsList");
 }
 
 function addTicketsList(row: any) {
+  showTicketsListModal.value = true;
+  console.log("addTicketsList");
+}
+function onSaveTicketsListModal() {
+  showTicketsListModal.value = false;
+  console.log("addTicketsList");
+}
+function onCloseTicketsListModal() {
+  showTicketsListModal.value = false;
   console.log("addTicketsList");
 }
 
 function addTicket(row: any) {
+  showTicketModal.value = true;
   console.log("addTicket");
 }
+function onSaveTicketModal() {
+  showBoardModal.value = false;
+  console.log("addTicketsList");
+}
+function onCloseTicketModal() {
+  showBoardModal.value = false;
+  console.log("addTicketsList");
+}
 
-function boardInfo(id: string) {
+async function boardSelected(row: INameDto) {
+  currentBoard.value = row;
+  await RequestUtils.default
+    .sendRequest("tickets-lists/by-board", "GET", {
+      boardId: currentBoard.value.id,
+    })
+    .then((res: ITicketsListDto[]) => {
+      if (res != null) {
+        ticketListsData.value = res;
+      }
+    })
+    .finally(() => {
+      console.log("get tickets list by board");
+    });
+}
+
+async function boardInfo(id: string) {
   showBoardModal.value = true;
+  await RequestUtils.default
+    .sendRequest("boards", "GET", {
+      id: id,
+    })
+    .then((res: IBoardDto) => {
+      if (res != null) {
+        boardFormValue.value = res;
+      }
+    })
+    .finally(() => {
+      console.log("get tickets list by board");
+    });
   console.log("boardInfo");
 }
 
+function ticketsListInfo(id: string) {
+  showTicketsListModal.value = true;
+  console.log("ticketsListInfo");
+}
+
 function ticketInfo(id: string) {
-  showModal.value = true;
+  showTicketModal.value = true;
   console.log("ticketInfo");
 }
 
 function onPositiveClick() {
+  showConfirmModal.value = false;
   console.log("onPositiveClick");
 }
 function onNegativeClick() {
-  showModal.value = false;
+  showConfirmModal.value = false;
   console.log("onNegativeClick");
 }
 
 function deleteBoard(id: string) {
-  showModal.value = true;
-  console.log("deleteBoard");
+  confirmModalTitle.value = "Delete board";
+  showConfirmModal.value = true;
 }
 
 function deleteTicketsList(id: string) {
-  showModal.value = true;
-  console.log("deleteTicketsList");
+  confirmModalTitle.value = "Delete tickets list";
+  showConfirmModal.value = true;
 }
 
 function deleteTicket(id: string) {
-  showModal.value = true;
-  console.log("deleteTicket");
+  confirmModalTitle.value = "Delete ticket";
+  showConfirmModal.value = true;
 }
 </script>
 

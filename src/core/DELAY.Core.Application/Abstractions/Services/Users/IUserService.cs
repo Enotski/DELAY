@@ -1,5 +1,6 @@
 ﻿using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos;
+using DELAY.Core.Application.Contracts.Models.Dtos.Base;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Models;
 
@@ -29,6 +30,7 @@ namespace DELAY.Core.Application.Abstractions.Services.Users
         Task<IEnumerable<UserDto>> GetByBoardAsync(Guid boardId);
 
         Task<IEnumerable<UserDto>> GetByChatRoomAsync(Guid boardId);
+        Task<IEnumerable<KeyNameDto>> GetKeyNameRecordsAsync(OperationUserInfo triggeredBy);
         Task<int> DeleteAsync(IEnumerable<Guid> id, OperationUserInfo triggeredBy);
         /// <summary>
         /// Get records by search options

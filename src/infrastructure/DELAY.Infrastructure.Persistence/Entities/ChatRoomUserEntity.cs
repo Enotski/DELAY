@@ -5,6 +5,10 @@ namespace DELAY.Infrastructure.Persistence.Entities
 {
     public class ChatRoomUserEntity
     {
+        public ChatRoomUserEntity()
+        {
+        }
+
         [Key]
         public Guid ChatRoomId { get; set; }
         public ChatRoomEntity ChatRoom { get; set; }

@@ -18,9 +18,13 @@ namespace DELAY.Core.Application.Services
         private readonly IUserStorage userStorage;
         private readonly IModelMapperService mapperService;
 
-        public BoardService(IBoardStorage boardStorage, IUserStorage userStorage)
+        public BoardService(IBoardStorage boardStorage, IUserStorage userStorage, IModelMapperService mapperService, ITicketStorage ticketStorage, ITicketsListStorage ticketsListStorage)
         {
             this.boardStorage = boardStorage ?? throw new ArgumentNullException(nameof(IBoardStorage));
+            this.userStorage = userStorage ?? throw new ArgumentNullException(nameof(IUserStorage));
+            this.mapperService = mapperService ?? throw new ArgumentNullException(nameof(IModelMapperService));
+            this.ticketStorage = ticketStorage ?? throw new ArgumentNullException(nameof(ITicketStorage));
+            this.ticketsListStorage = ticketsListStorage ?? throw new ArgumentNullException(nameof(ITicketsListStorage));
         }
 
         protected async Task<bool> IsGlobalAllowToPerformOperationAsync(RoleType roleType, Guid triggeredById)
@@ -61,9 +65,9 @@ namespace DELAY.Core.Application.Services
             if (model == null)
                 throw new ArgumentNullException(nameof(BoardDto));
 
-            await IsAllowToPerformOperationAsync(BoardRoleType.Admin, triggeredBy.Id, model.Id);
+            await IsAllowToPerformOperationAsync(BoardRoleType.Admin, triggeredBy.Id, model.Id.Value);
 
-            var entity = await boardStorage.GetAsync(model.Id);
+            var entity = await boardStorage.GetAsync(model.Id.Value);
             if (entity == null)
                 throw new ArgumentException("Not found");
 

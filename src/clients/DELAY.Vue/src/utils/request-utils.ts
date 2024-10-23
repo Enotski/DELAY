@@ -96,7 +96,7 @@ instance.interceptors.response.use(
 
 class RequestUtils{
 
-async sendRequest(url: string, method: string = "GET", args: object = {}) {
+async sendRequest<T>(url: string, method: string = "GET", args?: T) {
   url = apiUrl + url;
 
   if (method === "GET") {

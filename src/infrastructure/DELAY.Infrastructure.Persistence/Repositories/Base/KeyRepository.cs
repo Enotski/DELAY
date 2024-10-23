@@ -120,15 +120,15 @@ namespace DELAY.Infrastructure.Persistence.Repositories.Base
 
             return entity.Id;
         }
-        public async Task<Guid> AddAsync(TDomain model, Action<Guid, DbContext> beforeSaveDelegate, CancellationToken cancellationToken = default)
+        public async Task<Guid> AddAsync(TDomain model, Action<TEntity, DbContext> beforeSaveDelegate, CancellationToken cancellationToken = default)
         {
             var entity = _mapper.Map<TEntity>(model);
 
             entity.Id = Guid.NewGuid();
 
-            context.Set<TEntity>().Add(entity);
+            beforeSaveDelegate(entity, context);
 
-            beforeSaveDelegate(entity.Id, context);
+            context.Set<TEntity>().Add(entity);
 
             await context.SaveChangesAsync(cancellationToken);
 

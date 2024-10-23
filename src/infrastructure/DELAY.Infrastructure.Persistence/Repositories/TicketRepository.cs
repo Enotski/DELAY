@@ -19,10 +19,10 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
         public async Task<Guid> CreateTicketAsync(Ticket ticket, CancellationToken cancellationToken = default)
         {
-            return await AddAsync(ticket, (id, dbContext) => {
+            return await AddAsync(ticket, (entity, dbContext) => {
                 if (ticket.Users.Any())
                 {
-                    var entities = ticket.Users.Select(x => new TicketUserEntity(ticket.Id, x.Id));
+                    var entities = ticket.Users.Select(x => new TicketUserEntity(entity.Id, x.Id));
 
                     dbContext.Set<TicketUserEntity>().AddRange(entities);
                 }

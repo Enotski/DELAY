@@ -2,6 +2,7 @@
 using DELAY.Core.Application.Abstractions.Services.Boards;
 using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Contracts.Models;
+using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Core.Application.Contracts.Models.Dtos;
 using DELAY.Core.Application.Contracts.Models.Dtos.Base;
 using DELAY.Presentation.RestAPI.Controllers.Base;
@@ -44,13 +45,14 @@ namespace DELAY.Core.Application.Abstractions.Services
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            return Ok(new BoardDto()
-            {
-                Id = Guid.NewGuid(),
-                IsPublic = true,
-                Name = "Board 1",
-                Description = "Description 1"
-            });
+            //return Ok(new BoardDto()
+            //{
+            //    Id = Guid.NewGuid(),
+            //    IsPublic = true,
+            //    Name = "Board 1",
+            //    description = "description 1",
+            //    Users = []
+            //});
             try
             {
                 TryGetUser(out OperationUserInfo user);
@@ -105,7 +107,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                return Ok(new List<KeyNameDto>() { new KeyNameDto(Guid.NewGuid(), "Board primary"), new KeyNameDto(Guid.NewGuid(), "Board lower"), new KeyNameDto(Guid.NewGuid(), "Board middle") });
+                //return Ok(new List<KeyNameDto>() { new KeyNameDto(Guid.NewGuid(), "Board primary"), new KeyNameDto(Guid.NewGuid(), "Board lower"), new KeyNameDto(Guid.NewGuid(), "Board middle") });
 
                 TryGetUser(out OperationUserInfo user);
 
@@ -125,9 +127,8 @@ namespace DELAY.Core.Application.Abstractions.Services
         }
 
         [HttpPost]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //[ProducesResponseType(StatusCodes.Status201Created)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateBoardAsync([FromBody] BoardDto model)
         {
             try

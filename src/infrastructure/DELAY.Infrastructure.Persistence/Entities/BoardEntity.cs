@@ -4,6 +4,10 @@ namespace DELAY.Infrastructure.Persistence.Entities
 {
     public class BoardEntity : KeyNamedEntity
     {
+        public BoardEntity()
+        {
+        }
+
         public string CreatedBy { get; set; }
         public string ChangedBy { get; set; }
         public string Description { get; set; }

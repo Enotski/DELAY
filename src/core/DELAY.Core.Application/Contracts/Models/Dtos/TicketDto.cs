@@ -18,7 +18,6 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
 
         public DateTime DeadLineDate { get; set; }
 
-        public Guid BoardId { get; set; }
         public Guid TicketsListId { get; set; }
 
         public IEnumerable<KeyNameDto> AssignedUsers { get; set; }

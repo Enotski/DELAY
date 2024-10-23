@@ -9,6 +9,10 @@ namespace DELAY.Infrastructure.Persistence.Entities
 {
     public class BoardChatRoomEntity
     {
+        public BoardChatRoomEntity()
+        {
+        }
+
         [Key]
         public Guid BoardId { get; set; }
         public BoardEntity Board { get; set; }

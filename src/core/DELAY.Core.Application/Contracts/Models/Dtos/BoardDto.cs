@@ -4,16 +4,26 @@ using DELAY.Core.Domain.Enums;
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos
 {
-    public class BoardDto : KeyNameDto
+    public class BoardDto
     {
-        public bool IsPublic { get; set; }
-        public string Description { get; set; }
+        public BoardDto()
+        {
+        }
 
-        public IList<BoardUserDto> Users { get; set; }
+        public Guid? Id { get; set; }
+        public string? Name { get; set; }
+        public bool IsPublic { get; set; }
+        public string? Description { get; set; }
+
+        public IList<BoardUserDto>? Users { get; set; }
     }
 
     public class BoardUserDto
     {
+        public BoardUserDto()
+        {
+        }
+
         public KeyNameDto User { get; set; }
         public BoardRoleType UserRole { get; set; }
     }

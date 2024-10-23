@@ -22,11 +22,12 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
         public async Task<Guid> CreateBoardAsync(Board board, CancellationToken cancellationToken = default)
         {
-            return await AddAsync(board, (id, dbContext) => {
+
+            return await AddAsync(board, (entity, dbContext) => {
                 if (board.BoardUsers.Any())
                 {
-                    var entities = board.BoardUsers.Select(x => new BoardUserEntity(id, x.User.Id, x.UserRole));
-
+                    var entities = board.BoardUsers.Select(x => new BoardUserEntity(entity.Id, x.User.Id, x.UserRole));
+                    entity.BoardUsers = null;
                     dbContext.Set<BoardUserEntity>().AddRange(entities);
                 }
             }, cancellationToken);

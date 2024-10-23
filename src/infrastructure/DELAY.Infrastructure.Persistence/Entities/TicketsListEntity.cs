@@ -4,6 +4,10 @@ namespace DELAY.Infrastructure.Persistence.Entities
 {
     public class TicketsListEntity : KeyNamedEntity
     {
+        public TicketsListEntity()
+        {
+        }
+
         public ICollection<TicketEntity> Tickets { get; set; }
 
         public Guid BoardId { get; set; }

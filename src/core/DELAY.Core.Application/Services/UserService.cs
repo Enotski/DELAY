@@ -1,4 +1,5 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
+using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Abstractions.Services.Users;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Models;
@@ -17,11 +18,15 @@ namespace DELAY.Core.Application.Services
 
         protected readonly IUserStorage userStorage;
 
-        public UserService(IUserStorage userStorage, IPasswordHelper passwordHelper)
+        private readonly IModelMapperService modelMapperService;
+
+        public UserService(IUserStorage userStorage, IPasswordHelper passwordHelper, IModelMapperService modelMapperService)
         {
             this._passwordHelper = passwordHelper ?? throw new ArgumentNullException(nameof(IPasswordHelper));
 
             this.userStorage = userStorage ?? throw new ArgumentNullException(nameof(IUserStorage));
+
+            this.modelMapperService = modelMapperService ?? throw new ArgumentNullException(nameof(IModelMapperService));
         }
 
         private async Task<KeyNamedModel> ValidatePermissionToOperation(RoleType roleType, string triggeredByName)
@@ -158,9 +163,11 @@ namespace DELAY.Core.Application.Services
             return await userStorage.GetRecordsAsync(searchOptions, sortOptions, pagination);
         }
 
-        public async Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids)
+        public async Task<IEnumerable<KeyNameDto>> GetKeyNameRecordsAsync(OperationUserInfo triggeredBy)
         {
-            return await userStorage.GetKeyNameRecordsAsync(ids);
+            var res = await userStorage.GetKeyNameRecordsAsync();
+
+            return modelMapperService.Map<IEnumerable<KeyNameDto>>(res);
         }
 
         public async Task<IReadOnlyList<User>> GetRecordsAsync(IEnumerable<Guid> ids)

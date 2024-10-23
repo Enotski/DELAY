@@ -26,7 +26,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 defaultValue: false);
 
             migrationBuilder.AddColumn<string>(
-                name: "Description",
+                name: "description",
                 table: "Boards",
                 type: "text",
                 nullable: false,
@@ -52,7 +52,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 table: "Tickets");
 
             migrationBuilder.DropColumn(
-                name: "Description",
+                name: "description",
                 table: "Boards");
 
             migrationBuilder.DropColumn(

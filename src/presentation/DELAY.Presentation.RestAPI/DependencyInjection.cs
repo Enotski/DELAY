@@ -20,7 +20,11 @@ namespace DELAY.Presentation.RestAPI
             services.AddHttpClient();
             services.AddCors();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson();
+                //.AddJsonOptions(options => {
+                //    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                //});
             services.AddEndpointsApiExplorer();
 
             services.AddSwagger();

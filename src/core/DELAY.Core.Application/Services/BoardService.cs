@@ -120,7 +120,7 @@ namespace DELAY.Core.Application.Services
         {
             await IsAllowToPerformOperationAsync(BoardRoleType.User, triggeredBy.Id, model.BoardId);
 
-            var entity = await ticketsListStorage.GetRecordAsync(model.TicketsListId);
+            var entity = await ticketsListStorage.GetRecordAsync(model.Id);
             if (entity == null)
                 throw new ArgumentException("Not found");
 
@@ -145,7 +145,7 @@ namespace DELAY.Core.Application.Services
 
             await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, model.BoardId);
 
-            var list = new TicketsList(model.Id, model.BoardId, model.Name);
+            var list = new TicketsList(model.BoardId, model.Name);
 
             if (!list.IsValid())
                 throw new ArgumentException("Invalid list data");
@@ -160,7 +160,7 @@ namespace DELAY.Core.Application.Services
 
             await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, model.BoardId);
 
-            var entity = await ticketsListStorage.GetAsync(model.Id);
+            var entity = await ticketsListStorage.GetAsync(model.Id.Value);
 
             entity.Update(model.Name);
 
@@ -170,14 +170,14 @@ namespace DELAY.Core.Application.Services
             return await ticketsListStorage.UpdateAsync(entity);
         }
 
-        public async Task<int> DeleteTicketsListAsync(Guid id, OperationUserInfo triggeredBy)
+        public async Task<int> DeleteTicketsListAsync(TicketsListRequestDto model, OperationUserInfo triggeredBy)
         {
-            await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, id);
+            await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, model.BoardId);
 
-            return await ticketsListStorage.DeleteAsync(id);
+            return await ticketsListStorage.DeleteAsync(model.Id);
         }
 
-        public async Task<Guid?> CreateTicketAsync(EditTicketRequestDto model, OperationUserInfo triggeredBy)
+        public async Task<Guid?> CreateTicketAsync(TicketDto model, OperationUserInfo triggeredBy)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(TicketDto));
@@ -195,7 +195,7 @@ namespace DELAY.Core.Application.Services
             return await ticketStorage.CreateTicketAsync(ticket);
         }
 
-        public async Task<int> UpdateTicketAsync(EditTicketRequestDto model, OperationUserInfo triggeredBy)
+        public async Task<int> UpdateTicketAsync(TicketDto model, OperationUserInfo triggeredBy)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(TicketDto));
@@ -205,7 +205,7 @@ namespace DELAY.Core.Application.Services
             if (!await ticketsListStorage.IsExistById(model.TicketsListId) || !await boardStorage.IsExistById(model.BoardId))
                 throw new ArgumentException("Tickets list or board not exist");
 
-            var entity = await ticketStorage.GetAsync(model.Id);
+            var entity = await ticketStorage.GetAsync(model.Id.Value);
             if(entity == null)
                 throw new ArgumentException("Ticket is not exist");
 

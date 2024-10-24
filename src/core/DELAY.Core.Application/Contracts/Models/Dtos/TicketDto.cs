@@ -2,12 +2,15 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos
 {
-    public class TicketDto : KeyNameDto
+    public class TicketDto 
     {
         public TicketDto()
         {
         }
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
 
+        public bool IsDone { get; set; }
         public string Description { get; set; }
 
         public DateTime ChangedDate { get; set; }
@@ -17,24 +20,8 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
         public string CreatedBy { get; set; }
 
         public DateTime DeadLineDate { get; set; }
-
-        public Guid TicketsListId { get; set; }
-
-        public IEnumerable<KeyNameDto> AssignedUsers { get; set; }
-    }
-
-    public class EditTicketRequestDto : KeyNameDto
-    {
-        public EditTicketRequestDto()
-        {
-        }
-
-        public bool IsDone { get; set; }
         public Guid BoardId { get; set; }
         public Guid TicketsListId { get; set; }
-        public string Description { get; set; }
-
-        public DateTime DeadLineDate { get; set; }
 
         public IEnumerable<KeyNameDto> Users { get; set; }
     }

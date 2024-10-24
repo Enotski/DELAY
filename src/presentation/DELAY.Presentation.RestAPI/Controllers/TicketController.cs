@@ -118,7 +118,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateTicketAsync([FromBody] EditTicketRequestDto model)
+        public async Task<IActionResult> CreateTicketAsync([FromBody] TicketDto model)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateAsync([FromBody] EditTicketRequestDto model)
+        public async Task<IActionResult> UpdateAsync([FromBody] TicketDto model)
         {
             try
             {
@@ -166,7 +166,7 @@ namespace DELAY.Core.Application.Abstractions.Services
 
                 var result = await boardService.DeleteTicketAsync(id, user);
 
-                return Ok();
+                return Ok(result);
             }
             catch (Exception exp)
             {

@@ -20,7 +20,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         public async Task<TicketsListSelector> GetRecordAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Expression<Func<TicketsListEntity, TicketsListSelector>> selector = x
-                => new TicketsListSelector(x.Id, x.Name, x.Tickets.Select(xx => new KeyNameSelector(xx.Id, xx.Name)));
+                => new TicketsListSelector(x.Id, x.Name, x.BoardId, x.Tickets.Select(xx => new KeyNameSelector(xx.Id, xx.Name)));
 
             var filter = ByKeySearchSpecification(id);
 
@@ -32,7 +32,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         public async Task<IEnumerable<TicketsListSelector>> GetRecordsByBoardAsync(Guid boardId, CancellationToken cancellationToken = default)
         {
             Expression<Func<TicketsListEntity, TicketsListSelector>> selector = x
-                => new TicketsListSelector(x.Id, x.Name, x.Tickets.Select(xx => new KeyNameSelector(xx.Id, xx.Name)));
+                => new TicketsListSelector(x.Id, x.Name, x.BoardId, x.Tickets.Select(xx => new KeyNameSelector(xx.Id, xx.Name)));
 
             Expression<Func<TicketsListEntity, bool>> filter = x
                 => x.BoardId == boardId;

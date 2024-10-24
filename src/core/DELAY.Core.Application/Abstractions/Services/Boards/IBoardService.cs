@@ -40,14 +40,14 @@ namespace DELAY.Core.Application.Abstractions.Services.Boards
         Task<IEnumerable<TicketsListDto>> GetTicketsListByBoardAsync(Guid boardId, OperationUserInfo triggeredBy);
         Task<Guid?> CreateTicketsListAsync(TicketsListDto model, OperationUserInfo triggeredBy);
         Task<int> UpdateTicketsListAsync(TicketsListDto model, OperationUserInfo triggeredBy);
-        Task<int> DeleteTicketsListAsync(Guid id, OperationUserInfo triggeredBy);
+        Task<int> DeleteTicketsListAsync(TicketsListRequestDto model, OperationUserInfo triggeredBy);
 
 
 
         Task<IEnumerable<TicketsListDto>> GetTicketsByUserAsync(OperationUserInfo triggeredBy);
         Task<IEnumerable<KeyNameDto>> GetTicketsByListAsync(TicketsByListRequestDto model, OperationUserInfo triggeredBy);
-        Task<Guid?> CreateTicketAsync(EditTicketRequestDto model, OperationUserInfo triggeredBy);
-        Task<int> UpdateTicketAsync(EditTicketRequestDto model, OperationUserInfo triggeredBy);
+        Task<Guid?> CreateTicketAsync(TicketDto model, OperationUserInfo triggeredBy);
+        Task<int> UpdateTicketAsync(TicketDto model, OperationUserInfo triggeredBy);
         Task<TicketDto> GetTicketAsync(TicketRequestDto model, OperationUserInfo triggeredBy);
         Task<int> DeleteTicketAsync(Guid id, OperationUserInfo triggeredBy);
     }

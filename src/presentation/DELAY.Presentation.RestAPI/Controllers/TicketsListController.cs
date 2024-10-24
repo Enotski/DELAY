@@ -48,7 +48,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetTicketsListAsync(new TicketsListRequestDto() { TicketsListId = id, BoardId = boardId }, user);
+                var model = await boardService.GetTicketsListAsync(new TicketsListRequestDto() { Id = id, BoardId = boardId }, user);
 
                 if (model == null)
                 {
@@ -159,15 +159,15 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteAsync([FromBody] Guid id)
+        public async Task<IActionResult> DeleteAsync([FromBody] TicketsListRequestDto model)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.DeleteTicketsListAsync(id, user);
+                var result = await boardService.DeleteTicketsListAsync(model, user);
 
-                return Ok();
+                return Ok(result);
             }
             catch (Exception exp)
             {

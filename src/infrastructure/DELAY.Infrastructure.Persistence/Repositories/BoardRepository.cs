@@ -35,13 +35,15 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
         public async Task<int> UpdateBoardAsync(Board board, CancellationToken cancellationToken = default)
         {
-            return await UpdateAsync(board, (id, dbContext) => {
+            return await UpdateAsync(board, (entity, dbContext) => {
+                entity.BoardUsers = null;
+
                 var toRemove = dbContext.Set<BoardUserEntity>().Where(x => x.BoardId == board.Id);
                 dbContext.Set<BoardUserEntity>().RemoveRange(toRemove);
 
                 if (board.BoardUsers.Any())
                 {
-                    var toAdd = board.BoardUsers.Select(x => new BoardUserEntity(id, x.User.Id, x.UserRole));
+                    var toAdd = board.BoardUsers.Select(x => new BoardUserEntity(board.Id, x.User.Id, x.UserRole));
                     dbContext.Set<BoardUserEntity>().AddRange(toAdd);
                 }
             }, cancellationToken);

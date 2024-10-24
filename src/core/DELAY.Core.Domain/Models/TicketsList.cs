@@ -8,10 +8,10 @@ namespace DELAY.Core.Domain.Models
         {
         }
 
-        public TicketsList(string name) : base(name)
+        public TicketsList(Guid boardId, string name) : base(name)
         {
+            BoardId = boardId;
         }
-
         public TicketsList(Guid id, Guid boardId, string name) : base(id, name)
         {
             BoardId = boardId;

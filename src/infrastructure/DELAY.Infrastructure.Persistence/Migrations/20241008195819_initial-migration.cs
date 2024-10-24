@@ -193,7 +193,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         name: "FK_Tickets_TicketsLists_TicketListId",
                         column: x => x.TicketListId,
                         principalTable: "TicketsLists",
-                        principalColumn: "TicketsListId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
 

@@ -8,5 +8,7 @@ export interface ITicketDto extends INameDto{
     createDate: string,
     deadLineDate: string,
     ticketListId: string,
-    AssignedUsers: INameDto[]
+    boardId: string,
+    isDone: boolean,
+    users: INameDto[]
 }

@@ -225,7 +225,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("TicketsListId");
+                        .HasColumnName("Id");
 
                     b.Property<Guid>("BoardId")
                         .HasColumnType("uuid");

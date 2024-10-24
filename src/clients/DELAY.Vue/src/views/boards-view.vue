@@ -293,21 +293,23 @@ const currentBoard = ref<INameDto>({
 const confirmModalTitle = ref<string>("");
 const boardsData = ref<INameDto[]>([]);
 const ticketListsData = ref<ITicketsListDto[]>([]);
-const boardFormValue = ref<IBoardDto>({
+const boardFormValueDefault: IBoardDto = {
   id: "",
   name: "",
   description: "",
   isPublic: true,
   users: [],
-});
-const ticketsListFormValue = ref<ITicketsListDto>({
+};
+const ticketsListFormValueDefault: ITicketsListDto = {
   id: "",
   name: "",
   boardId: "",
   tickets: [],
-});
-const ticketFormValue = ref<ITicketDto>({
+};
+const ticketFormValueDefault: ITicketDto = {
   id: "",
+  isDone: false,
+  boardId: "",
   name: "",
   description: "",
   changedBy: "",
@@ -316,9 +318,11 @@ const ticketFormValue = ref<ITicketDto>({
   createDate: "",
   deadLineDate: "",
   ticketListId: "",
-  AssignedUsers: [],
-});
-
+  users: [],
+};
+const boardFormValue = ref<IBoardDto>(boardFormValueDefault);
+const ticketsListFormValue = ref<ITicketsListDto>(ticketsListFormValueDefault);
+const ticketFormValue = ref<ITicketDto>(ticketFormValueDefault);
 const railStyle = ({
   focused,
   checked,
@@ -343,6 +347,8 @@ const railStyle = ({
 
 const rowKey = (row: IBaseDto) => row.id;
 const rowBoardUserKey = (row: IBoardUserDto) => row.user.id;
+
+let rowIdToDelete: string = "";
 
 const pagination = {
   pageSize: 10,
@@ -437,14 +443,20 @@ const allUsersColumns: TableColumn<INameDto>[] = [
   },
 ];
 
+let isEditBoard = false;
+let isEditTicketList = false;
+let isEditTicket = false;
+
 const allUsersData = ref<INameDto[]>([]);
 const showBoardModal = ref(false);
 const showTicketsListModal = ref(false);
 const showTicketModal = ref(false);
 const showConfirmModal = ref(false);
 
-async function addBoard(row: any) {
+async function addBoard() {
+  boardFormValue.value = boardFormValueDefault;
   showBoardModal.value = true;
+  isEditBoard = false;
   await RequestUtils.default
     .sendRequest("users/get-key-name-list", "GET")
     .then(async (response: INameDto[]) => {
@@ -455,9 +467,7 @@ async function addBoard(row: any) {
     .finally(() => {
       console.log("get all user");
     });
-  console.log("addBoard");
 }
-
 function addUserToBoard(row: INameDto) {
   allUsersData.value = allUsersData.value.filter((x) => {
     return x.id != row.id;
@@ -476,47 +486,113 @@ function deleteUserFromBoard(row: IBoardUserDto) {
 
   console.log("deleteUserFromBoard");
 }
-
 async function onSaveBoardModal() {
-  await RequestUtils.default
-    .sendRequest<IBoardDto>("boards", "POST", boardFormValue.value)
-    .then(async (response: INameDto[]) => {
-      if (response != null) {
-        showBoardModal.value = false;
-      }
-    })
-    .finally(() => {
-      console.log("save board");
-    });
+  if (!isEditBoard) {
+    await RequestUtils.default
+      .sendRequest<IBoardDto>("boards", "POST", boardFormValue.value)
+      .then(async (response: string) => {
+        if (response != null && response != "") {
+          showBoardModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("save board");
+      });
+  } else {
+    await RequestUtils.default
+      .sendRequest<IBoardDto>("boards", "PUT", boardFormValue.value)
+      .then(async (response: number) => {
+        if (response > 0) {
+          showBoardModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("save board");
+      });
+  }
 }
 function onCloseBoardModal() {
   showBoardModal.value = false;
   console.log("addTicketsList");
 }
 
-function addTicketsList(row: any) {
+async function addTicketsList() {
   showTicketsListModal.value = true;
-  console.log("addTicketsList");
+  isEditTicketList = false;
+  ticketsListFormValue.value = ticketsListFormValueDefault;
+  ticketsListFormValue.value.boardId = currentBoard.value.id;
 }
-function onSaveTicketsListModal() {
-  showTicketsListModal.value = false;
-  console.log("addTicketsList");
+async function onSaveTicketsListModal() {
+  if (!isEditTicketList) {
+    await RequestUtils.default
+      .sendRequest<ITicketsListDto>(
+        "tickets-lists",
+        "POST",
+        ticketsListFormValue.value
+      )
+      .then(async (response: string) => {
+        if (response != null && response != "") {
+          showTicketsListModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("edit TicketsList");
+      });
+  } else {
+    await RequestUtils.default
+      .sendRequest<ITicketsListDto>(
+        "tickets-lists",
+        "PUT",
+        ticketsListFormValue.value
+      )
+      .then(async (response: number) => {
+        if (response > 0) {
+          showTicketsListModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("add TicketsList");
+      });
+  }
 }
 function onCloseTicketsListModal() {
   showTicketsListModal.value = false;
   console.log("addTicketsList");
 }
 
-function addTicket(row: any) {
+function addTicket() {
   showTicketModal.value = true;
+  isEditTicket = false;
+  ticketFormValue.value = ticketFormValueDefault;
   console.log("addTicket");
 }
-function onSaveTicketModal() {
-  showBoardModal.value = false;
-  console.log("addTicketsList");
+async function onSaveTicketModal() {
+  if (!isEditTicketList) {
+    await RequestUtils.default
+      .sendRequest<ITicketDto>("tickets", "POST", ticketFormValue.value)
+      .then(async (response: string) => {
+        if (response != null && response != "") {
+          showTicketModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("edit Ticket");
+      });
+  } else {
+    await RequestUtils.default
+      .sendRequest<ITicketDto>("tickets", "PUT", ticketFormValue.value)
+      .then(async (response: number) => {
+        if (response > 0) {
+          showTicketModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("add Ticket");
+      });
+  }
 }
 function onCloseTicketModal() {
-  showBoardModal.value = false;
+  showTicketModal.value = false;
   console.log("addTicketsList");
 }
 
@@ -538,6 +614,8 @@ async function boardSelected(row: INameDto) {
 
 async function boardInfo(id: string) {
   showBoardModal.value = true;
+  isEditBoard = true;
+
   await RequestUtils.default
     .sendRequest("boards", "GET", {
       id: id,
@@ -553,36 +631,104 @@ async function boardInfo(id: string) {
   console.log("boardInfo");
 }
 
-function ticketsListInfo(id: string) {
+async function ticketsListInfo(id: string) {
   showTicketsListModal.value = true;
-  console.log("ticketsListInfo");
+  isEditTicketList = true;
+
+  await RequestUtils.default
+    .sendRequest("tickets-lists", "GET", {
+      id: id,
+      boardId: currentBoard.value.id,
+    })
+    .then((res: ITicketsListDto) => {
+      if (res != null) {
+        ticketsListFormValue.value = res;
+      }
+    })
+    .finally(() => {
+      console.log("ticketsListInfo");
+    });
 }
 
-function ticketInfo(id: string) {
+async function ticketInfo(id: string) {
   showTicketModal.value = true;
-  console.log("ticketInfo");
+  isEditTicket = true;
+
+  await RequestUtils.default
+    .sendRequest("tickets", "GET", {
+      id: id,
+    })
+    .then((res: ITicketDto) => {
+      if (res != null) {
+        ticketFormValue.value = res;
+      }
+    })
+    .finally(() => {
+      console.log("ticketInfo");
+    });
 }
 
-function onPositiveClick() {
-  showConfirmModal.value = false;
+async function onPositiveClick() {
+  if (confirmModalTitle.value == "Delete board") {
+    await RequestUtils.default
+      .sendRequest("boards", "DELETE", rowIdToDelete)
+      .then((res: number) => {
+        if (res != 0) {
+          showConfirmModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("ticketInfo");
+      });
+  } else if (confirmModalTitle.value == "Delete tickets list") {
+    await RequestUtils.default
+      .sendRequest("tickets-lists", "DELETE", {
+        id: rowIdToDelete,
+        boardId: currentBoard.value.id,
+      })
+      .then((res: number) => {
+        if (res != 0) {
+          showConfirmModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("ticketInfo");
+      });
+  } else {
+    await RequestUtils.default
+      .sendRequest("ticket", "DELETE", rowIdToDelete)
+      .then((res: number) => {
+        if (res != 0) {
+          showConfirmModal.value = false;
+        }
+      })
+      .finally(() => {
+        console.log("ticketInfo");
+      });
+  }
   console.log("onPositiveClick");
 }
+
 function onNegativeClick() {
   showConfirmModal.value = false;
+  rowIdToDelete = "";
   console.log("onNegativeClick");
 }
 
 function deleteBoard(id: string) {
+  rowIdToDelete = id;
   confirmModalTitle.value = "Delete board";
   showConfirmModal.value = true;
 }
 
 function deleteTicketsList(id: string) {
+  rowIdToDelete = id;
   confirmModalTitle.value = "Delete tickets list";
   showConfirmModal.value = true;
 }
 
 function deleteTicket(id: string) {
+  rowIdToDelete = id;
   confirmModalTitle.value = "Delete ticket";
   showConfirmModal.value = true;
 }

@@ -127,8 +127,8 @@ namespace DELAY.Core.Application.Abstractions.Services
         }
 
         [HttpPost]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateBoardAsync([FromBody] BoardDto model)
         {
             try
@@ -177,7 +177,7 @@ namespace DELAY.Core.Application.Abstractions.Services
 
                 var result = await boardService.DeleteAsync(id, user);
 
-                return Ok();
+                return Ok(result);
             }
             catch (Exception exp)
             {

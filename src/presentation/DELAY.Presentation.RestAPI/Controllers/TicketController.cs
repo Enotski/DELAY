@@ -146,7 +146,7 @@ namespace DELAY.Core.Application.Abstractions.Services
 
                 var result = await boardService.UpdateTicketAsync(model, user);
 
-                return Ok();
+                return Ok(result);
             }
             catch (Exception exp)
             {
@@ -158,13 +158,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteAsync([FromBody] Guid id)
+        public async Task<IActionResult> DeleteAsync([FromBody] TicketRequestDto model)
         {
             try
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var result = await boardService.DeleteTicketAsync(id, user);
+                var result = await boardService.DeleteTicketAsync(model, user);
 
                 return Ok(result);
             }

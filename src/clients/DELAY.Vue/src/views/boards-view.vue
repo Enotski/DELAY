@@ -56,7 +56,7 @@
             :max-height="300"
             :bordered="true"
             :single-line="false"
-            :columns="allUsersColumns"
+            :columns="allUsersBoardColumns"
             :data="allUsersData"
             :row-key="rowKey"
             :pagination="pagination"
@@ -110,18 +110,64 @@
     @positive-click="onSaveTicketModal"
     @negative-click="onCloseTicketModal"
   >
-    <n-form
-      ref="ticketsListFormRef"
-      inline
-      :model="ticketFormValue"
-      class="row"
-    >
+    <n-form ref="ticketFormRef" inline :model="ticketFormValue" class="row">
       <n-form-item label="Name">
         <n-input
           v-model:value="ticketFormValue.name"
           placeholder="Input Name"
         />
       </n-form-item>
+      <n-form-item>
+        <n-switch
+          v-model:value="ticketFormValue.isDone"
+          :rail-style="isDoneStyle"
+        >
+          <template #unchecked> In progress </template>
+          <template #checked> Done </template>
+        </n-switch>
+      </n-form-item>
+      <div>
+        <n-form-item label="Description">
+          <n-input
+            class="w-100"
+            v-model:value="ticketFormValue.description"
+            placeholder="Input description"
+            type="textarea"
+          />
+        </n-form-item>
+      </div>
+      <div class="d-flex">
+        <n-form-item label="Assigned users">
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            :max-height="300"
+            :bordered="true"
+            :single-line="false"
+            :columns="ticketUsersColumns"
+            :data="ticketFormValue.users"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+          />
+        </n-form-item>
+        <n-form-item label="All users">
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            :max-height="300"
+            :bordered="true"
+            :single-line="false"
+            :columns="allUsersTicketColumns"
+            :data="allUsersData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+          />
+        </n-form-item>
+      </div>
     </n-form>
   </n-modal>
   <div class="d-flex" size="large">
@@ -225,7 +271,7 @@
                           type="info"
                           strong
                           size="small"
-                          @click="ticketInfo(ticket.id)"
+                          @click="ticketInfo(ticket.id, item.id)"
                           >Info</n-button
                         >
                         <n-button
@@ -243,7 +289,12 @@
                 </div>
               </n-scrollbar>
             </n-list>
-            <n-button type="success" class="mt-3" ghost @click="addTicket">
+            <n-button
+              type="success"
+              class="mt-3"
+              ghost
+              @click="addTicket(item.id)"
+            >
               <template #icon>
                 <n-icon><plus-ico /></n-icon>
               </template>
@@ -272,6 +323,7 @@ import {
   NModal,
   NForm,
   NFormItem,
+  NDatePicker,
   NSelect,
 } from "naive-ui";
 import type { TableColumn } from "naive-ui/es/data-table/src/interface";
@@ -289,40 +341,38 @@ const currentBoard = ref<INameDto>({
   id: "",
   name: "",
 });
+const currentTicketList = ref<string>("");
 
 const confirmModalTitle = ref<string>("");
 const boardsData = ref<INameDto[]>([]);
 const ticketListsData = ref<ITicketsListDto[]>([]);
-const boardFormValueDefault: IBoardDto = {
+const boardFormValue = ref<IBoardDto>({
   id: "",
   name: "",
   description: "",
   isPublic: true,
   users: [],
-};
-const ticketsListFormValueDefault: ITicketsListDto = {
+});
+const ticketsListFormValue = ref<ITicketsListDto>({
   id: "",
   name: "",
   boardId: "",
   tickets: [],
-};
-const ticketFormValueDefault: ITicketDto = {
+});
+const ticketFormValue = ref<ITicketDto>({
   id: "",
-  isDone: false,
-  boardId: "",
   name: "",
+  isDone: false,
   description: "",
   changedBy: "",
   createdBy: "",
-  dateChange: "",
+  changedDate: "",
   createDate: "",
-  deadLineDate: "",
+  boardId: "",
   ticketListId: "",
   users: [],
-};
-const boardFormValue = ref<IBoardDto>(boardFormValueDefault);
-const ticketsListFormValue = ref<ITicketsListDto>(ticketsListFormValueDefault);
-const ticketFormValue = ref<ITicketDto>(ticketFormValueDefault);
+});
+const ticketDeadLineDate = ref<number>();
 const railStyle = ({
   focused,
   checked,
@@ -344,6 +394,27 @@ const railStyle = ({
   }
   return style;
 };
+const isDoneStyle = ({
+  focused,
+  checked,
+}: {
+  focused: boolean;
+  checked: boolean;
+}) => {
+  const style: CSSProperties = {};
+  if (checked) {
+    style.background = "#2080f0";
+    if (focused) {
+      style.boxShadow = "0 0 0 2px #2080f040";
+    }
+  } else {
+    style.background = "#f5770a";
+    if (focused) {
+      style.boxShadow = "0 0 0 2px #f5770a";
+    }
+  }
+  return style;
+};
 
 const rowKey = (row: IBaseDto) => row.id;
 const rowBoardUserKey = (row: IBoardUserDto) => row.user.id;
@@ -355,16 +426,7 @@ const pagination = {
 };
 
 onMounted(async () => {
-  await RequestUtils.default
-    .sendRequest("boards/by-user", "GET")
-    .then(async (response: IBoardDto[]) => {
-      if (response != null) {
-        boardsData.value = response;
-      }
-    })
-    .finally(() => {
-      console.log("get boards by user");
-    });
+  await updateBoardsList();
 });
 
 const userBoardRoleOpetions = [
@@ -418,7 +480,30 @@ const boardUsersColumns: TableColumn<IBoardUserDto>[] = [
     },
   },
 ];
-const allUsersColumns: TableColumn<INameDto>[] = [
+const ticketUsersColumns: TableColumn<INameDto>[] = [
+  {
+    title: "Name",
+    key: "name",
+  },
+  {
+    width: 80,
+    key: "delete",
+    render(row) {
+      return h(
+        NButton,
+        {
+          ghost: true,
+          type: "error",
+          strong: true,
+          size: "small",
+          onClick: () => deleteUserFromTicket(row),
+        },
+        { default: () => "Delete" }
+      );
+    },
+  },
+];
+const allUsersBoardColumns: TableColumn<INameDto>[] = [
   {
     title: "Name",
     key: "name",
@@ -443,6 +528,31 @@ const allUsersColumns: TableColumn<INameDto>[] = [
   },
 ];
 
+const allUsersTicketColumns: TableColumn<INameDto>[] = [
+  {
+    title: "Name",
+    key: "name",
+  },
+  {
+    title: "",
+    key: "success",
+    width: 68,
+    render(row) {
+      return h(
+        NButton,
+        {
+          ghost: true,
+          type: "success",
+          strong: true,
+          size: "small",
+          onClick: () => addUserToTicket(row),
+        },
+        { default: () => "Add" }
+      );
+    },
+  },
+];
+
 let isEditBoard = false;
 let isEditTicketList = false;
 let isEditTicket = false;
@@ -454,7 +564,13 @@ const showTicketModal = ref(false);
 const showConfirmModal = ref(false);
 
 async function addBoard() {
-  boardFormValue.value = boardFormValueDefault;
+  boardFormValue.value = {
+    id: "",
+    name: "",
+    description: "",
+    isPublic: true,
+    users: [],
+  };
   showBoardModal.value = true;
   isEditBoard = false;
   await RequestUtils.default
@@ -477,6 +593,16 @@ function addUserToBoard(row: INameDto) {
 
   console.log("addUserToBoard");
 }
+
+function addUserToTicket(row: INameDto) {
+  allUsersData.value = allUsersData.value.filter((x) => {
+    return x.id != row.id;
+  });
+
+  ticketFormValue.value.users.push(row);
+
+  console.log("addUserToTicket");
+}
 function deleteUserFromBoard(row: IBoardUserDto) {
   boardFormValue.value.users = boardFormValue.value.users.filter((x) => {
     return x.user.id != row.user.id;
@@ -486,6 +612,15 @@ function deleteUserFromBoard(row: IBoardUserDto) {
 
   console.log("deleteUserFromBoard");
 }
+function deleteUserFromTicket(row: INameDto) {
+  ticketFormValue.value.users = ticketFormValue.value.users.filter((x) => {
+    return x.id != row.id;
+  });
+
+  allUsersData.value.push(row);
+
+  console.log("deleteUserFromTicket");
+}
 async function onSaveBoardModal() {
   if (!isEditBoard) {
     await RequestUtils.default
@@ -493,6 +628,7 @@ async function onSaveBoardModal() {
       .then(async (response: string) => {
         if (response != null && response != "") {
           showBoardModal.value = false;
+          await updateBoardsList();
         }
       })
       .finally(() => {
@@ -504,6 +640,7 @@ async function onSaveBoardModal() {
       .then(async (response: number) => {
         if (response > 0) {
           showBoardModal.value = false;
+          await updateBoardsList();
         }
       })
       .finally(() => {
@@ -519,7 +656,12 @@ function onCloseBoardModal() {
 async function addTicketsList() {
   showTicketsListModal.value = true;
   isEditTicketList = false;
-  ticketsListFormValue.value = ticketsListFormValueDefault;
+  ticketsListFormValue.value = {
+    id: "",
+    name: "",
+    boardId: "",
+    tickets: [],
+  };
   ticketsListFormValue.value.boardId = currentBoard.value.id;
 }
 async function onSaveTicketsListModal() {
@@ -533,6 +675,7 @@ async function onSaveTicketsListModal() {
       .then(async (response: string) => {
         if (response != null && response != "") {
           showTicketsListModal.value = false;
+          await updateBoardData();
         }
       })
       .finally(() => {
@@ -548,6 +691,7 @@ async function onSaveTicketsListModal() {
       .then(async (response: number) => {
         if (response > 0) {
           showTicketsListModal.value = false;
+          await updateBoardData();
         }
       })
       .finally(() => {
@@ -560,19 +704,47 @@ function onCloseTicketsListModal() {
   console.log("addTicketsList");
 }
 
-function addTicket() {
+async function addTicket(ticketListId: string) {
   showTicketModal.value = true;
   isEditTicket = false;
-  ticketFormValue.value = ticketFormValueDefault;
+  currentTicketList.value = ticketListId;
+  ticketFormValue.value = {
+    id: "",
+    isDone: false,
+    boardId: "",
+    name: "",
+    description: "",
+    changedBy: "",
+    createdBy: "",
+    changedDate: "",
+    createDate: "",
+    ticketListId: ticketListId,
+    users: [],
+  };
+  ticketFormValue.value.boardId = currentBoard.value.id;
+  ticketFormValue.value.ticketListId = ticketListId;
+  await RequestUtils.default
+    .sendRequest("users/get-key-name-list", "GET")
+    .then(async (response: INameDto[]) => {
+      if (response != null) {
+        allUsersData.value = response;
+      }
+    })
+    .finally(() => {
+      console.log("get all user");
+    });
   console.log("addTicket");
 }
 async function onSaveTicketModal() {
-  if (!isEditTicketList) {
+  ticketFormValue.value.boardId = currentBoard.value.id;
+  ticketFormValue.value.ticketListId = currentTicketList.value;
+  if (!isEditTicket) {
     await RequestUtils.default
       .sendRequest<ITicketDto>("tickets", "POST", ticketFormValue.value)
       .then(async (response: string) => {
         if (response != null && response != "") {
           showTicketModal.value = false;
+          await updateBoardData();
         }
       })
       .finally(() => {
@@ -584,6 +756,7 @@ async function onSaveTicketModal() {
       .then(async (response: number) => {
         if (response > 0) {
           showTicketModal.value = false;
+          await updateBoardData();
         }
       })
       .finally(() => {
@@ -598,6 +771,20 @@ function onCloseTicketModal() {
 
 async function boardSelected(row: INameDto) {
   currentBoard.value = row;
+  await RequestUtils.default
+    .sendRequest("tickets-lists/by-board", "GET", {
+      boardId: currentBoard.value.id,
+    })
+    .then((res: ITicketsListDto[]) => {
+      if (res != null) {
+        ticketListsData.value = res;
+      }
+    })
+    .finally(() => {
+      console.log("get tickets list by board");
+    });
+}
+async function updateBoardData() {
   await RequestUtils.default
     .sendRequest("tickets-lists/by-board", "GET", {
       boardId: currentBoard.value.id,
@@ -650,13 +837,14 @@ async function ticketsListInfo(id: string) {
     });
 }
 
-async function ticketInfo(id: string) {
+async function ticketInfo(id: string, ticketListId: string) {
   showTicketModal.value = true;
   isEditTicket = true;
-
+  currentTicketList.value = ticketListId;
   await RequestUtils.default
     .sendRequest("tickets", "GET", {
       id: id,
+      boardId: currentBoard.value.id,
     })
     .then((res: ITicketDto) => {
       if (res != null) {
@@ -667,14 +855,31 @@ async function ticketInfo(id: string) {
       console.log("ticketInfo");
     });
 }
-
+async function updateBoardsList() {
+  boardsData.value = [];
+  await RequestUtils.default
+    .sendRequest("boards/by-user", "GET")
+    .then((response: IBoardDto[]) => {
+      if (response != null) {
+        boardsData.value = response;
+      }
+    })
+    .finally(() => {
+      console.log("get boards by user");
+    });
+}
 async function onPositiveClick() {
   if (confirmModalTitle.value == "Delete board") {
     await RequestUtils.default
       .sendRequest("boards", "DELETE", rowIdToDelete)
-      .then((res: number) => {
+      .then(async (res: number) => {
         if (res != 0) {
           showConfirmModal.value = false;
+          if (currentBoard.value.id == rowIdToDelete) {
+            currentBoard.value = { id: "", name: "" };
+            ticketListsData.value = [];
+            await updateBoardsList();
+          }
         }
       })
       .finally(() => {
@@ -686,9 +891,10 @@ async function onPositiveClick() {
         id: rowIdToDelete,
         boardId: currentBoard.value.id,
       })
-      .then((res: number) => {
+      .then(async (res: number) => {
         if (res != 0) {
           showConfirmModal.value = false;
+          await updateBoardData();
         }
       })
       .finally(() => {
@@ -696,10 +902,14 @@ async function onPositiveClick() {
       });
   } else {
     await RequestUtils.default
-      .sendRequest("ticket", "DELETE", rowIdToDelete)
-      .then((res: number) => {
+      .sendRequest("tickets", "DELETE", {
+        id: rowIdToDelete,
+        boardId: currentBoard.value.id,
+      })
+      .then(async (res: number) => {
         if (res != 0) {
           showConfirmModal.value = false;
+          await updateBoardData();
         }
       })
       .finally(() => {

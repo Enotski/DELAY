@@ -45,14 +45,6 @@ namespace DELAY.Core.Application.Abstractions.Services
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            //return Ok(new BoardDto()
-            //{
-            //    Id = Guid.NewGuid(),
-            //    IsPublic = true,
-            //    Name = "Board 1",
-            //    description = "description 1",
-            //    Users = []
-            //});
             try
             {
                 TryGetUser(out OperationUserInfo user);
@@ -107,8 +99,6 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                //return Ok(new List<KeyNameDto>() { new KeyNameDto(Guid.NewGuid(), "Board primary"), new KeyNameDto(Guid.NewGuid(), "Board lower"), new KeyNameDto(Guid.NewGuid(), "Board middle") });
-
                 TryGetUser(out OperationUserInfo user);
 
                 var model = await boardService.GetBoardByUserAsync(user.Id);
@@ -157,7 +147,7 @@ namespace DELAY.Core.Application.Abstractions.Services
 
                 var result = await boardService.UpdateBoardAsync(model, user);
 
-                return Ok();
+                return Ok(result);
             }
             catch (Exception exp)
             {

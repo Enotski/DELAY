@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DELAY.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class initialmigration : Migration
+    public partial class ticketupdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,8 +18,10 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     BoardId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: false),
                     ChangedBy = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
                     ChangeDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsPublic = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -45,7 +47,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: true),
                     PhoneNumber = table.Column<string>(type: "text", nullable: true),
                     Password = table.Column<string>(type: "text", nullable: true),
@@ -178,6 +180,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     TicketId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDone = table.Column<bool>(type: "boolean", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     ChangedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -193,7 +196,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         name: "FK_Tickets_TicketsLists_TicketListId",
                         column: x => x.TicketListId,
                         principalTable: "TicketsLists",
-                        principalColumn: "Id",
+                        principalColumn: "TicketsListId",
                         onDelete: ReferentialAction.SetNull);
                 });
 

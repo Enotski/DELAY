@@ -184,13 +184,13 @@ namespace DELAY.Core.Application.Services
 
             await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, model.BoardId);
 
-            if(!await ticketsListStorage.IsExistById(model.TicketsListId) || !await boardStorage.IsExistById(model.BoardId))
+            if(!await ticketsListStorage.IsExistById(model.TicketListId) || !await boardStorage.IsExistById(model.BoardId))
                 throw new ArgumentException("Tickets list or board not exist");
 
-            var ticket = new Ticket(new KeyNamedModel(model.TicketsListId, ""), model.Name, model.Description, triggeredBy.Name, mapperService.Map<IEnumerable<KeyNamedModel>>(model.Users));
+            var ticket = new Ticket(model.TicketListId, model.Name, model.Description, triggeredBy.Name, mapperService.Map<IEnumerable<KeyNamedModel>>(model.Users));
 
             if (!ticket.IsValid())
-                throw new ArgumentException("Invalid list data");
+               throw new ArgumentException("Invalid list data");
 
             return await ticketStorage.CreateTicketAsync(ticket);
         }
@@ -202,7 +202,7 @@ namespace DELAY.Core.Application.Services
 
             await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, model.BoardId);
 
-            if (!await ticketsListStorage.IsExistById(model.TicketsListId) || !await boardStorage.IsExistById(model.BoardId))
+            if (!await ticketsListStorage.IsExistById(model.TicketListId) || !await boardStorage.IsExistById(model.BoardId))
                 throw new ArgumentException("Tickets list or board not exist");
 
             var entity = await ticketStorage.GetAsync(model.Id.Value);
@@ -221,7 +221,7 @@ namespace DELAY.Core.Application.Services
         {
             await IsAllowToPerformOperationAsync(BoardRoleType.User, triggeredBy.Id, model.BoardId);
 
-            var entity = await ticketsListStorage.GetRecordAsync(model.Id);
+            var entity = await ticketStorage.GetRecordAsync(model.Id);
             if (entity == null)
                 throw new ArgumentException("Not found");
 
@@ -250,11 +250,11 @@ namespace DELAY.Core.Application.Services
             return mapperService.Map<IEnumerable<TicketsListDto>>(entities);
         }
 
-        public async Task<int> DeleteTicketAsync(Guid id, OperationUserInfo triggeredBy)
+        public async Task<int> DeleteTicketAsync(TicketRequestDto model, OperationUserInfo triggeredBy)
         {
-            await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, id);
+            await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, model.BoardId);
 
-            return await ticketStorage.DeleteAsync(id);
+            return await ticketStorage.DeleteAsync(model.Id);
         }
     }
 }

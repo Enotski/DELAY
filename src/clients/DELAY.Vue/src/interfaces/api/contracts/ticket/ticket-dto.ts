@@ -1,14 +1,15 @@
 import { type INameDto } from '../base/name-dto';
 
 export interface ITicketDto extends INameDto{
+    id: string,
+    name: string,
+    isDone: boolean,
     description: string,
+    changedDate: string,
+    createDate: string,
     changedBy: string,
     createdBy: string,
-    dateChange: string,
-    createDate: string,
-    deadLineDate: string,
-    ticketListId: string,
     boardId: string,
-    isDone: boolean,
-    users: INameDto[]
+    ticketListId: string,
+    users: INameDto[],
 }

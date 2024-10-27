@@ -23,7 +23,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
                 if (ticket.Users.Any())
                 {
                     var entities = ticket.Users.Select(x => new TicketUserEntity(entity.Id, x.Id));
-
+                    entity.Users = null;
                     dbContext.Set<TicketUserEntity>().AddRange(entities);
                 }
             }, cancellationToken);
@@ -31,14 +31,14 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
         public async Task<int> UpdateTicketAsync(Ticket ticket, CancellationToken cancellationToken = default)
         {
-            return await UpdateAsync(ticket, (id, dbContext) => {
+            return await UpdateAsync(ticket, (entity, dbContext) => {
                 var toRemove = dbContext.Set<TicketUserEntity>().Where(x => x.TicketId == ticket.Id);
                 dbContext.Set<TicketUserEntity>().RemoveRange(toRemove);
 
                 if (ticket.Users.Any())
                 {
                     var entities = ticket.Users.Select(x => new TicketUserEntity(ticket.Id, x.Id));
-
+                    entity.Users = null;
                     dbContext.Set<TicketUserEntity>().AddRange(entities);
                 }
             }, cancellationToken);
@@ -60,7 +60,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         public async Task<TicketSelector> GetRecordAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Expression<Func<TicketEntity, TicketSelector>> selector = x
-                => new TicketSelector(x.Id, x.Name, x.IsDone, x.Description, x.ChangedDate, x.CreateDate, x.ChangedBy, x.CreatedBy, x.DeadlineDate,
+                => new TicketSelector(x.Id, x.Name, x.IsDone, x.Description, x.ChangedDate, x.CreateDate, x.ChangedBy, x.CreatedBy,
                 x.Users.Select(xx => new KeyNameSelector(xx.UserId, xx.User.Name)));
 
             var filter = ByKeySearchSpecification(id);

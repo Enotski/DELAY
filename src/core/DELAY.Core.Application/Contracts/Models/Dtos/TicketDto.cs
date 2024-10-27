@@ -13,15 +13,14 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
         public bool IsDone { get; set; }
         public string Description { get; set; }
 
-        public DateTime ChangedDate { get; set; }
-        public DateTime CreateDate { get; set; }
+        public DateTime? ChangedDate { get; set; }
+        public DateTime? CreateDate { get; set; }
 
-        public string ChangedBy { get; set; }
-        public string CreatedBy { get; set; }
+        public string? ChangedBy { get; set; }
+        public string? CreatedBy { get; set; }
 
-        public DateTime DeadLineDate { get; set; }
         public Guid BoardId { get; set; }
-        public Guid TicketsListId { get; set; }
+        public Guid TicketListId { get; set; }
 
         public IEnumerable<KeyNameDto> Users { get; set; }
     }

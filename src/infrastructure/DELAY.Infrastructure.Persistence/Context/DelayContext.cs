@@ -43,8 +43,6 @@ namespace DELAY.Infrastructure.Persistence.Context
         {
             builder.ApplyConfigurationsFromAssembly(typeof(DelayContext).Assembly);
 
-            //builder.Seed();
-
             base.OnModelCreating(builder);
         }
 

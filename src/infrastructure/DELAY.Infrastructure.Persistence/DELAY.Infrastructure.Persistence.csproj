@@ -24,8 +24,4 @@
     <ProjectReference Include="..\..\core\DELAY.Core.Application\DELAY.Core.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
 </Project>

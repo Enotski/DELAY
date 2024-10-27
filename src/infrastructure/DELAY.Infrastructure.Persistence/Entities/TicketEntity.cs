@@ -15,11 +15,10 @@ namespace DELAY.Infrastructure.Persistence.Entities
         public bool IsDone { get; set; }
         public string Description { get; set; }
 
-        public DateTime ChangedDate { get; set; }
-        public DateTime DeadlineDate { get; set; }
+        public DateTime? ChangedDate { get; set; }
         public DateTime CreateDate { get; set; }
 
-        public string ChangedBy { get; set; }
+        public string? ChangedBy { get; set; }
         public string CreatedBy { get; set; }
 
         public Guid TicketListId { get; set; }

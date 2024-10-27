@@ -58,14 +58,14 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("description")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -102,7 +102,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Property<int>("ChatType")
                         .HasColumnType("integer");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -168,10 +168,9 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .HasColumnName("TicketId");
 
                     b.Property<string>("ChangedBy")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("ChangedDate")
+                    b.Property<DateTime?>("ChangedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreateDate")
@@ -181,17 +180,14 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("DeadlineDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("description")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDone")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -225,12 +221,12 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("Id");
+                        .HasColumnName("TicketsListId");
 
                     b.Property<Guid>("BoardId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -260,7 +256,8 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Password")

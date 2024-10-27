@@ -49,6 +49,6 @@ namespace DELAY.Core.Application.Abstractions.Services.Boards
         Task<Guid?> CreateTicketAsync(TicketDto model, OperationUserInfo triggeredBy);
         Task<int> UpdateTicketAsync(TicketDto model, OperationUserInfo triggeredBy);
         Task<TicketDto> GetTicketAsync(TicketRequestDto model, OperationUserInfo triggeredBy);
-        Task<int> DeleteTicketAsync(Guid id, OperationUserInfo triggeredBy);
+        Task<int> DeleteTicketAsync(TicketRequestDto model, OperationUserInfo triggeredBy);
     }
 }

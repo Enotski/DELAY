@@ -8,7 +8,6 @@ using DELAY.Core.Application.Contracts.Models.Dtos.Base;
 using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
-using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Application.Services
 {
@@ -29,18 +28,14 @@ namespace DELAY.Core.Application.Services
             this.modelMapperService = modelMapperService ?? throw new ArgumentNullException(nameof(IModelMapperService));
         }
 
-        private async Task<KeyNamedModel> ValidatePermissionToOperation(RoleType roleType, string triggeredByName)
+        protected async Task<bool> IsGlobalAllowToPerformOperationAsync(RoleType roleType, Guid triggeredById)
         {
-            throw new NotImplementedException();
-            //var result = await userStorage.PermissionToPerformOperationAsync(roleType, triggeredByName);
+            if (!await userStorage.IsAllowToPerformOperationAsync(roleType, triggeredById))
+                throw new Exception("No permission for operation");
 
-            //if (result == null)
-            //{
-            //    throw new Exception("No permission for operation");
-            //}
-
-            //return result;
+            return true;
         }
+
         private async Task ValidateUserAsync(User user)
         {
             if (!user.IsValidCredentials(false))
@@ -56,31 +51,48 @@ namespace DELAY.Core.Application.Services
                 throw new ArgumentException("Such phone already exist");
         }
 
-        public async Task<Guid?> AddAsync(User model, string triggeredBy)
+        public async Task<Guid> AddAsync(UserDto model, OperationUserInfo triggeredBy)
         {
             if (model == null)
-                throw new ArgumentNullException(nameof(User));
+                throw new ArgumentNullException(nameof(UserDto));
 
-            if (triggeredBy == null)
-                throw new ArgumentNullException(nameof(triggeredBy));
-
-            var triggered = await ValidatePermissionToOperation(Domain.Enums.RoleType.Admin, triggeredBy);
+            await IsGlobalAllowToPerformOperationAsync(Domain.Enums.RoleType.User, triggeredBy.Id);
 
             model.Password = _passwordHelper.GetHash(model.Password);
 
-            await ValidateUserAsync(model);
+            var user = new User(model.Name, model.Email, model.PhoneNumber, model.Password, triggeredBy.Name);
 
-            var user = new User(model.Name, model.Email, model.PhoneNumber, model.Password, triggered.Name);
+            await ValidateUserAsync(user);
 
             return await userStorage.AddAsync(user);
         }
 
-        public async Task<int> UpdateAsync(User model, string triggeredBy)
+        public async Task<int> UpdateAsync(UserDto model, OperationUserInfo triggeredBy)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(User));
 
-            var triggred = await ValidatePermissionToOperation(RoleType.User, triggeredBy);
+            await IsGlobalAllowToPerformOperationAsync(RoleType.User, triggeredBy.Id);
+
+            var entity = await userStorage.GetAsync(model.Id.Value);
+            if (entity == null)
+                throw new ArgumentException("Not found");
+
+            entity.Update(model.Name, model.Email, model.PhoneNumber, model.Role, triggeredBy.Name);
+
+            await ValidateUserAsync(entity);
+
+            return await userStorage.UpdateAsync(entity);
+        }
+
+        public async Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(model.Password, nameof(model.Password));               
+
+            if (model.Id == Guid.Empty)
+                throw new ArgumentException(nameof(model.Id));
+
+            var triggred = await IsGlobalAllowToPerformOperationAsync(RoleType.User, triggeredBy.Id);
 
             if (triggred == null)
             {
@@ -94,44 +106,16 @@ namespace DELAY.Core.Application.Services
                 throw new Exception("Record not found");
             }
 
-            record.Update(model.Name, model.Email, model.PhoneNumber, record.Role, triggred.Name);
+            record.SetPassword(_passwordHelper.GetHash(model.Password), triggeredBy.Name);
 
             await ValidateUserAsync(record);
 
             return await userStorage.UpdateAsync(record);
         }
 
-        public async Task<int> UpdatePasswordAsync(Guid id, string password, string triggeredBy)
+        public async Task<int> DeleteAsync(Guid id, OperationUserInfo triggeredBy)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(password, nameof(password));               
-
-            if (id == Guid.Empty)
-                throw new ArgumentException(nameof(id));
-
-            var triggred = await ValidatePermissionToOperation(RoleType.User, triggeredBy);
-
-            if (triggred == null)
-            {
-                throw new Exception("No permission for operation");
-            }
-
-            var record = await userStorage.GetAsync(id);
-
-            if (record == null)
-            {
-                throw new Exception("Record not found");
-            }
-
-            record.SetPassword(_passwordHelper.GetHash(password), triggred.Name);
-
-            await ValidateUserAsync(record);
-
-            return await userStorage.UpdateAsync(record);
-        }
-
-        public async Task<int> DeleteAsync(Guid id, string triggeredBy)
-        {
-            var triggred = await ValidatePermissionToOperation(RoleType.Admin, triggeredBy);
+            var triggred = await IsGlobalAllowToPerformOperationAsync(RoleType.Admin, triggeredBy.Id);
 
             if (triggred == null)
             {
@@ -141,9 +125,9 @@ namespace DELAY.Core.Application.Services
             return await userStorage.DeleteAsync(id);
         }
 
-        public async Task<int> DeleteAsync(IEnumerable<Guid> ids, string triggeredBy)
+        public async Task<int> DeleteAsync(IEnumerable<Guid> ids, OperationUserInfo triggeredBy)
         {
-            var triggred = await ValidatePermissionToOperation(RoleType.Admin, triggeredBy);
+            var triggred = await IsGlobalAllowToPerformOperationAsync(RoleType.Admin, triggeredBy.Id);
 
             if (triggred == null)
             {
@@ -153,51 +137,26 @@ namespace DELAY.Core.Application.Services
             return await userStorage.DeleteAsync(ids);
         }
 
-        public async Task<User> GetAsync(Guid id)
+        public async Task<UserDto> GetAsync(Guid id)
         {
-            return await userStorage.GetAsync(id);
+            var res = await userStorage.GetAsync(id);
+
+            return modelMapperService.Map<UserDto>(res);
         }
 
-        public async Task<PagedData<User>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
+        public async Task<PagedData<UserDto>> GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
         {
-            return await userStorage.GetRecordsAsync(searchOptions, sortOptions, pagination);
+            var res = await userStorage.GetRecordsAsync(searchOptions, sortOptions, pagination);
+
+            return new PagedData<UserDto>(res.TotalCount, modelMapperService.Map<IEnumerable<UserDto>>(res.Data));
         }
+
 
         public async Task<IEnumerable<KeyNameDto>> GetKeyNameRecordsAsync(OperationUserInfo triggeredBy)
         {
             var res = await userStorage.GetKeyNameRecordsAsync();
 
             return modelMapperService.Map<IEnumerable<KeyNameDto>>(res);
-        }
-
-        public async Task<IReadOnlyList<User>> GetRecordsAsync(IEnumerable<Guid> ids)
-        {
-            return await userStorage.GetAsync(ids);
-        }
-
-        public async Task<IEnumerable<User>> GetUsersByTicketAsync(Guid ticketId)
-        {
-            return await userStorage.GetAssigedUsersToTicketAsync(ticketId);
-        }
-
-        public async Task<IEnumerable<User>> GetBoardUsersAsync(Guid boardId)
-        {
-            return await userStorage.GetBoardUsersAsync(boardId);
-        }
-
-        public Task<Guid?> AddAsync(EditCreateUserRequestDto model, OperationUserInfo triggeredBy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> UpdateAsync(EditCreateUserRequestDto model, OperationUserInfo triggeredBy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy)
-        {
-            throw new NotImplementedException();
         }
 
         public Task<IEnumerable<UserDto>> GetByTicketAsync(Guid ticketId)
@@ -211,31 +170,6 @@ namespace DELAY.Core.Application.Services
         }
 
         public Task<IEnumerable<UserDto>> GetByChatRoomAsync(Guid boardId)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<PagedData<UserDto>> IUserService.GetRecordsAsync(IEnumerable<SearchOptions> searchOptions, IEnumerable<SortOptions> sortOptions, PaginationOptions pagination)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Guid?> CreateAsync(NameDto model, OperationUserInfo triggeredBy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> DeleteAsync(Guid id, OperationUserInfo triggeredBy)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> DeleteAsync(IEnumerable<Guid> ids, OperationUserInfo triggeredBy)
-        {
-            throw new NotImplementedException();
-        }
-
-        Task<UserDto> IUserService.GetAsync(Guid id)
         {
             throw new NotImplementedException();
         }

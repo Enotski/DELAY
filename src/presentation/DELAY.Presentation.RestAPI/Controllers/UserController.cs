@@ -418,7 +418,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddAsync([FromBody] EditCreateUserRequestDto model)
+        public async Task<IActionResult> AddAsync([FromBody] UserDto model)
         {
             try
             {
@@ -466,7 +466,7 @@ namespace DELAY.Core.Application.Abstractions.Services
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateAsync([FromBody] EditCreateUserRequestDto model)
+        public async Task<IActionResult> UpdateAsync([FromBody] UserDto model)
         {
             try
             {

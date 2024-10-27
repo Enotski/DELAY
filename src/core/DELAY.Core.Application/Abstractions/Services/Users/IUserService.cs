@@ -13,20 +13,18 @@ namespace DELAY.Core.Application.Abstractions.Services.Users
         /// </summary>
         /// <param name="user">User model</param>
         /// <returns></returns>
-        Task<Guid?> AddAsync(EditCreateUserRequestDto model, OperationUserInfo triggeredBy);
+        Task<Guid> AddAsync(UserDto model, OperationUserInfo triggeredBy);
 
         /// <summary>
         /// Update user
         /// </summary>
         /// <param name="user">User updated model</param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EditCreateUserRequestDto model, OperationUserInfo triggeredBy);
-
-        Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy);
+        Task<int> UpdateAsync(UserDto model, OperationUserInfo triggeredBy);
 
         Task<UserDto> GetAsync(Guid id);
         Task<IEnumerable<UserDto>> GetByTicketAsync(Guid ticketId);
-
+        Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy);
         Task<IEnumerable<UserDto>> GetByBoardAsync(Guid boardId);
 
         Task<IEnumerable<UserDto>> GetByChatRoomAsync(Guid boardId);

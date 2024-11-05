@@ -1,7 +1,7 @@
 import axios from "axios";
 
 let accessToken = "";
-const apiUrl = import.meta.env.VITE_API_URI;
+export const apiUrl = import.meta.env.VITE_API_URI;
 let tokensRefreshSuccess:(response: any) => void;
 let tokensRefreshFailed:() => void;
 
@@ -17,6 +17,9 @@ export function setAccessToken(token: string){
 }
 export function clearAccessToken(){
   accessToken = "";
+}
+export function getAccessToken() : string{
+  return accessToken;
 }
 
 export function parseJwt (token: string) {

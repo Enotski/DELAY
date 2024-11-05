@@ -335,7 +335,20 @@ import {
   type IBoardUserDto,
   type INameDto,
 } from "@/interfaces";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalR";
 import type { ITicketsListDto } from "@/interfaces/api/contracts/board/tickets-list-dto";
+
+const hubConnection = new HubConnectionBuilder()
+  .withAutomaticReconnect()
+  .configureLogging(LogLevel.Debug)
+  .withUrl("https://localhost:7259/notifications", {
+    accessTokenFactory: () => RequestUtils.getAccessToken(),
+  })
+  .build();
+
+hubConnection.on("Notify", (message) => {
+  console.log(message);
+});
 
 const currentBoard = ref<INameDto>({
   id: "",
@@ -426,6 +439,15 @@ const pagination = {
 };
 
 onMounted(async () => {
+  hubConnection
+    .start()
+    .then(function () {
+      console.log("Connected!");
+    })
+    .catch(function (err) {
+      return console.error(err.toString());
+    });
+
   await updateBoardsList();
 });
 

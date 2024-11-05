@@ -225,10 +225,10 @@ function renderIcon(icon: Component) {
 }
 
 const currentRouteName: any = computed(() => router.currentRoute.value.name);
-const isAuthorized = ref(false);
-const isDisplaySignBtn = ref(false);
+const isAuthorized = ref<boolean>(false);
+const isDisplaySignBtn = ref<boolean>(false);
 
-const showSignInModal = ref(false);
+const showSignInModal = ref<boolean>(false);
 const radioSignInTypeGroupValue = ref("email");
 const radioSignModalTypeGroupValue = ref("signIn");
 
@@ -436,7 +436,7 @@ function setMenuOptions(endpoints: []) {
           },
           { default: () => element.title }
         ),
-      key: element.route,
+      key: element.path,
       show: isAuthorized.value,
       icon: renderIcon(getRouteItemIcon(element.path)),
     });

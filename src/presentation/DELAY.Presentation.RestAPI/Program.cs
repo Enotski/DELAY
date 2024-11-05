@@ -1,5 +1,6 @@
 using DELAY.Core.Application;
 using DELAY.Infrastructure;
+using DELAY.Presentation.RestAPI.Hubs;
 using Microsoft.AspNetCore.CookiePolicy;
 
 namespace DELAY.Presentation.RestAPI
@@ -52,6 +53,9 @@ namespace DELAY.Presentation.RestAPI
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.MapHub<ChatHub>("/chat");
+            app.MapHub<NotificationHub>("/notifications");
 
             app.Run();
         }

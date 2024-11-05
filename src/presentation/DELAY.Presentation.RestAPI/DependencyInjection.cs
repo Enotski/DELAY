@@ -1,7 +1,9 @@
 ﻿using DELAY.Core.Application.Contracts.Models.Auth;
 using DELAY.Infrastructure.Auth.Services;
 using DELAY.Infrastructure.Security;
+using DELAY.Presentation.RestAPI.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -19,12 +21,12 @@ namespace DELAY.Presentation.RestAPI
         {
             services.AddHttpClient();
             services.AddCors();
+            services.AddSignalR();
+
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
             services.AddControllers()
                 .AddNewtonsoftJson();
-                //.AddJsonOptions(options => {
-                //    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-                //});
             services.AddEndpointsApiExplorer();
 
             services.AddSwagger();

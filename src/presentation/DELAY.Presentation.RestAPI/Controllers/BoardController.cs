@@ -29,20 +29,13 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         private readonly IModelMapperService mapper;
 
-        /// <summary>
-        /// <inheritdoc cref="NotificationHub"/>
-        /// </summary>
-        private readonly IHubContext<NotificationHub, INotificationClient> notificationHub;
-
-        public BoardController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<BoardController> logger, IHubContext<NotificationHub, INotificationClient> notificationHub) : base(tokensService)
+        public BoardController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<BoardController> logger) : base(tokensService)
         {
             this.logger = logger;
 
             this.boardService = userService ?? throw new ArgumentNullException(nameof(IBoardService));
 
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(IModelMapperService));
-
-            this.notificationHub = notificationHub ?? throw new ArgumentNullException(nameof(IHubContext<NotificationHub>));
         }
 
         [HttpGet]
@@ -55,8 +48,6 @@ namespace DELAY.Core.Application.Abstractions.Services
             try
             {
                 TryGetUser(out OperationUserInfo user);
-
-                await notificationHub.Clients.User(user.Id.ToString()).Notify("GetAsync");
 
                 var model = await boardService.GetBoardAsync(id, user);
 
@@ -108,8 +99,6 @@ namespace DELAY.Core.Application.Abstractions.Services
         {
             try
             {
-                notificationHub.Clients.All.Notify("Hello");
-
                 TryGetUser(out OperationUserInfo user);
 
                 var model = await boardService.GetBoardByUserAsync(user.Id);

@@ -43,4 +43,21 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
         public Guid ListId { get; set; }
         public Guid BoardId { get; set; }
     }
+
+    public class UpdateTicketResultDto
+    {
+        public UpdateTicketResultDto(Guid? id, IEnumerable<Guid> ticketUsers, IEnumerable<Guid> removedTicketUsers, IEnumerable<Guid> newTicketUsers, bool success)
+        {
+            Id = id;
+            TicketUsers = ticketUsers;
+            RemovedTicketUsers = removedTicketUsers;
+            NewTicketUsers = newTicketUsers;
+            Success = success;
+        }
+        public Guid? Id { get; set; }
+        public IEnumerable<Guid> TicketUsers { get; set; }
+        public IEnumerable<Guid> RemovedTicketUsers { get; set; }
+        public IEnumerable<Guid> NewTicketUsers { get; set; }
+        public bool Success { get; set; }
+    }
 }

@@ -19,7 +19,8 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
         public async Task<Guid> CreateTicketAsync(Ticket ticket, CancellationToken cancellationToken = default)
         {
-            return await AddAsync(ticket, (entity, dbContext) => {
+            return await AddAsync(ticket, (entity, dbContext) =>
+            {
                 if (ticket.Users.Any())
                 {
                     var entities = ticket.Users.Select(x => new TicketUserEntity(entity.Id, x.Id));
@@ -31,7 +32,8 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
         public async Task<int> UpdateTicketAsync(Ticket ticket, CancellationToken cancellationToken = default)
         {
-            return await UpdateAsync(ticket, (entity, dbContext) => {
+            return await UpdateAsync(ticket, (entity, dbContext) =>
+            {
                 var toRemove = dbContext.Set<TicketUserEntity>().Where(x => x.TicketId == ticket.Id);
                 dbContext.Set<TicketUserEntity>().RemoveRange(toRemove);
 
@@ -79,6 +81,20 @@ namespace DELAY.Infrastructure.Persistence.Repositories
                 => x.Users.Any(xx => xx.UserId == userId);
 
             return await BuildQuery(filter)
+                .Select(selector)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<KeyNameSelector>> GetUsersAsync(Guid ticketId, CancellationToken cancellationToken = default)
+        {
+            Expression<Func<TicketUserEntity, KeyNameSelector>> selector = x
+                => new KeyNameSelector(x.UserId, x.User.Name);
+
+            Expression<Func<TicketUserEntity, bool>> filter = x
+                => x.TicketId == ticketId;
+
+            return await context.Set<TicketUserEntity>()
+                .Where(filter)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
         }

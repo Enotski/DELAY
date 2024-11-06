@@ -177,25 +177,27 @@ namespace DELAY.Core.Application.Services
             return await ticketsListStorage.DeleteAsync(model.Id);
         }
 
-        public async Task<Guid?> CreateTicketAsync(TicketDto model, OperationUserInfo triggeredBy)
+        public async Task<UpdateTicketResultDto> CreateTicketAsync(TicketDto model, OperationUserInfo triggeredBy)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(TicketDto));
 
             await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, model.BoardId);
 
-            if(!await ticketsListStorage.IsExistById(model.TicketListId) || !await boardStorage.IsExistById(model.BoardId))
+            if (!await ticketsListStorage.IsExistById(model.TicketListId) || !await boardStorage.IsExistById(model.BoardId))
                 throw new ArgumentException("Tickets list or board not exist");
 
             var ticket = new Ticket(model.TicketListId, model.Name, model.Description, triggeredBy.Name, mapperService.Map<IEnumerable<KeyNamedModel>>(model.Users));
 
             if (!ticket.IsValid())
-               throw new ArgumentException("Invalid list data");
+                throw new ArgumentException("Invalid list data");
 
-            return await ticketStorage.CreateTicketAsync(ticket);
+            var res = await ticketStorage.CreateTicketAsync(ticket);
+
+            return new UpdateTicketResultDto(res, null, null, model.Users.Select(x => x.Id), true);
         }
 
-        public async Task<int> UpdateTicketAsync(TicketDto model, OperationUserInfo triggeredBy)
+        public async Task<UpdateTicketResultDto> UpdateTicketAsync(TicketDto model, OperationUserInfo triggeredBy)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(TicketDto));
@@ -206,15 +208,23 @@ namespace DELAY.Core.Application.Services
                 throw new ArgumentException("Tickets list or board not exist");
 
             var entity = await ticketStorage.GetAsync(model.Id.Value);
-            if(entity == null)
+            if (entity == null)
                 throw new ArgumentException("Ticket is not exist");
+
+            var oldUsers = (await ticketStorage.GetUsersAsync(model.Id.Value)).Select(x => x.Id);
 
             entity.Update(model.Name, model.Description, model.IsDone, mapperService.Map<IEnumerable<KeyNamedModel>>(model.Users), triggeredBy.Name);
 
             if (!entity.IsValid())
                 throw new ArgumentException("Invalid list data");
 
-            return await ticketStorage.UpdateTicketAsync(entity);
+            var res = await ticketStorage.UpdateTicketAsync(entity);
+
+            var removedUsers = oldUsers.Except(model.Users.Select(x => x.Id));
+            var newUsers = model.Users.Select(x => x.Id).Except(oldUsers);
+            var unchangedUsers = oldUsers.Intersect(model.Users.Select(x => x.Id));
+
+            return new UpdateTicketResultDto(model.Id, unchangedUsers, removedUsers, newUsers, res != 0);
         }
 
         public async Task<TicketDto> GetTicketAsync(TicketRequestDto model, OperationUserInfo triggeredBy)
@@ -250,11 +260,15 @@ namespace DELAY.Core.Application.Services
             return mapperService.Map<IEnumerable<TicketsListDto>>(entities);
         }
 
-        public async Task<int> DeleteTicketAsync(TicketRequestDto model, OperationUserInfo triggeredBy)
+        public async Task<UpdateTicketResultDto> DeleteTicketAsync(TicketRequestDto model, OperationUserInfo triggeredBy)
         {
             await IsAllowToPerformOperationAsync(BoardRoleType.Moderator, triggeredBy.Id, model.BoardId);
 
-            return await ticketStorage.DeleteAsync(model.Id);
+            var users = await ticketStorage.GetUsersAsync(model.Id);
+
+            var res = await ticketStorage.DeleteAsync(model.Id);
+
+            return new UpdateTicketResultDto(model.Id, null, users.Select(x => x.Id), null, res != 0);
         }
     }
 }

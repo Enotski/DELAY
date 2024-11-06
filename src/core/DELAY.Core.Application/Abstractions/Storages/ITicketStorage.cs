@@ -12,5 +12,6 @@ namespace DELAY.Core.Application.Abstractions.Storages
         Task<IEnumerable<KeyNameSelector>> GetRecordsByListAsync(Guid listId, CancellationToken cancellationToken = default);
         Task<TicketSelector> GetRecordAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IEnumerable<KeyNameSelector>> GetRecordsByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<KeyNameSelector>> GetUsersAsync(Guid ticketId, CancellationToken cancellationToken = default);
     }
 }

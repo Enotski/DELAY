@@ -4,7 +4,9 @@ using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos;
 using DELAY.Presentation.RestAPI.Controllers.Base;
+using DELAY.Presentation.RestAPI.Hubs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {
@@ -27,13 +29,20 @@ namespace DELAY.Core.Application.Abstractions.Services
         /// </summary>
         private readonly IModelMapperService mapper;
 
-        public TicketController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<TicketController> logger) : base(tokensService)
+        /// <summary>
+        /// <inheritdoc cref="NotificationHub"/>
+        /// </summary>
+        private readonly IHubContext<NotificationHub, INotificationClient> notificationHub;
+
+        public TicketController(IBoardService userService, IModelMapperService mapper, ITokensService tokensService, ILogger<TicketController> logger, IHubContext<NotificationHub, INotificationClient> notificationHub) : base(tokensService)
         {
             this.logger = logger;
 
             this.boardService = userService ?? throw new ArgumentNullException(nameof(IBoardService));
 
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(IModelMapperService));
+
+            this.notificationHub = notificationHub ?? throw new ArgumentNullException(nameof(IHubContext<NotificationHub>));
         }
 
         [HttpGet]
@@ -125,6 +134,8 @@ namespace DELAY.Core.Application.Abstractions.Services
                 TryGetUser(out OperationUserInfo user);
 
                 var result = await boardService.CreateTicketAsync(model, user);
+                               
+                await notificationHub.Clients.Users(result.NewTicketUsers.Select(x => x.ToString())).Notify($"Ticket {result.Id} was added");
 
                 return Created(result.ToString(), result);
             }
@@ -146,6 +157,10 @@ namespace DELAY.Core.Application.Abstractions.Services
 
                 var result = await boardService.UpdateTicketAsync(model, user);
 
+                await notificationHub.Clients.Users(result.TicketUsers.Select(x => x.ToString())).Notify($"Ticket {result.Id} was updated");
+                await notificationHub.Clients.Users(result.RemovedTicketUsers.Select(x => x.ToString())).Notify($"You was un-assigned from ticket {result.Id}");
+                await notificationHub.Clients.Users(result.NewTicketUsers.Select(x => x.ToString())).Notify($"You was assigned to ticket {result.Id}");
+
                 return Ok(result);
             }
             catch (Exception exp)
@@ -165,6 +180,8 @@ namespace DELAY.Core.Application.Abstractions.Services
                 TryGetUser(out OperationUserInfo user);
 
                 var result = await boardService.DeleteTicketAsync(model, user);
+
+                await notificationHub.Clients.Users(result.RemovedTicketUsers.Select(x => x.ToString())).Notify($"Ticket {result.Id} was removed");
 
                 return Ok(result);
             }

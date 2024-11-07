@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DELAY.Core.Domain.Enums
 {
-    public enum ChatType
+    public enum RoomType
     {
         OneToOne,
         OneToN,

@@ -13,14 +13,14 @@ namespace DELAY.Core.Application.Abstractions.Services.Rooms
         /// </summary>
         /// <param name="room">ChatRoom model</param>
         /// <returns></returns>
-        Task CreateAsync(ChatRoomDto model, OperationUserInfo triggeredBy);
+        Task CreateAsync(RoomDto model, OperationUserInfo triggeredBy);
 
         /// <summary>
         /// Update room
         /// </summary>
         /// <param name="room">ChatRoom updated model</param>
         /// <returns></returns>
-        Task UpdateAsync(ChatRoomDto model, OperationUserInfo triggeredBy);
+        Task UpdateAsync(RoomDto model, OperationUserInfo triggeredBy);
 
         /// <summary>
         /// Get boards assigned to user

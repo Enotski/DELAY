@@ -1,45 +1,119 @@
 <template>
   <n-modal
-    v-model:show="showModal"
+    v-model:show="showConfirmModal"
     preset="dialog"
-    title="Dialog"
+    :title="confirmModalTitle"
     content="Are you sure?"
     positive-text="Confirm"
     negative-text="Cancel"
     @positive-click="onPositiveClick"
     @negative-click="onNegativeClick"
   />
-  <div class="d-flex justify-content-between" size="large">
-    <div class="col me-4 flex-container">
-      <div
-        class="card-border mb-3 me-5 flex-card-content"
-        style="width: inherit; height: max-content"
-      >
-        <n-data-table
-          :style="{
-            height: '100%',
-          }"
-          :max-height="630"
-          style="min-width: 350px"
-          :bordered="true"
-          :single-line="false"
-          :columns="roomsColumns"
-          :data="roomsData"
-          :row-key="rowKey"
-          :pagination="pagination"
-          :remote="true"
-          @update:checked-row-keys="handleCheck"
-        />
-        <n-button type="success" class="mt-3" ghost @click="addRoom">
-          <template #icon>
-            <n-icon><plus-ico /></n-icon>
-          </template>
-        </n-button>
+  <n-modal
+    v-model:show="showRoomModal"
+    class="w-100"
+    preset="dialog"
+    title="Edit room"
+    positive-text="Confirm"
+    negative-text="Cancel"
+    @positive-click="onSaveRoomModal"
+    @negative-click="onCloseRoomModal"
+  >
+    <n-form ref="roomFormRef" inline :model="roomFormValue" class="row">
+      <n-form-item label="Name">
+        <n-input v-model:value="roomFormValue.name" placeholder="Input Name" />
+      </n-form-item>
+      <n-form-item>
+        <n-switch
+          v-model:value="roomFormValue.isPublic"
+          :rail-style="railStyle"
+        >
+          <template #checked> Public </template>
+          <template #unchecked> Private </template>
+        </n-switch>
+      </n-form-item>
+      <div class="d-flex">
+        <n-form-item label="Room users">
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            :max-height="300"
+            :bordered="true"
+            :single-line="false"
+            :columns="roomUsersColumns"
+            :data="roomFormValue.users"
+            :row-key="rowRoomUserKey"
+            :pagination="pagination"
+            :remote="true"
+          />
+        </n-form-item>
+        <n-form-item label="All users">
+          <n-data-table
+            :style="{
+              height: '100%',
+            }"
+            :max-height="300"
+            :bordered="true"
+            :single-line="false"
+            :columns="allUsersColumns"
+            :data="allUsersData"
+            :row-key="rowKey"
+            :pagination="pagination"
+            :remote="true"
+          />
+        </n-form-item>
       </div>
+    </n-form>
+  </n-modal>
+
+  <div class="d-flex" size="large">
+    <div
+      class="card-border mb-3 me-5 flex-card-content"
+      style="width: inherit; height: max-content"
+    >
+      <n-list bordered clickable hoverable>
+        <n-scrollbar style="max-height: 400px; min-width: 350px">
+          <div v-for="(row, index) in roomsList" :key="index">
+            <n-list-item @click="roomSelected(row)">
+              <template #suffix>
+                <n-space horizontal inline class="row-buttons-space">
+                  <n-button
+                    ghost
+                    type="info"
+                    strong
+                    size="small"
+                    @click="roomInfo(row.id)"
+                    >Info</n-button
+                  >
+                  <n-button
+                    ghost
+                    type="error"
+                    strong
+                    size="small"
+                    @click="deleteRoom(row.id)"
+                    >Delete</n-button
+                  >
+                </n-space>
+              </template>
+              <n-thing :description="row.name"> </n-thing>
+            </n-list-item>
+          </div>
+        </n-scrollbar>
+      </n-list>
+      <n-button type="success" class="mt-3" ghost @click="addRoom">
+        <template #icon>
+          <n-icon><plus-ico /></n-icon>
+        </template>
+      </n-button>
     </div>
     <div class="col me-4 flex-container">
       <div class="d-flex flex-column card-border mb-3 flex-stretch">
-        <div class="text-center"><h5>Chat</h5></div>
+        <div class="text-center">
+          <h5>
+            <span class="fw-bold"> {{ currentRoom.name }}</span>
+          </h5>
+        </div>
         <div style="height: 70vh">
           <n-infinite-scroll :distance="10" @load="handleLoad">
             <div
@@ -69,320 +143,94 @@
         </div>
       </div>
     </div>
-    <div class="col card-border flex-container">
-      <div class="mb-4" style="width: inherit; height: max-content">
-        <n-input-group>
-          <n-select
-            v-model:value="selectedUsersValues"
-            multiple
-            filterable
-            placeholder="Search users"
-            :options="usersOptions"
-            :loading="loading"
-            clearable
-            remote
-            :clear-filter-after-select="false"
-            @search="handleUsersSearch"
-          />
-          <n-button type="primary" @click="addUserToRoom">
-            <template #icon>
-              <n-icon><plus-ico /></n-icon>
-            </template>
-          </n-button>
-        </n-input-group>
-      </div>
-      <div class="flex-stretch">
-        <n-data-table
-          :style="{
-            height: '100%',
-          }"
-          max-height="630"
-          :bordered="true"
-          :single-line="false"
-          :columns="roomUsersColumns"
-          :data="roomUsersData"
-          :row-key="rowKey"
-          :pagination="pagination"
-          :remote="true"
-          @update:checked-row-keys="handleCheck"
-        />
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, h, onMounted, computed } from "vue";
-import RequestUtils from "@/utils/request-utils";
+import { ref, h, onMounted, computed, type CSSProperties } from "vue";
+import { RequestUtils } from "@/utils";
 import {
-  NDataTable,
   NButton,
   NInput,
   NInputGroup,
   NIcon,
   NInfiniteScroll,
-  NDivider,
   NModal,
+  NSwitch,
+  NForm,
+  NFormItem,
+  NDataTable,
   NSelect,
+  NList,
+  NScrollbar,
+  NListItem,
+  NSpace,
+  NThing,
 } from "naive-ui";
 import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
 
-import {
-  Remove as plusIco,
-  Add as minusIco,
-  ChatboxOutline as sendIco,
-} from "@vicons/ionicons5";
+import { Add as plusIco, ChatboxOutline as sendIco } from "@vicons/ionicons5";
+import type { IBaseDto, INameDto, IRoomDto, IRoomUserDto } from "@/interfaces";
 
-const roomsData = ref([
-  {
-    id: 110,
-    name: "John Brown",
-  },
-  {
-    id: 111,
-    name: "Jim Green",
-  },
-  {
-    id: 112,
-    name: "Joe Black",
-  },
-  {
-    id: 111,
-    name: "John Brown",
-  },
-  {
-    id: 212,
-    name: "Jim Green",
-  },
-  {
-    id: 313,
-    name: "Joe Black",
-  },
-  {
-    id: 112,
-    name: "John Brown",
-  },
-  {
-    id: 131,
-    name: "Jim Green",
-  },
-  {
-    id: 0,
-    name: "John Brown",
-  },
-  {
-    id: 1,
-    name: "Jim Green",
-  },
-  {
-    id: 2,
-    name: "Joe Black",
-  },
-  {
-    id: 11,
-    name: "John Brown",
-  },
-  {
-    id: 22,
-    name: "Jim Green",
-  },
-  {
-    id: 33,
-    name: "Joe Black",
-  },
-  {
-    id: 12,
-    name: "John Brown",
-  },
-  {
-    id: 31,
-    name: "Jim Green",
-  },
-  {
-    id: 21,
-    name: "Joe Black",
-  },
-  {
-    id: 10,
-    name: "John Brown",
-  },
-  {
-    id: 41,
-    name: "Jim Green",
-  },
-  {
-    id: 92,
-    name: "Joe Black",
-  },
-]);
-
-const roomUsersData = ref([
-  {
-    id: 110,
-    name: "John Brown",
-  },
-  {
-    id: 111,
-    name: "Jim Green",
-  },
-  {
-    id: 112,
-    name: "Joe Black",
-  },
-  {
-    id: 111,
-    name: "John Brown",
-  },
-  {
-    id: 212,
-    name: "Jim Green",
-  },
-  {
-    id: 313,
-    name: "Joe Black",
-  },
-  {
-    id: 112,
-    name: "John Brown",
-  },
-  {
-    id: 131,
-    name: "Jim Green",
-  },
-  {
-    id: 0,
-    name: "John Brown",
-  },
-  {
-    id: 1,
-    name: "Jim Green",
-  },
-  {
-    id: 2,
-    name: "Joe Black",
-  },
-  {
-    id: 11,
-    name: "John Brown",
-  },
-  {
-    id: 22,
-    name: "Jim Green",
-  },
-  {
-    id: 33,
-    name: "Joe Black",
-  },
-  {
-    id: 12,
-    name: "John Brown",
-  },
-  {
-    id: 31,
-    name: "Jim Green",
-  },
-  {
-    id: 21,
-    name: "Joe Black",
-  },
-  {
-    id: 10,
-    name: "John Brown",
-  },
-  {
-    id: 41,
-    name: "Jim Green",
-  },
-  {
-    id: 92,
-    name: "Joe Black",
-  },
-]);
-
-const rowKey = (row: any) => row.id;
-const checkedRowKeysRef = ref([]);
-
-const handleCheck = (rowKeys: any) => {
-  checkedRowKeysRef.value = rowKeys;
-};
-
-const pagination = {
-  pageSize: 10,
-};
-
-const defaultRequestOptions = {
-  searchOptions: [
-    {
-      column: "",
-      value: "",
-    },
-  ],
-  sortOptions: [
-    {
-      column: "",
-      order: 0,
-    },
-  ],
-  paginatedOption: {
-    skip: 0,
-    take: 0,
-  },
-};
-let usersOptions: any[];
-let selectedUsersValues: any[];
-onMounted(async () => {});
-
-// const handleAddClick = async () => {
-//   await sendRequest("users", "POST", formValue.value.form).then(() => {
-//     sendRequest("users/search", "POST", defaultRequestOptions).then((value) => {
-//       data.value = value.records;
-//     });
-//     formValue.value.form = {
-//       name: "",
-//       login: "",
-//       password: "",
-//     };
-//   });
-// };
-
-// const handleRemoveClick = async () => {
-//   await sendRequest("users", "DELETE", checkedRowKeysRef.value).then(
-//     async () => {
-//       await sendRequest("users/search", "POST", defaultRequestOptions).then(
-//         (value) => {
-//           data.value = value.records;
-//         }
-//       );
-//     }
-//   );
-// };
-
-const roomsColumns: TableColumn[] = [
-  {
-    type: "selection",
-  },
+const allUsersColumns: TableColumn<INameDto>[] = [
   {
     title: "Name",
     key: "name",
   },
   {
     title: "",
-    key: "info",
+    key: "success",
     width: 68,
     render(row) {
       return h(
         NButton,
         {
-          type: "info",
+          ghost: true,
+          type: "success",
           strong: true,
           size: "small",
-          onClick: () => roomInfo(row),
+          onClick: () => addUserToRoom(row),
         },
-        { default: () => "Info" }
+        { default: () => "Add" }
       );
+    },
+  },
+];
+
+const userRoomRoleOpetions = [
+  {
+    label: "User",
+    value: "1",
+  },
+  {
+    label: "Moder",
+    value: "2",
+  },
+  {
+    label: "Admin",
+    value: "3",
+  },
+];
+
+const roomUsersColumns: TableColumn<IRoomUserDto>[] = [
+  {
+    title: "Name",
+    key: "user.name",
+  },
+  {
+    title: "Role",
+    key: "userRole",
+    render(row, index) {
+      return h(NSelect, {
+        options: userRoomRoleOpetions,
+        value: row.role,
+        onUpdateValue(v) {
+          roomFormValue.value.users[index].role = v;
+        },
+      });
     },
   },
   {
@@ -392,101 +240,42 @@ const roomsColumns: TableColumn[] = [
       return h(
         NButton,
         {
+          ghost: true,
           type: "error",
           strong: true,
           size: "small",
-          onClick: () => deleteRoom(row),
+          onClick: () => deleteUserFromRoom(row),
         },
         { default: () => "Delete" }
       );
     },
   },
 ];
+const railStyle = ({
+  focused,
+  checked,
+}: {
+  focused: boolean;
+  checked: boolean;
+}) => {
+  const style: CSSProperties = {};
+  if (checked) {
+    style.background = "#f5770a";
+    if (focused) {
+      style.boxShadow = "0 0 0 2px #f5770a";
+    }
+  } else {
+    style.background = "#2080f0";
+    if (focused) {
+      style.boxShadow = "0 0 0 2px #2080f040";
+    }
+  }
+  return style;
+};
 
-const roomUsersColumns: TableColumn[] = [
-  {
-    title: "Users",
-    align: "center",
-    key: "name",
-  },
-  {
-    title: "",
-    key: "info",
-    width: 68,
-    render(row) {
-      return h(
-        NButton,
-        {
-          ghost: true,
-          type: "info",
-          strong: true,
-          size: "small",
-          onClick: () => userInfo(row),
-        },
-        { default: () => "Info" }
-      );
-    },
-  },
-  {
-    width: 80,
-    key: "delete",
-    render(row) {
-      return h(
-        NButton,
-        {
-          type: "error",
-          size: "small",
-          ghost: true,
-          onClick: () => deleteUser(row),
-        },
-        { default: () => "Delete" }
-      );
-    },
-  },
-];
-
-const showModal = ref(false);
-
-function addRoom(row: any) {
-  console.log("addRoom");
-}
-
-function roomInfo(row: any) {
-  showModal.value = true;
-  console.log("roomInfo");
-}
-
-function userInfo(row: any) {
-  showModal.value = true;
-  console.log("userInfo");
-}
-
-function deleteUser(row: any) {
-  showModal.value = true;
-  console.log("deleteUser");
-}
-
-function deleteRoom(row: any) {
-  showModal.value = true;
-  console.log("deleteRoom");
-}
-function sendMesage(row: any) {
-  console.log("sendMesage");
-}
-function addUserToRoom(row: any) {
-  console.log("addUserToRoom");
-}
-function handleUsersSearch(arg: string) {
-  console.log("handleUsersSearch");
-}
-
-function onPositiveClick() {
-  console.log("onPositiveClick");
-}
-function onNegativeClick() {
-  showModal.value = false;
-  console.log("onNegativeClick");
-}
+onMounted(async () => {
+  await updateRoomsList();
+});
 
 const loading = ref(false);
 
@@ -517,6 +306,193 @@ const handleLoad = async () => {
   items.value.push(...[mock(items.value.length), mock(items.value.length + 1)]);
   loading.value = false;
 };
+
+const pagination = {
+  pageSize: 10,
+};
+
+const rowKey = (row: IBaseDto) => row.id;
+const rowRoomUserKey = (row: IRoomUserDto) => row.user.id;
+const allUsersData = ref<INameDto[]>([]);
+const showConfirmModal = ref(false);
+const confirmModalTitle = ref<string>("");
+let rowIdToDelete: string = "";
+let isEditRoom = false;
+const roomsList = ref<INameDto[]>([]);
+const showRoomModal = ref(false);
+const currentRoom = ref<INameDto>({
+  id: "",
+  name: "",
+});
+
+const roomFormValue = ref<IRoomDto>({
+  id: "",
+  name: "",
+  chatType: "0",
+  isPublic: true,
+  boards: [],
+  users: [],
+});
+
+async function addRoom() {
+  roomFormValue.value = {
+    id: "",
+    name: "",
+    chatType: "0",
+    isPublic: true,
+    boards: [],
+    users: [],
+  };
+  showRoomModal.value = true;
+  isEditRoom = false;
+  await RequestUtils.default
+    .sendRequest("users/get-key-name-list", "GET")
+    .then(async (response: INameDto[]) => {
+      if (response != null) {
+        allUsersData.value = response;
+      }
+    })
+    .finally(() => {
+      console.log("get all user");
+    });
+}
+
+function deleteUserFromRoom(row: IRoomUserDto) {
+  roomFormValue.value.users = roomFormValue.value.users.filter((x) => {
+    return x.user.id != row.user.id;
+  });
+
+  allUsersData.value.push(row.user);
+
+  console.log("deleteUserFromRoom");
+}
+function addUserToRoom(row: INameDto) {
+  allUsersData.value = allUsersData.value.filter((x) => {
+    return x.id != row.id;
+  });
+
+  roomFormValue.value.users.push({ user: row, role: "1" });
+
+  console.log("addUserToRoom");
+}
+
+function deleteRoom(id: string) {
+  rowIdToDelete = id;
+  confirmModalTitle.value = "Delete room";
+  showConfirmModal.value = true;
+}
+
+async function roomSelected(row: INameDto) {
+  currentRoom.value = row;
+  await RequestUtils.default
+    .sendRequest("rooms/chat", "GET", {
+      boardId: currentRoom.value.id,
+    })
+    .then((res: any) => {
+      console.log(res);
+    })
+    .finally(() => {
+      console.log("get tickets list by room");
+    });
+}
+
+async function roomInfo(id: string) {
+  showRoomModal.value = true;
+  isEditRoom = true;
+
+  await RequestUtils.default
+    .sendRequest("rooms", "GET", {
+      id: id,
+    })
+    .then((res: IRoomDto) => {
+      if (res != null) {
+        roomFormValue.value = res;
+      }
+    })
+    .finally(() => {
+      console.log("get tickets list by room");
+    });
+  console.log("roomInfo");
+}
+
+function cleatChatWindow() {}
+function sendMesage() {}
+
+async function onPositiveClick() {
+  if (confirmModalTitle.value == "Delete room") {
+    await RequestUtils.default
+      .sendRequest("rooms", "DELETE", rowIdToDelete)
+      .then(async (res: number) => {
+        if (res != 0) {
+          showConfirmModal.value = false;
+          if (currentRoom.value.id == rowIdToDelete) {
+            currentRoom.value = { id: "", name: "" };
+            cleatChatWindow();
+          }
+        }
+      })
+      .finally(() => {
+        console.log("ticketInfo");
+      });
+  }
+  console.log("onPositiveClick");
+}
+
+function onNegativeClick() {
+  showConfirmModal.value = false;
+  rowIdToDelete = "";
+  console.log("onNegativeClick");
+}
+
+async function updateRoomsList() {
+  roomsList.value = [
+    { id: "1", name: "Chat 1" },
+    { id: "2", name: "Chat 2" },
+    { id: "3", name: "Chat 3" },
+  ];
+  await RequestUtils.default
+    .sendRequest("rooms/by-user", "GET")
+    .then((response: IRoomDto[]) => {
+      if (response != null) {
+        roomsList.value = response;
+      }
+    })
+    .finally(() => {
+      console.log("get rooms by user");
+    });
+}
+
+async function onSaveRoomModal() {
+  if (!isEditRoom) {
+    await RequestUtils.default
+      .sendRequest<IRoomDto>("rooms", "POST", roomFormValue.value)
+      .then(async (response: string) => {
+        if (response != null && response != "") {
+          showRoomModal.value = false;
+          await updateRoomsList();
+        }
+      })
+      .finally(() => {
+        console.log("save room");
+      });
+  } else {
+    await RequestUtils.default
+      .sendRequest<IRoomDto>("rooms", "PUT", roomFormValue.value)
+      .then(async (response: number) => {
+        if (response > 0) {
+          showRoomModal.value = false;
+          await updateRoomsList();
+        }
+      })
+      .finally(() => {
+        console.log("save room");
+      });
+  }
+}
+function onCloseRoomModal() {
+  showRoomModal.value = false;
+  console.log("addTicketsList");
+}
 </script>
 
 <style scoped>

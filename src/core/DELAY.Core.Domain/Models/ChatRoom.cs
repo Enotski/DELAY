@@ -20,7 +20,7 @@ namespace DELAY.Core.Domain.Models
             RoomUsers = roomUsers;
         }
 
-        public ChatType ChatType { get; set; }
+        public RoomType ChatType { get; set; }
 
         public IEnumerable<Board> Boards { get; set; }
         public IEnumerable<ChatRoomUser> RoomUsers { get; set; }

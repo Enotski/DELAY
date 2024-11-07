@@ -30,6 +30,11 @@ a,
 .flex-stretch {
   flex-grow: 1;
 }
+
+.row-buttons-space {
+  flex-flow: nowrap !important;
+}
+
 html,
 body {
   height: 100%;

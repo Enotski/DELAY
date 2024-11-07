@@ -13,6 +13,6 @@ namespace DELAY.Infrastructure.Persistence.Entities
         public ICollection<ChatRoomUserEntity> ChatRoomUsers { get; set; } = new List<ChatRoomUserEntity>();
         public ICollection<BoardChatRoomEntity> BoardChatRooms { get; set; } = new List<BoardChatRoomEntity>();
 
-        public ChatType ChatType { get; set; }
+        public RoomType ChatType { get; set; }
     }
 }

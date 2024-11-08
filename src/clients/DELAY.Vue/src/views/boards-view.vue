@@ -385,7 +385,7 @@ const ticketFormValue = ref<ITicketDto>({
   ticketListId: "",
   users: [],
 });
-const ticketDeadLineDate = ref<number>();
+
 const railStyle = ({
   focused,
   checked,

@@ -19,13 +19,14 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
                 builder.Property(p => p.Name).HasMaxLength(128).IsRequired();
             }
         }
+        private const string SuffixToReplace = "Entity";
+
         private static string GetTableName(string modelName)
         {
             return modelName + "s";
         }
 
-        internal abstract class DbKeyModelEntityConfiguration<TEntity>
-            : IEntityTypeConfiguration<TEntity>
+        internal abstract class DbKeyModelEntityConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
             where TEntity : class, IKey
         {
             protected string TableName;
@@ -39,7 +40,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
 
             public virtual void Configure(EntityTypeBuilder<TEntity> builder)
             {
-                IntiTableAndPrimaryKeyNames(typeof(TEntity).Name.Replace("Entity", ""));
+                IntiTableAndPrimaryKeyNames(typeof(TEntity).Name.Replace(SuffixToReplace, ""));
 
                 builder.ToTable(TableName).HasKey(p => p.Id);
 
@@ -47,8 +48,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbTicketEntityConfiguration
-            : DbKeyModelEntityConfiguration<TicketEntity>
+        internal sealed class DbTicketEntityConfiguration : DbKeyModelEntityConfiguration<TicketEntity>
         {
             public override void Configure(EntityTypeBuilder<TicketEntity> builder)
             {
@@ -59,8 +59,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbTicketsListEntityConfiguration
-            : DbKeyModelEntityConfiguration<TicketsListEntity>
+        internal sealed class DbTicketsListEntityConfiguration : DbKeyModelEntityConfiguration<TicketsListEntity>
         {
             public override void Configure(EntityTypeBuilder<TicketsListEntity> builder)
             {
@@ -68,8 +67,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbUserEntityConfiguration
-            : DbKeyModelEntityConfiguration<UserEntity>
+        internal sealed class DbUserEntityConfiguration : DbKeyModelEntityConfiguration<UserEntity>
         {
             public override void Configure(EntityTypeBuilder<UserEntity> builder)
             {
@@ -77,8 +75,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbBoardEntityConfiguration
-            : DbKeyModelEntityConfiguration<BoardEntity>
+        internal sealed class DbBoardEntityConfiguration : DbKeyModelEntityConfiguration<BoardEntity>
         {
             public override void Configure(EntityTypeBuilder<BoardEntity> builder)
             {
@@ -89,8 +86,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbRoomEntityConfiguration
-            : DbKeyModelEntityConfiguration<ChatRoomEntity>
+        internal sealed class DbRoomEntityConfiguration : DbKeyModelEntityConfiguration<ChatRoomEntity>
         {
             public override void Configure(EntityTypeBuilder<ChatRoomEntity> builder)
             {
@@ -98,8 +94,7 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbSessionLogEntityConfiguration
-            : DbKeyModelEntityConfiguration<SessionLogEntity>
+        internal sealed class DbSessionLogEntityConfiguration : DbKeyModelEntityConfiguration<SessionLogEntity>
         {
             public override void Configure(EntityTypeBuilder<SessionLogEntity> builder)
             {
@@ -110,12 +105,11 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbBoardUserEntityConfiguration
-            : IEntityTypeConfiguration<BoardUserEntity>
+        internal sealed class DbBoardUserEntityConfiguration : IEntityTypeConfiguration<BoardUserEntity>
         {
             public void Configure(EntityTypeBuilder<BoardUserEntity> builder)
             {
-                builder.ToTable(GetTableName(typeof(BoardUserEntity).Name.Replace("Entity", "")))
+                builder.ToTable(GetTableName(typeof(BoardUserEntity).Name.Replace(SuffixToReplace, "")))
                                     .HasKey(p => new { p.BoardId, p.UserId });
 
                 builder.HasOne(p => p.User).WithMany(p => p.BoardUsers)
@@ -126,12 +120,11 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbChatRoomUserEntityConfiguration
-            : IEntityTypeConfiguration<ChatRoomUserEntity>
+        internal sealed class DbChatRoomUserEntityConfiguration : IEntityTypeConfiguration<ChatRoomUserEntity>
         {
             public void Configure(EntityTypeBuilder<ChatRoomUserEntity> builder)
             {
-                builder.ToTable(GetTableName(typeof(ChatRoomUserEntity).Name.Replace("Entity", "")))
+                builder.ToTable(GetTableName(typeof(ChatRoomUserEntity).Name.Replace(SuffixToReplace, "")))
                     .HasKey(p => new { p.ChatRoomId, p.UserId });
 
                 builder.HasOne(p => p.User).WithMany(p => p.ChatRoomUsers)
@@ -142,12 +135,11 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbBoardChatRoomEntityConfiguration
-            : IEntityTypeConfiguration<BoardChatRoomEntity>
+        internal sealed class DbBoardChatRoomEntityConfiguration : IEntityTypeConfiguration<BoardChatRoomEntity>
         {
             public void Configure(EntityTypeBuilder<BoardChatRoomEntity> builder)
             {
-                builder.ToTable(GetTableName(typeof(BoardChatRoomEntity).Name.Replace("Entity", "")))
+                builder.ToTable(GetTableName(typeof(BoardChatRoomEntity).Name.Replace(SuffixToReplace, "")))
                     .HasKey(p => new { p.BoardId, p.ChatRoomId });
 
                 builder.HasOne(p => p.Board).WithMany(p => p.BoardChatRooms)
@@ -158,12 +150,23 @@ namespace DELAY.Infrastructure.Persistence.Context.Configuration
             }
         }
 
-        internal sealed class DbTicketUserEntityConfiguration
-    : IEntityTypeConfiguration<TicketUserEntity>
+        internal sealed class DbChatMessageEntityConfiguration : IEntityTypeConfiguration<ChatMessageEntity>
+        {
+            public void Configure(EntityTypeBuilder<ChatMessageEntity> builder)
+            {
+                builder.ToTable(GetTableName(typeof(ChatMessageEntity).Name.Replace(SuffixToReplace, "")))
+                    .HasKey(p => new { p.ChatId, p.Author, p.Time });
+
+                builder.HasOne(p => p.Chat).WithMany(p => p.Messages)
+                    .HasForeignKey(p => p.ChatId).OnDelete(DeleteBehavior.Cascade);
+            }
+        }
+
+        internal sealed class DbTicketUserEntityConfiguration : IEntityTypeConfiguration<TicketUserEntity>
         {
             public void Configure(EntityTypeBuilder<TicketUserEntity> builder)
             {
-                builder.ToTable(GetTableName(typeof(TicketUserEntity).Name.Replace("Entity", "")))
+                builder.ToTable(GetTableName(typeof(TicketUserEntity).Name.Replace(SuffixToReplace, "")))
                     .HasKey(p => new { p.TicketId, p.UserId });
 
                 builder.HasOne(p => p.User).WithMany(p => p.AssignedTickets)

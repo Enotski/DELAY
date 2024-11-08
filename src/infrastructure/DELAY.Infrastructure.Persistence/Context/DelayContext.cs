@@ -17,6 +17,8 @@ namespace DELAY.Infrastructure.Persistence.Context
 
         public DbSet<ChatRoomEntity> Rooms { get; set; }
 
+        public DbSet<ChatMessageEntity> Messages { get; set; }
+
         public DbSet<ChatRoomUserEntity> RoomUsers { get; set; }
 
         public DbSet<UserEntity> Users { get; set; }

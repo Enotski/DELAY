@@ -13,6 +13,12 @@ namespace DELAY.Infrastructure.Persistence.Entities
         {
         }
 
+        public BoardChatRoomEntity(Guid boardId, Guid chatRoomId)
+        {
+            BoardId = boardId;
+            ChatRoomId = chatRoomId;
+        }
+
         [Key]
         public Guid BoardId { get; set; }
         public BoardEntity Board { get; set; }

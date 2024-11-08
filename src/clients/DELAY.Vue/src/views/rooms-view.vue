@@ -9,6 +9,7 @@
     @positive-click="onPositiveClick"
     @negative-click="onNegativeClick"
   />
+
   <n-modal
     v-model:show="showRoomModal"
     class="w-100"
@@ -22,15 +23,6 @@
     <n-form ref="roomFormRef" inline :model="roomFormValue" class="row">
       <n-form-item label="Name">
         <n-input v-model:value="roomFormValue.name" placeholder="Input Name" />
-      </n-form-item>
-      <n-form-item>
-        <n-switch
-          v-model:value="roomFormValue.isPublic"
-          :rail-style="railStyle"
-        >
-          <template #checked> Public </template>
-          <template #unchecked> Private </template>
-        </n-switch>
       </n-form-item>
       <div class="d-flex">
         <n-form-item label="Room users">
@@ -114,26 +106,35 @@
             <span class="fw-bold"> {{ currentRoom.name }}</span>
           </h5>
         </div>
-        <div style="height: 70vh">
-          <n-infinite-scroll :distance="10" @load="handleLoad">
-            <div
-              v-for="(item, index) in items"
-              :key="item.key"
-              class="message"
-              :class="{ reverse: index % 5 === 0 }"
-            >
-              <img class="avatar" :src="item.avatar" alt="" />
-              <span> {{ item.message }} {{ index % 5 === 0 ? "?" : "" }}</span>
-            </div>
-            <div v-if="loading" class="text">Loading...</div>
-            <div v-if="noMore" class="text">No More 🤪</div>
-          </n-infinite-scroll>
+        <div style="height: 60vh">
+          <n-list bordered>
+            <n-scrollbar style="max-height: 400px; min-width: 350px">
+              <div v-for="(item, index) in messagesList" :key="index">
+                <n-list-item>
+                  <div>
+                    <div
+                      v-if="item.author != userStore.user.name"
+                      :title="item.time"
+                    >
+                      <span>{{ item.author }}</span
+                      >:&nbsp;<span style="font-weight: bold">{{
+                        item.text
+                      }}</span>
+                    </div>
+                    <div v-else :title="item.time">
+                      <span style="font-weight: bold">{{ item.text }}</span>
+                    </div>
+                  </div>
+                </n-list-item>
+              </div>
+            </n-scrollbar>
+          </n-list>
         </div>
       </div>
       <div class="mb-4" style="display: contents">
         <div class="card-border" style="width: inherit; height: max-content">
           <n-input-group>
-            <n-input />
+            <n-input v-model:value="message" />
             <n-button type="primary" @click="sendMesage">
               <template #icon>
                 <n-icon><send-ico /></n-icon>
@@ -147,6 +148,7 @@
 </template>
 
 <script setup lang="ts">
+import { useUserStore } from "@/stores/user-store";
 import { ref, h, onMounted, computed, type CSSProperties } from "vue";
 import { RequestUtils } from "@/utils";
 import {
@@ -154,7 +156,6 @@ import {
   NInput,
   NInputGroup,
   NIcon,
-  NInfiniteScroll,
   NModal,
   NSwitch,
   NForm,
@@ -171,9 +172,29 @@ import type {
   RowData,
   TableColumn,
 } from "naive-ui/es/data-table/src/interface";
-
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalR";
 import { Add as plusIco, ChatboxOutline as sendIco } from "@vicons/ionicons5";
-import type { IBaseDto, INameDto, IRoomDto, IRoomUserDto } from "@/interfaces";
+import type {
+  IBaseDto,
+  IMessageDto,
+  INameDto,
+  IRoomDto,
+  IRoomUserDto,
+} from "@/interfaces";
+
+const userStore = useUserStore();
+const hubConnection = new HubConnectionBuilder()
+  .withAutomaticReconnect()
+  .configureLogging(LogLevel.Debug)
+  .withUrl("https://localhost:7259/chat", {
+    accessTokenFactory: () => RequestUtils.getAccessToken(),
+  })
+  .build();
+
+hubConnection.on("NewMessage", (message: IMessageDto) => {
+  messagesList.value.push(message);
+  console.log(message);
+});
 
 const allUsersColumns: TableColumn<INameDto>[] = [
   {
@@ -251,61 +272,21 @@ const roomUsersColumns: TableColumn<IRoomUserDto>[] = [
     },
   },
 ];
-const railStyle = ({
-  focused,
-  checked,
-}: {
-  focused: boolean;
-  checked: boolean;
-}) => {
-  const style: CSSProperties = {};
-  if (checked) {
-    style.background = "#f5770a";
-    if (focused) {
-      style.boxShadow = "0 0 0 2px #f5770a";
-    }
-  } else {
-    style.background = "#2080f0";
-    if (focused) {
-      style.boxShadow = "0 0 0 2px #2080f040";
-    }
-  }
-  return style;
-};
 
 onMounted(async () => {
+  hubConnection
+    .start()
+    .then(function () {
+      console.log("Connected!");
+    })
+    .catch(function (err) {
+      return console.error(err.toString());
+    });
+
   await updateRoomsList();
 });
 
-const loading = ref(false);
-
-const avatars = [
-  "https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg",
-  "https://avatars.githubusercontent.com/u/20943608?s=60&v=4",
-  "https://avatars.githubusercontent.com/u/46394163?s=60&v=4",
-  "https://avatars.githubusercontent.com/u/39197136?s=60&v=4",
-  "https://avatars.githubusercontent.com/u/19239641?s=60&v=4",
-];
-
-const messages = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-
-const mock = (i: number) => ({
-  key: `${i}`,
-  value: i,
-  avatar: avatars[i % avatars.length],
-  message: messages[Math.floor(Math.random() * messages.length)],
-});
-
-const items = ref(Array.from({ length: 10 }, (_, i) => mock(i)));
-const noMore = computed(() => items.value.length > 16);
-
-const handleLoad = async () => {
-  if (loading.value || noMore.value) return;
-  loading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  items.value.push(...[mock(items.value.length), mock(items.value.length + 1)]);
-  loading.value = false;
-};
+const message = ref<string>("");
 
 const pagination = {
   pageSize: 10,
@@ -319,6 +300,7 @@ const confirmModalTitle = ref<string>("");
 let rowIdToDelete: string = "";
 let isEditRoom = false;
 const roomsList = ref<INameDto[]>([]);
+const messagesList = ref<IMessageDto[]>([]);
 const showRoomModal = ref(false);
 const currentRoom = ref<INameDto>({
   id: "",
@@ -329,7 +311,6 @@ const roomFormValue = ref<IRoomDto>({
   id: "",
   name: "",
   chatType: "0",
-  isPublic: true,
   boards: [],
   users: [],
 });
@@ -339,7 +320,6 @@ async function addRoom() {
     id: "",
     name: "",
     chatType: "0",
-    isPublic: true,
     boards: [],
     users: [],
   };
@@ -385,14 +365,14 @@ function deleteRoom(id: string) {
 async function roomSelected(row: INameDto) {
   currentRoom.value = row;
   await RequestUtils.default
-    .sendRequest("rooms/chat", "GET", {
-      boardId: currentRoom.value.id,
+    .sendRequest("chats/messages", "GET", {
+      chatId: currentRoom.value.id,
     })
-    .then((res: any) => {
-      console.log(res);
+    .then((res: IMessageDto[]) => {
+      messagesList.value = res;
     })
     .finally(() => {
-      console.log("get tickets list by room");
+      console.log("get messages list by room");
     });
 }
 
@@ -401,7 +381,7 @@ async function roomInfo(id: string) {
   isEditRoom = true;
 
   await RequestUtils.default
-    .sendRequest("rooms", "GET", {
+    .sendRequest("chats", "GET", {
       id: id,
     })
     .then((res: IRoomDto) => {
@@ -415,19 +395,41 @@ async function roomInfo(id: string) {
   console.log("roomInfo");
 }
 
-function cleatChatWindow() {}
-function sendMesage() {}
+function clearChatWindow() {
+  messagesList.value = [];
+}
+async function sendMesage() {
+  let model: IMessageDto = {
+    isCurrentUserMessage: true,
+    text: message.value,
+    author: "You",
+    time: new Date().toLocaleString("ru-Ru").replace(",", ""),
+    chatId: currentRoom.value.id,
+  };
+  message.value = "";
+
+  hubConnection.invoke<IMessageDto>("PostMessage", model).catch(function (err) {
+    return console.error(err.toString());
+  });
+  // await RequestUtils.default
+  //   .sendRequest("chats/messages", "POST", messObj)
+  //   .then((res: number) => {})
+  //   .finally(() => {
+  //     console.log("get tickets list by room");
+  //   });
+}
 
 async function onPositiveClick() {
   if (confirmModalTitle.value == "Delete room") {
     await RequestUtils.default
-      .sendRequest("rooms", "DELETE", rowIdToDelete)
+      .sendRequest("chats", "DELETE", rowIdToDelete)
       .then(async (res: number) => {
         if (res != 0) {
           showConfirmModal.value = false;
           if (currentRoom.value.id == rowIdToDelete) {
             currentRoom.value = { id: "", name: "" };
-            cleatChatWindow();
+            clearChatWindow();
+            await updateRoomsList();
           }
         }
       })
@@ -445,13 +447,8 @@ function onNegativeClick() {
 }
 
 async function updateRoomsList() {
-  roomsList.value = [
-    { id: "1", name: "Chat 1" },
-    { id: "2", name: "Chat 2" },
-    { id: "3", name: "Chat 3" },
-  ];
   await RequestUtils.default
-    .sendRequest("rooms/by-user", "GET")
+    .sendRequest("chats/by-user", "GET")
     .then((response: IRoomDto[]) => {
       if (response != null) {
         roomsList.value = response;
@@ -465,7 +462,7 @@ async function updateRoomsList() {
 async function onSaveRoomModal() {
   if (!isEditRoom) {
     await RequestUtils.default
-      .sendRequest<IRoomDto>("rooms", "POST", roomFormValue.value)
+      .sendRequest<IRoomDto>("chats", "POST", roomFormValue.value)
       .then(async (response: string) => {
         if (response != null && response != "") {
           showRoomModal.value = false;
@@ -477,7 +474,7 @@ async function onSaveRoomModal() {
       });
   } else {
     await RequestUtils.default
-      .sendRequest<IRoomDto>("rooms", "PUT", roomFormValue.value)
+      .sendRequest<IRoomDto>("chats", "PUT", roomFormValue.value)
       .then(async (response: number) => {
         if (response > 0) {
           showRoomModal.value = false;

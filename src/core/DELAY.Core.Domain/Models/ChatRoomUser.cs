@@ -9,7 +9,14 @@ namespace DELAY.Core.Domain.Models
         {
         }
 
-        public KeyNamedModel Room { get; set; }
+        public ChatRoomUser(KeyNamedModel? room, KeyNamedModel user, ChatRoomRoleType userRole)
+        {
+            Room = room;
+            User = user;
+            UserRole = userRole;
+        }
+
+        public KeyNamedModel? Room { get; set; }
         public KeyNamedModel User { get; set; }
         public ChatRoomRoleType UserRole { get; set; }
     }

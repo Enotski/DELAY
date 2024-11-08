@@ -3,13 +3,13 @@ using DELAY.Core.Domain.Enums;
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos
 {
-    public class RoomDto
+    public class ChatRoomDto
     {
-        public RoomDto()
+        public ChatRoomDto()
         {
         }
 
-        public RoomDto(Guid? id, string name, bool isPublic, RoomType chatType, IEnumerable<KeyNameDto> boards, IEnumerable<RoomUserDto> users)
+        public ChatRoomDto(Guid? id, string name, bool isPublic, RoomType chatType, IEnumerable<KeyNameDto> boards, IEnumerable<RoomUserDto> users)
         {
             Id = id;
             Name = name;
@@ -43,5 +43,27 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
 
         public KeyNameDto User { get; set; }
         public ChatRoomRoleType Role { get; set; }
+    }
+
+    public class ChatMessageDto
+    {
+        public ChatMessageDto()
+        {
+        }
+
+        public ChatMessageDto(Guid chatId, string time, string author, string text, bool isCurrentUserMessage)
+        {
+            ChatId = chatId;
+            Time = time;
+            Author = author;
+            Text = text;
+            IsCurrentUserMessage = isCurrentUserMessage;
+        }
+
+        public Guid ChatId { get; set; }
+        public string Time { get; set; }
+        public string Author { get; set; }
+        public string Text { get; set; }
+        public bool IsCurrentUserMessage {  get; set; } 
     }
 }

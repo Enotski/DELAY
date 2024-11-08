@@ -36,7 +36,7 @@ namespace DELAY.Core.Domain.Models
 
         public void SetUser(Guid userId, string name, BoardRoleType role)
         {
-            BoardUsers.Add(new BoardUser(new KeyNamedModel(userId, name), role));
+            BoardUsers.Add(new BoardUser(null, new KeyNamedModel(userId, name), role));
         }
 
         public bool IsValid()

@@ -102,7 +102,7 @@ namespace DELAY.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("ChatRoomId");
 
-                    b.Property<int>("RoomType")
+                    b.Property<int>("ChatType")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")

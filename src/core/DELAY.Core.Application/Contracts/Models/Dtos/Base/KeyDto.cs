@@ -2,6 +2,9 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos.Base
 {
+    /// <summary>
+    /// Keyied model
+    /// </summary>
     public class KeyDto : IKey
     {
         public KeyDto() { }

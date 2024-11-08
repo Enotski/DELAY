@@ -1,6 +1,5 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Infrastructure.Auth.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DELAY.Infrastructure.Auth
@@ -12,7 +11,7 @@ namespace DELAY.Infrastructure.Auth
             services.AddSingleton<IGoogleAuthService, GoogleAuthService>();
             services.AddSingleton<IVkAuthService, VkAuthService>();
             services.AddSingleton<ITokensService, JwtTokensService>();
-                     
+
             return services;
         }
     }

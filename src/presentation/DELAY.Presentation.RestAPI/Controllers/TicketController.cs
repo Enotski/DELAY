@@ -56,7 +56,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetTicketAsync(new TicketRequestDto() { Id = id, BoardId = boardId}, user);
+                var model = await boardService.GetTicketAsync(new TicketRequestDto() { Id = id, BoardId = boardId }, user);
 
                 if (model == null)
                 {
@@ -82,7 +82,7 @@ namespace DELAY.Core.Application.Abstractions.Services
             {
                 TryGetUser(out OperationUserInfo user);
 
-                var model = await boardService.GetTicketsByListAsync(new TicketsByListRequestDto() { ListId = listId, BoardId = boardId}, user);
+                var model = await boardService.GetTicketsByListAsync(new TicketsByListRequestDto() { ListId = listId, BoardId = boardId }, user);
 
                 if (model == null)
                 {
@@ -134,7 +134,7 @@ namespace DELAY.Core.Application.Abstractions.Services
                 TryGetUser(out OperationUserInfo user);
 
                 var result = await boardService.CreateTicketAsync(model, user);
-                               
+
                 await notificationHub.Clients.Users(result.NewTicketUsers.Select(x => x.ToString())).Notify($"Ticket {result.Id} was added");
 
                 return Created(result.ToString(), result);

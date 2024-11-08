@@ -1,5 +1,4 @@
 ﻿using DELAY.Core.Application.Contracts.Models.Dtos.Base;
-using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
 using DELAY.Core.Domain.Enums;
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos

@@ -1,5 +1,8 @@
 ﻿namespace DELAY.Core.Application.Contracts.Models.Auth
 {
+    /// <summary>
+    /// Tokens? generated after success auth
+    /// </summary>
     public class Tokens
     {
         public Tokens()

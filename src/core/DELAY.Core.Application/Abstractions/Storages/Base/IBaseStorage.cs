@@ -1,6 +1,4 @@
-﻿using DELAY.Core.Domain.Interfaces;
-
-namespace DELAY.Core.Application.Abstractions.Storages.Base
+﻿namespace DELAY.Core.Application.Abstractions.Storages.Base
 {
     /// <summary>
     /// Base storage

@@ -6,7 +6,6 @@ using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Application.Extensions;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
-using DELAY.Core.Domain.Models.Base;
 using DELAY.Infrastructure.Persistence.Builders;
 using DELAY.Infrastructure.Persistence.Context;
 using DELAY.Infrastructure.Persistence.Entities;

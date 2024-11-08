@@ -3,6 +3,9 @@ using DELAY.Core.Domain.Interfaces;
 
 namespace DELAY.Core.Application.Contracts.Models.Auth
 {
+    /// <summary>
+    /// Result of authentication
+    /// </summary>
     public class AuthResult : IName
     {
         public AuthResult(string email, string phone, string name, RoleType role, Tokens tokens)

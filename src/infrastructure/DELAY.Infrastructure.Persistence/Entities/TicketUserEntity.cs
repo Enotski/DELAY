@@ -2,7 +2,7 @@
 
 namespace DELAY.Infrastructure.Persistence.Entities
 {
-    public class TicketUserEntity 
+    public class TicketUserEntity
     {
         public TicketUserEntity()
         {

@@ -87,7 +87,7 @@ namespace DELAY.Core.Application.Services
 
         public async Task<int> UpdatePasswordAsync(UserPasswordRequestDto model, OperationUserInfo triggeredBy)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(model.Password, nameof(model.Password));               
+            ArgumentException.ThrowIfNullOrWhiteSpace(model.Password, nameof(model.Password));
 
             if (model.Id == Guid.Empty)
                 throw new ArgumentException(nameof(model.Id));

@@ -2,6 +2,9 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Auth
 {
+    /// <summary>
+    /// Authentication request of vk api
+    /// </summary>
     public class VkAuthRequest : AuthUserAgentRequest
     {
         public VkAuthRequest()

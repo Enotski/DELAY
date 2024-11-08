@@ -1,7 +1,4 @@
 ﻿using DELAY.Core.Application.Contracts.Models;
-using DELAY.Core.Application.Contracts.Models.Dtos.Base;
-using DELAY.Core.Domain.Interfaces;
-using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {

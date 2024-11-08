@@ -7,7 +7,7 @@ namespace DELAY.Infrastructure.Persistence.Entities
         [Key]
         public Guid ChatId { get; set; }
 
-        public ChatRoomEntity Chat {  get; set; }
+        public ChatRoomEntity Chat { get; set; }
 
         [Key]
         public DateTime Time { get; set; }

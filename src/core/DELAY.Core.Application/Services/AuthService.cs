@@ -139,7 +139,7 @@ namespace DELAY.Core.Application.Services
 
             var cachedRootSession = _cacheService.GetData<RootUserSessionCache>(root.Value);
 
-            if(cachedRootSession != null)
+            if (cachedRootSession != null)
             {
                 cachedRootSession.SessionsKeys = cachedRootSession.SessionsKeys.Where(x => x != refreshToken);
 
@@ -213,11 +213,11 @@ namespace DELAY.Core.Application.Services
 
             if (cachedRootSession == null)
             {
-                cachedRootSession = new RootUserSessionCache([refreshToken]);                
+                cachedRootSession = new RootUserSessionCache([refreshToken]);
             }
             else
             {
-                if(cachedRootSession.SessionsKeys.Count() >= 5)
+                if (cachedRootSession.SessionsKeys.Count() >= 5)
                 {
                     foreach (var key in cachedRootSession.SessionsKeys)
                         _cacheService.RemoveData(key);

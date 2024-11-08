@@ -2,6 +2,7 @@
 
 namespace DELAY.Infrastructure.Caching.Abstractions
 {
-    internal interface IRedisCacheService : ICacheService {
+    internal interface IRedisCacheService : ICacheService
+    {
     }
 }

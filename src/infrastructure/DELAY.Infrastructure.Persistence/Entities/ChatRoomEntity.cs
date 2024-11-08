@@ -1,5 +1,4 @@
 ﻿using DELAY.Core.Domain.Enums;
-using DELAY.Core.Domain.Interfaces;
 using DELAY.Infrastructure.Persistence.Entities.Base;
 
 namespace DELAY.Infrastructure.Persistence.Entities

@@ -1,7 +1,6 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Auth;
 using DELAY.Core.Application.Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System.Security.Claims;
 
@@ -27,7 +26,7 @@ namespace DELAY.Presentation.RestAPI.Controllers.Base
                 var token = tokenValue.FirstOrDefault();
 
                 var claims = _tokensService.GetPrincipal(token, out DateTime validTo)?.Claims;
-                if(claims == null)
+                if (claims == null)
                     return false;
 
                 var id = Guid.Parse(claims.FirstOrDefault(x => x.Type == "ueid").Value);

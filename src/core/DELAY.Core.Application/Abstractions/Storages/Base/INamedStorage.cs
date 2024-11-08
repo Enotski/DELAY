@@ -56,6 +56,11 @@ namespace DELAY.Core.Application.Abstractions.Storages.Base
         /// <returns></returns>
         Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Get all key-name records
+        /// </summary>
+        /// <param name="cancellationToken"><inheritdoc cref="CancellationToken"/></param>
+        /// <returns></returns>
         Task<IReadOnlyList<KeyNamedModel>> GetKeyNameRecordsAsync(CancellationToken cancellationToken = default);
     }
 }

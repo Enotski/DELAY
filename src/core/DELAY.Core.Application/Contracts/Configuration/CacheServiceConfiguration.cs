@@ -1,25 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DELAY.Core.Application.Contracts.Configuration
+﻿namespace DELAY.Core.Application.Contracts.Configuration
 {
+    /// <summary>
+    /// Configurations of caching services
+    /// </summary>
     public class CacheServiceConfiguration
     {
         /// <summary>
-        /// Название раздела.
+        /// Name of section in config
         /// </summary>
         public const string SectionName = nameof(CacheServiceConfiguration);
 
-        public int StorageValueTimeoutMinutes { get; set; }
         /// <summary>
-        /// Вариант кеширования.
+        /// Timeout in minutes
+        /// </summary>
+        public int StorageValueTimeoutMinutes { get; set; }
+
+        /// <summary>
+        /// Cache storage variant
         /// </summary>
         /// <value>Строка.</value>
         public string StorageVariant { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Storage address
+        /// </summary>
         public string StorageURL { get; set; } = string.Empty;
     }
 }

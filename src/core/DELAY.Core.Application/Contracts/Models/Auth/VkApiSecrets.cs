@@ -1,5 +1,8 @@
 ﻿namespace DELAY.Core.Application.Contracts.Models.Auth
 {
+    /// <summary>
+    /// Secrets of vk services
+    /// </summary>
     public class VkApiSecrets
     {
         public const string SectionName = "Authentication:Vk";
@@ -16,7 +19,9 @@
         }
 
         public string ClientSecret { get; set; }
+
         public string ClientId { get; set; }
+
         public string ServiceSecret { get; set; }
     }
 }

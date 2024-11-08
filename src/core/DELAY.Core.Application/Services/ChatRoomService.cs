@@ -109,13 +109,8 @@ namespace DELAY.Core.Application.Services
             var entities = await chatStorage.GetMessagesAsync(chatId);
             if (entities == null)
                 throw new ArgumentException("Not found");
-            
-            var res = mapperService.Map<IEnumerable<ChatMessageDto>>(entities.OrderBy(x => x.Time)).ToList();
 
-            foreach (var entity in res.Where(x => x.Author == triggeredBy.Name))
-            {
-                entity.IsCurrentUserMessage = true;
-            }
+            var res = mapperService.Map<IEnumerable<ChatMessageDto>>(entities.OrderBy(x => x.Time)).ToList();
 
             return res;
         }

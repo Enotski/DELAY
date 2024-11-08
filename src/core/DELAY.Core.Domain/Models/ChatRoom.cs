@@ -1,5 +1,4 @@
 ﻿using DELAY.Core.Domain.Enums;
-using DELAY.Core.Domain.Interfaces;
 using DELAY.Core.Domain.Models.Base;
 
 namespace DELAY.Core.Domain.Models

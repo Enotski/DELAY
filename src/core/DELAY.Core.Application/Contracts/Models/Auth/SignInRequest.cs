@@ -2,6 +2,9 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Auth
 {
+    /// <summary>
+    /// Request of auth
+    /// </summary>
     public class SignInRequest : AuthUserAgentRequest
     {
         public SignInRequest()

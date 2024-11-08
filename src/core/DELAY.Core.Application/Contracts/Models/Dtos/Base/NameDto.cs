@@ -2,6 +2,9 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos.Base
 {
+    /// <summary>
+    /// Named model
+    /// </summary>
     public class NameDto : IName
     {
         public NameDto() : base()

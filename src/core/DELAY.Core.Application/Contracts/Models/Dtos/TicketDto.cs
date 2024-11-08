@@ -2,7 +2,10 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos
 {
-    public class TicketDto 
+    /// <summary>
+    /// Ticket model
+    /// </summary>
+    public class TicketDto
     {
         public TicketDto()
         {
@@ -25,6 +28,9 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
         public IEnumerable<KeyNameDto> Users { get; set; }
     }
 
+    /// <summary>
+    /// Ticket request model
+    /// </summary>
     public class TicketRequestDto : KeyDto
     {
         public TicketRequestDto()
@@ -34,6 +40,9 @@ namespace DELAY.Core.Application.Contracts.Models.Dtos
         public Guid BoardId { get; set; }
     }
 
+    /// <summary>
+    /// Ticket by list
+    /// </summary>
     public class TicketsByListRequestDto
     {
         public TicketsByListRequestDto()

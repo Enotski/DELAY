@@ -28,7 +28,7 @@ namespace DELAY.Core.Application.Contracts.Models
         public string? UserAgent { get; set; }
         public DateTime CreatedTime { get; set; }
         public DateTime ValidTo { get; set; }
-        public AuthProviderType AuthProvider {  get; set; }
+        public AuthProviderType AuthProvider { get; set; }
     }
 
     internal class RootUserSessionCache

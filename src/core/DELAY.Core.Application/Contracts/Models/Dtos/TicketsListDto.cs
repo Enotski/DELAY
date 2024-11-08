@@ -2,7 +2,7 @@
 
 namespace DELAY.Core.Application.Contracts.Models.Dtos
 {
-    public class TicketsListDto 
+    public class TicketsListDto
     {
         public TicketsListDto()
         {

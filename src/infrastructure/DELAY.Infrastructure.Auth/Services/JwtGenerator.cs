@@ -1,10 +1,6 @@
 ﻿using DELAY.Core.Application.Contracts.Models.Auth;
-using DELAY.Core.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
-using System.CodeDom.Compiler;
-using System.Data;
 using System.IdentityModel.Tokens.Jwt;
-using System.Numerics;
 using System.Security.Claims;
 using System.Text;
 

@@ -4,9 +4,7 @@ using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Contracts.Models;
 using DELAY.Core.Application.Contracts.Models.Dtos;
 using DELAY.Presentation.RestAPI.Controllers.Base;
-using DELAY.Presentation.RestAPI.Hubs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace DELAY.Core.Application.Abstractions.Services
 {

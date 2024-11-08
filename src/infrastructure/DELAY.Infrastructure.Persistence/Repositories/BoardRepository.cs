@@ -1,7 +1,7 @@
 ﻿using DELAY.Core.Application.Abstractions.Services.Common;
 using DELAY.Core.Application.Abstractions.Storages;
 using DELAY.Core.Application.Contracts.Models.ModelSelectors;
-using DELAY.Core.Application.Contracts.Models.SelectOptions;
+using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
 using DELAY.Core.Domain.Enums;
 using DELAY.Core.Domain.Models;
 using DELAY.Infrastructure.Persistence.Builders;
@@ -10,7 +10,6 @@ using DELAY.Infrastructure.Persistence.Entities;
 using DELAY.Infrastructure.Persistence.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using DELAY.Core.Application.Contracts.Models.ModelSelectors.Base;
 
 namespace DELAY.Infrastructure.Persistence.Repositories
 {
@@ -23,7 +22,8 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         public async Task<Guid> CreateBoardAsync(Board board, CancellationToken cancellationToken = default)
         {
 
-            return await AddAsync(board, (entity, dbContext) => {
+            return await AddAsync(board, (entity, dbContext) =>
+            {
                 if (board.BoardUsers.Any())
                 {
                     var entities = board.BoardUsers.Select(x => new BoardUserEntity(entity.Id, x.User.Id, x.UserRole));
@@ -35,7 +35,8 @@ namespace DELAY.Infrastructure.Persistence.Repositories
 
         public async Task<int> UpdateBoardAsync(Board board, CancellationToken cancellationToken = default)
         {
-            return await UpdateAsync(board, (entity, dbContext) => {
+            return await UpdateAsync(board, (entity, dbContext) =>
+            {
                 entity.BoardUsers = null;
 
                 var toRemove = dbContext.Set<BoardUserEntity>().Where(x => x.BoardId == board.Id);
@@ -52,7 +53,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
         public async Task<BoardSelector> GetRecordAsync(Guid id, CancellationToken cancellationToken = default)
         {
             Expression<Func<BoardEntity, BoardSelector>> selector = x
-                => new BoardSelector(x.Id, x.Name, x.Description, x.IsPublic, 
+                => new BoardSelector(x.Id, x.Name, x.Description, x.IsPublic,
                 x.BoardUsers.Select(xx => new BoardUserSelector(new KeyNameSelector(xx.UserId, xx.User.Name), xx.UserRole)));
 
             var filter = ByKeySearchSpecification(id);
@@ -67,7 +68,7 @@ namespace DELAY.Infrastructure.Persistence.Repositories
             Expression<Func<BoardEntity, KeyNameSelector>> selector = x
                 => new KeyNameSelector(x.Id, x.Name);
 
-            Expression<Func<BoardEntity, bool>> filter = x 
+            Expression<Func<BoardEntity, bool>> filter = x
                 => x.IsPublic || x.BoardUsers.Any(xx => xx.UserId == userId);
 
             return await BuildQuery(filter)

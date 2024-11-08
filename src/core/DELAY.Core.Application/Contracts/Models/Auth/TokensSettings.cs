@@ -1,33 +1,42 @@
 ﻿namespace DELAY.Core.Application.Contracts.Models.Auth
 {
+    /// <summary>
+    /// Configuration of tokens
+    /// </summary>
     public class TokensSettings
     {
         /// <summary>
-        /// Название раздела
+        /// Section name in config file
         /// </summary>
         public const string SectionName = "TokensSettings";
+
         /// <summary>
-        /// Название схемы
+        /// Scheme
         /// </summary>
         public string SchemeName { get; set; }
+
         /// <summary>
-        /// Приложение, из которого отправляется токен
+        /// Token issuer name
         /// </summary>
         public string Issuer { get; init; } = string.Empty;
+
         /// <summary>
-        /// Потребитель токена
+        /// Token audience name
         /// </summary>
         public string Audience { get; init; } = string.Empty;
+
         /// <summary>
-        /// Секретный ключ
+        /// Token key
         /// </summary>
         public string SecretKey { get; set; } = string.Empty;
+
         /// <summary>
-        /// Идентификатор сведений о минутах истечения срока действия Access токена.
+        /// Expiration access token time
         /// </summary>
         public uint AccessTokenExpirationMinutes { get; init; } = 0;
+
         /// <summary>
-        /// Идентификатор сведений о днях истечения срока действия Refresh токена.
+        /// Expiration refresh token time
         /// </summary>
         public uint RefreshTokenExpirationDays { get; init; } = 0;
 

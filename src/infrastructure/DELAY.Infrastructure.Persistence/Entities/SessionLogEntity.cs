@@ -15,7 +15,7 @@ namespace DELAY.Infrastructure.Persistence.Entities
 
         public Guid UserId { get; set; }
 
-        public string IpAddress {  get; set; }
+        public string IpAddress { get; set; }
 
         public string UserAgent { get; set; }
 

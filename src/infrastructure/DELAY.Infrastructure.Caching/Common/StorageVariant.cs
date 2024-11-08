@@ -1,5 +1,7 @@
-﻿namespace DELAY.Infrastructure.Caching.Common {
-    internal struct StorageVariant {
+﻿namespace DELAY.Infrastructure.Caching.Common
+{
+    internal struct StorageVariant
+    {
         /// <summary>
         /// Кэширование с помощью Memory
         /// </summary>

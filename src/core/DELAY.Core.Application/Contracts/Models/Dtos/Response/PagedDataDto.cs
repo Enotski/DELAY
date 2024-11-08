@@ -1,5 +1,9 @@
 ﻿namespace DELAY.Core.Application.Contracts.Models.Dtos.Response
 {
+    /// <summary>
+    /// Paged data model for table
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class PagedDataDto<T>
     {
         public PagedDataDto()

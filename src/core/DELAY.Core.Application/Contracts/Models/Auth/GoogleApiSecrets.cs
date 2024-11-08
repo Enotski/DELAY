@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DELAY.Core.Application.Contracts.Models.Auth
+﻿namespace DELAY.Core.Application.Contracts.Models.Auth
 {
+    /// <summary>
+    /// Secrets of google api
+    /// </summary>
     public class GoogleApiSecrets
     {
         public const string SectionName = "Authentication:Google";
@@ -21,6 +18,7 @@ namespace DELAY.Core.Application.Contracts.Models.Auth
         }
 
         public string ClientSecret { get; set; }
+
         public string ClientId { get; set; }
     }
 }

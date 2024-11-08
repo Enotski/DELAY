@@ -4,7 +4,6 @@ using DELAY.Core.Application.Contracts.Models.SelectOptions;
 using DELAY.Core.Domain.Interfaces;
 using DELAY.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using Z.EntityFramework.Plus;
 
